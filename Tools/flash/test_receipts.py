@@ -17,7 +17,9 @@ from common import (EvidenceError, FLASH_ROOT, RECEIPT_FORMAT, ROOT, build_sourc
 from gates import validate_checks, validate_python_test_result
 import benchmark
 import build_identity
-from receipts import validate_receipt, validate_receipt_file, validate_selection
+from receipts import (require_terminal_sampling, validate_receipt,
+                      validate_receipt_file, validate_selection)
+from observe import TERMINAL_SAMPLING_POLICY
 
 
 def good_checks():
@@ -63,6 +65,97 @@ class ReceiptTests(unittest.TestCase):
 
     def test_valid_receipt_and_artifact_hashes(self):
         validate_receipt(self.receipt, self.root, require_qualified=True)
+
+    def terminal_receipt(self):
+        live = {"start_abstime": 2, "exit_abstime": 0,
+                "physical_footprint_bytes": 1, "lifetime_peak_bytes": 1,
+                "resident_bytes": 1, "sample_kind": "live", "elapsed_seconds": 0.0}
+        terminal = {"start_abstime": 2, "exit_abstime": 3,
+                    "physical_footprint_bytes": 0, "lifetime_peak_bytes": 2,
+                    "resident_bytes": 0, "sample_kind": "terminal", "elapsed_seconds": 0.1,
+                    "wait_pid": 1, "wait_code": 1, "wait_status": 0, "exit_code": 0}
+        (self.root / "memory.jsonl").write_text(
+            json.dumps(live) + "\n" + json.dumps(terminal) + "\n")
+        receipt = copy.deepcopy(self.receipt)
+        receipt["memory"] = {
+            "target_gb_decimal": 1.0,
+            "sample_interval_seconds": 0.5,
+            "sampling_policy": TERMINAL_SAMPLING_POLICY,
+            "qualified": True,
+            "peak_bytes": 2,
+            "sample_count": 2,
+            "live_sample_count": 1,
+            "terminal_sample_count": 1,
+            "terminal_exit_abstime": 3,
+            "terminal_lifetime_peak_bytes": 2,
+            "samples_artifact": "memory.jsonl",
+            "sampler_error": None,
+        }
+        receipt["artifacts"]["memory.jsonl"] = {
+            "bytes": (self.root / "memory.jsonl").stat().st_size,
+            "sha256": sha256(self.root / "memory.jsonl"),
+        }
+        return receipt, live, terminal
+
+    def rewrite_samples(self, receipt, samples):
+        (self.root / "memory.jsonl").write_text(
+            "".join(json.dumps(sample) + "\n" for sample in samples))
+        receipt["artifacts"]["memory.jsonl"] = {
+            "bytes": (self.root / "memory.jsonl").stat().st_size,
+            "sha256": sha256(self.root / "memory.jsonl"),
+        }
+
+    def test_terminal_sampling_receipt_validates_and_legacy_remains_readable(self):
+        receipt, _, _ = self.terminal_receipt()
+        validate_receipt(receipt, self.root, require_qualified=True)
+        require_terminal_sampling(receipt)
+        with self.assertRaises(EvidenceError):
+            require_terminal_sampling(self.receipt)
+
+    def test_terminal_receipt_rejects_missing_duplicate_and_out_of_order_samples(self):
+        receipt, live, terminal = self.terminal_receipt()
+        self.rewrite_samples(receipt, [live])
+        with self.assertRaises(EvidenceError): validate_receipt(receipt, self.root)
+        receipt, live, terminal = self.terminal_receipt()
+        receipt["memory"]["sample_count"] = 3
+        receipt["memory"]["terminal_sample_count"] = 2
+        self.rewrite_samples(receipt, [live, terminal, terminal])
+        with self.assertRaisesRegex(EvidenceError, "duplicate terminal"):
+            validate_receipt(receipt, self.root)
+        receipt, live, terminal = self.terminal_receipt()
+        self.rewrite_samples(receipt, [terminal, live])
+        with self.assertRaisesRegex(EvidenceError, "follows terminal"):
+            validate_receipt(receipt, self.root)
+
+    def test_terminal_receipt_rejects_zero_forgery_identity_and_over_budget(self):
+        receipt, live, terminal = self.terminal_receipt()
+        terminal["lifetime_peak_bytes"] = 0
+        receipt["memory"]["terminal_lifetime_peak_bytes"] = 0
+        self.rewrite_samples(receipt, [live, terminal])
+        with self.assertRaises(EvidenceError): validate_receipt(receipt, self.root)
+        receipt, live, terminal = self.terminal_receipt()
+        terminal["exit_abstime"] = 1
+        receipt["memory"]["terminal_exit_abstime"] = 1
+        self.rewrite_samples(receipt, [live, terminal])
+        with self.assertRaises(EvidenceError): validate_receipt(receipt, self.root)
+        receipt, _, _ = self.terminal_receipt()
+        receipt["memory"]["target_gb_decimal"] = 1e-9
+        with self.assertRaisesRegex(EvidenceError, "exceeds target"):
+            validate_receipt(receipt, self.root)
+
+    def test_terminal_receipt_rejects_live_zero_and_exit_status_mismatch(self):
+        receipt, live, terminal = self.terminal_receipt()
+        live["physical_footprint_bytes"] = 0
+        self.rewrite_samples(receipt, [live, terminal])
+        with self.assertRaisesRegex(EvidenceError, "live memory"):
+            validate_receipt(receipt, self.root)
+        receipt, _, _ = self.terminal_receipt()
+        receipt["result"]["exit_code"] = 7
+        receipt["result"]["functional_success"] = False
+        receipt["qualified"] = False
+        receipt["qualification_reasons"] = ["child exited 7"]
+        with self.assertRaisesRegex(EvidenceError, "differs from terminal"):
+            validate_receipt(receipt, self.root)
 
     def test_memory_summary_and_sample_types_are_strict(self):
         exceeded = copy.deepcopy(self.receipt); exceeded["memory"]["target_gb_decimal"] = 0.0000000005

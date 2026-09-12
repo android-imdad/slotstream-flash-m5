@@ -19,6 +19,7 @@ from cache_study import (PINNED_REVISION, byte_comparison, decision, derive_sour
 from common import (EvidenceError, FLASH_ROOT, RECEIPT_FORMAT, atomic_json, harness_hashes,
                     sha256)
 from replay import LAYERS, TOP_K, TraceGroup, encode_trace, replay
+from observe import TERMINAL_SAMPLING_POLICY
 
 
 class CacheStudyTests(unittest.TestCase):
@@ -187,9 +188,14 @@ class CacheStudyTests(unittest.TestCase):
         directory.mkdir(parents=True, exist_ok=True)
         (directory / "stdout.txt").write_text("ok")
         (directory / "stderr.txt").write_text("")
-        sample = {"start_abstime": 1, "physical_footprint_bytes": 1,
-                  "lifetime_peak_bytes": 1, "resident_bytes": 1, "elapsed_seconds": 0.0}
-        (directory / "memory.jsonl").write_text(json.dumps(sample) + "\n")
+        live = {"start_abstime": 1, "exit_abstime": 0, "physical_footprint_bytes": 1,
+                "lifetime_peak_bytes": 1, "resident_bytes": 1, "sample_kind": "live",
+                "elapsed_seconds": 0.0}
+        terminal = {"start_abstime": 1, "exit_abstime": 2, "physical_footprint_bytes": 0,
+                    "lifetime_peak_bytes": 1, "resident_bytes": 0, "sample_kind": "terminal",
+                    "elapsed_seconds": 0.1, "wait_pid": 1, "wait_code": 1,
+                    "wait_status": 0, "exit_code": 0}
+        (directory / "memory.jsonl").write_text(json.dumps(live) + "\n" + json.dumps(terminal) + "\n")
         atomic_json(directory / "stats.json", stats)
         atomic_json(directory / "environment.json", environment)
         atomic_json(directory / "settling.json", {"policy": "fixed-before-full-model-launch",
@@ -209,7 +215,10 @@ class CacheStudyTests(unittest.TestCase):
                    "ended_at_unix": 2.0, "duration_seconds": 1.0,
                    "process": {"pid": 1, "process_group": 1, "start_identity": 1},
                    "memory": {"target_gb_decimal": 14, "sample_interval_seconds": 0.5,
-                              "qualified": True, "peak_bytes": 1, "sample_count": 1,
+                              "sampling_policy": TERMINAL_SAMPLING_POLICY,
+                              "qualified": True, "peak_bytes": 1, "sample_count": 2,
+                              "live_sample_count": 1, "terminal_sample_count": 1,
+                              "terminal_exit_abstime": 2, "terminal_lifetime_peak_bytes": 1,
                               "samples_artifact": "memory.jsonl", "sampler_error": None},
                    "vm": {}, "result": {"exit_code": 0, "functional_success": True,
                                          "timed_out": False, "interrupted": False,

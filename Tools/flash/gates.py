@@ -84,7 +84,7 @@ def _flatten(suite):
 def run_python_tests() -> dict[str, Any]:
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    for name in ("test_launcher", "test_receipts", "test_m5_probe", "test_cache_study",
+    for name in ("test_launcher", "test_receipts", "test_observe", "test_m5_probe", "test_cache_study",
                  "test_replay", "test_capture"):
         suite.addTests(loader.loadTestsFromModule(importlib.import_module(name)))
     tests = list(_flatten(suite))
@@ -134,7 +134,7 @@ def stage_zero(output: Path, *, runner: Callable[[list[str]], subprocess.Complet
 
         test_command = [sys.executable, "-m", "unittest", "Tools/flash/test_launcher.py", "Tools/flash/test_receipts.py"]
         test_result = run_python_tests()
-        test_count = validate_python_test_result(test_result, {"LauncherTests", "ReceiptTests"})
+        test_count = validate_python_test_result(test_result, {"LauncherTests", "ReceiptTests", "ObserveTests"})
         commands.append({"argv": test_command, "exit_code": 0, "structured_result": test_result})
         atomic_json(output / "commands.json", {"commands": commands})
 
@@ -202,7 +202,7 @@ def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.Completed
         atomic_json(output / "checks.json", checks)
         test_result = run_python_tests()
         test_count = validate_python_test_result(test_result,
-            {"LauncherTests", "ReceiptTests", "M5ProbeTests", "CacheStudyTests", "ReplayTests", "CaptureTests"})
+            {"LauncherTests", "ReceiptTests", "ObserveTests", "M5ProbeTests", "CacheStudyTests", "ReplayTests", "CaptureTests"})
         commands.append({"argv": [sys.executable, "-m", "unittest", "discover", "-s", "Tools/flash"],
                          "exit_code": 0, "structured_result": test_result})
         atomic_json(output / "commands.json", {"commands": commands})

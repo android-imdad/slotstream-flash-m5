@@ -9,7 +9,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 import benchmark
 from common import EvidenceError, atomic_json, fresh_output, harness_hashes, read_json, sha256, validate_build_identity
-from receipts import validate_receipt_file
+from receipts import require_terminal_sampling, validate_receipt_file
 VOCAB = 248320
 LAYERS = 48
 TOPK = 10
@@ -258,6 +258,7 @@ def _native(binary, model, manifest, split, mode, out, *, require_split=False):
             os.environ['SLOTSTREAM_OPT_RESIDENT_OVERLAP'] = prior
     atomic_json(out / 'settling.json', settle)
     receipt = validate_receipt_file(out / 'receipt.json')
+    require_terminal_sampling(receipt)
     if code or not receipt['result']['functional_success']:
         raise EvidenceError(f'native {mode} capture failed')
     request = validate_manifest(manifest)
@@ -270,6 +271,7 @@ def _ordinary(binary, model, out):
     code = benchmark.launch(out, 14, 900, cmd)
     atomic_json(out / 'settling.json', settle)
     receipt = validate_receipt_file(out / 'receipt.json')
+    require_terminal_sampling(receipt)
     if code or not receipt['result']['functional_success']:
         raise EvidenceError('ordinary parity generation failed')
     return (read_json(out / 'stats.json'), receipt, settle)

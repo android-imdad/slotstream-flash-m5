@@ -17,7 +17,16 @@
     "ended_at_unix": {"type": "number", "minimum": 0},
     "duration_seconds": {"type": "number", "minimum": 0},
     "process": {"type": "object"},
-    "memory": {"type": "object"},
+    "memory": {
+      "type": "object",
+      "properties": {
+        "sampling_policy": {"const": "darwin-rusage-v2-terminal-before-reap"},
+        "live_sample_count": {"type": "integer", "minimum": 0},
+        "terminal_sample_count": {"type": "integer", "minimum": 0, "maximum": 1},
+        "terminal_exit_abstime": {"type": ["integer", "null"], "minimum": 1},
+        "terminal_lifetime_peak_bytes": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
     "vm": {"type": "object"},
     "result": {"type": "object"},
     "artifacts": {"type": "object"},

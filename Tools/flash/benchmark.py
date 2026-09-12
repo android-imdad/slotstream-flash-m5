@@ -20,7 +20,8 @@ sys.path.insert(0, str(ROOT / "Tools"))
 
 from common import (EvidenceError, RECEIPT_FORMAT, atomic_json, copy_verified, fresh_output,
                     harness_hashes, sha256, validate_build_identity)
-from observe import DarwinSampler, SamplingError
+from observe import (DarwinExitObserver, DarwinSampler, ProcessExitedDuringSample,
+                     SamplingError, TERMINAL_SAMPLING_POLICY)
 from prefill_bench import preflight, terminate_child_tree, vm_snapshot
 
 ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MODE",
@@ -73,9 +74,32 @@ def _vm_safe(provider: Callable[[], dict[str, Any]]) -> dict[str, Any]:
         return {"unavailable": f"{type(error).__name__}: {error}"}
 
 
+def _cleanup_owned_child(child: subprocess.Popen[bytes], exit_observer: Any | None) -> int:
+    """Reap an already-exited owned child, otherwise drain its owned tree."""
+    if exit_observer is not None:
+        try:
+            exited = exit_observer.observe()
+        except Exception:
+            exited = None
+        if exited is not None:
+            try:
+                return child.wait(timeout=5)
+            except Exception:
+                pass
+    try:
+        terminate_child_tree(child)
+    except PermissionError:
+        # The root can become an unreaped zombie between WNOHANG and TERM.
+        return child.wait(timeout=5)
+    if child.returncode is None:
+        raise RuntimeError("owned child cleanup did not reap the process")
+    return child.returncode
+
+
 def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str], *,
            run_set_id: str | None = None, model_hash: str | None = None,
            sampler_factory: Callable[[int], Any] = DarwinSampler,
+           exit_observer_factory: Callable[[int], Any] = DarwinExitObserver,
            preflight_func: Callable[[float], dict[str, Any]] = preflight,
            vm_provider: Callable[[], dict[str, Any]] = vm_snapshot,
            clock: Callable[[], float] = time.monotonic,
@@ -93,12 +117,19 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
     started_wall, started = wall_clock(), clock()
     failures: list[str] = []
     sample_count = 0
+    live_sample_count = 0
+    terminal_sample_count = 0
+    terminal_exit_abstime: int | None = None
+    terminal_lifetime_peak: int | None = None
     peak: int | None = None
     child: subprocess.Popen[bytes] | None = None
     process: dict[str, Any] = {"pid": None, "process_group": None, "start_identity": None}
     before = _vm_safe(vm_provider)
     after: dict[str, Any] = {}
     exit_code: int | None = None
+    child_reaped = False
+    exit_observer: Any | None = None
+    lifecycle_evidence_failure = False
     timed_out = interrupted = budget_exceeded = False
     sampler_error: str | None = None
     executable = Path(command[0])
@@ -119,9 +150,64 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
             child = subprocess.Popen(command, cwd=ROOT, stdout=stdout, stderr=stderr, start_new_session=True)
             process.update(pid=child.pid, process_group=child.pid)
             try:
+                exit_observer = exit_observer_factory(child.pid)
                 sampler = sampler_factory(child.pid)
                 process["start_identity"] = sampler.start_identity
                 next_sample = started
+
+                def record_sample(observed: dict[str, Any], kind: str, now: float) -> None:
+                    nonlocal sample_count, live_sample_count, terminal_sample_count
+                    nonlocal peak, terminal_exit_abstime, terminal_lifetime_peak, budget_exceeded
+                    if observed.get("start_abstime") != sampler.start_identity:
+                        raise SamplingError("PID identity changed while sampling")
+                    observed["sample_kind"] = kind
+                    observed["elapsed_seconds"] = now - started
+                    memory_stream.write(json.dumps(observed, sort_keys=True) + "\n")
+                    memory_stream.flush()
+                    sample_count += 1
+                    if kind == "live":
+                        live_sample_count += 1
+                    else:
+                        terminal_sample_count += 1
+                        terminal_exit_abstime = observed["exit_abstime"]
+                        terminal_lifetime_peak = observed["lifetime_peak_bytes"]
+                    observed_peak = max(observed["physical_footprint_bytes"],
+                                        observed["lifetime_peak_bytes"])
+                    peak = observed_peak if peak is None else max(peak, observed_peak)
+                    if observed_peak > memory_gb * 1e9:
+                        budget_exceeded = True
+                        failures.append("memory budget exceeded")
+
+                def finish_exited(exited: dict[str, int], now: float) -> None:
+                    nonlocal exit_code, child_reaped, sampler_error, lifecycle_evidence_failure
+                    terminal = dict(sampler.terminal_sample(exited))
+                    try:
+                        reaped = child.wait(timeout=5)
+                        child_reaped = True
+                    except Exception as error:
+                        lifecycle_evidence_failure = True
+                        atomic_json(output / "rejected-terminal-sample.json", {
+                            "reason": f"reap failed: {type(error).__name__}: {error}",
+                            "non_reaping_observation": exited,
+                            "terminal_rusage": terminal,
+                        })
+                        raise SamplingError("terminal child reap failed") from error
+                    exit_code = reaped
+                    if reaped != exited["exit_code"]:
+                        lifecycle_evidence_failure = True
+                        sampler_error = "SamplingError: reaped exit status differs from non-reaping observation"
+                        failures.append("reaped exit status differs from non-reaping observation")
+                        atomic_json(output / "rejected-terminal-sample.json", {
+                            "reason": "reaped exit status differs from non-reaping observation",
+                            "actual_reaped_exit_code": reaped,
+                            "non_reaping_observation": exited,
+                            "terminal_rusage": terminal,
+                        })
+                        return
+                    record_sample(terminal, "terminal", now)
+                    if exit_code != 0:
+                        failures.append(f"child exited {exit_code}")
+
                 while True:
                     now = clock()
                     if cancelled():
@@ -132,55 +218,54 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
                         timed_out = True
                         failures.append("timeout")
                         break
+                    exited = exit_observer.observe()
+                    if exited is not None:
+                        finish_exited(exited, now)
+                        break
                     if now >= next_sample:
                         try:
                             observed = dict(sampler.sample())
-                            if observed.get("start_abstime") != sampler.start_identity:
-                                raise SamplingError("PID identity changed while sampling")
-                            observed["elapsed_seconds"] = now - started
-                            memory_stream.write(json.dumps(observed, sort_keys=True) + "\n")
-                            memory_stream.flush()
-                            sample_count += 1
-                            observed_peak = max(observed["physical_footprint_bytes"], observed["lifetime_peak_bytes"])
-                            peak = observed_peak if peak is None else max(peak, observed_peak)
-                            if max(observed["physical_footprint_bytes"], observed["lifetime_peak_bytes"]) > memory_gb * 1e9:
-                                budget_exceeded = True
-                                failures.append("memory budget exceeded")
-                                break
+                            record_sample(observed, "live", now)
+                        except ProcessExitedDuringSample:
+                            exited = exit_observer.observe()
+                            if exited is None:
+                                raise SamplingError(
+                                    "process exit was not confirmed after terminal rusage appeared")
+                            finish_exited(exited, now)
+                            break
                         except Exception as error:
                             sampler_error = f"{type(error).__name__}: {error}"
                             failures.append("memory sampler failed")
                             break
+                        if budget_exceeded:
+                            break
                         next_sample = now + 0.5
-                    exit_code = child.poll()
-                    if exit_code is not None:
-                        if not sample_count:
-                            failures.append("child exited before first valid memory sample")
-                        if exit_code != 0:
-                            failures.append(f"child exited {exit_code}")
-                        break
                     sleep(min(0.05, max(0.0, next_sample - clock())))
             except Exception as error:
                 sampler_error = f"{type(error).__name__}: {error}"
                 failures.append("memory sampler unavailable")
             finally:
-                if child.poll() is None:
+                if not child_reaped:
                     try:
-                        terminate_child_tree(child)
+                        exit_code = _cleanup_owned_child(child, exit_observer)
+                        child_reaped = True
                     except Exception as error:
                         failures.append(f"cleanup unverified: {type(error).__name__}: {error}")
-                exit_code = child.poll()
     except KeyboardInterrupt:
         interrupted = True
         failures.append("SIGINT")
-        if child is not None and child.poll() is None:
-            terminate_child_tree(child)
-        exit_code = child.poll() if child is not None else None
+        if child is not None and not child_reaped:
+            try:
+                exit_code = _cleanup_owned_child(child, exit_observer)
+                child_reaped = True
+            except Exception as cleanup:
+                failures.append(f"cleanup unverified: {type(cleanup).__name__}: {cleanup}")
     except Exception as error:
         failures.append(f"launch failed: {type(error).__name__}: {error}")
-        if child is not None and child.poll() is None:
+        if child is not None and not child_reaped:
             try:
-                terminate_child_tree(child)
+                exit_code = _cleanup_owned_child(child, exit_observer)
+                child_reaped = True
             except Exception as cleanup:
                 failures.append(f"cleanup unverified: {type(cleanup).__name__}: {cleanup}")
         if not stdout_path.exists(): stdout_path.touch()
@@ -203,8 +288,9 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
         except OSError as error:
             failures.append(f"executable unavailable after launch: {type(error).__name__}: {error}")
     artifacts = _all_artifacts(output, failures)
-    evidence_failure = len(failures) > evidence_failure_start
-    functional_success = not failures and exit_code == 0 and sample_count > 0
+    evidence_failure = lifecycle_evidence_failure or len(failures) > evidence_failure_start
+    functional_success = (not failures and exit_code == 0 and sample_count > 0
+                          and terminal_sample_count == 1)
     qualified = False
     receipt = {
         "format": RECEIPT_FORMAT, "schema_version": 1, "kind": "launch",
@@ -213,8 +299,14 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
         "started_at_unix": started_wall, "ended_at_unix": ended_wall,
         "duration_seconds": max(0.0, ended_wall - started_wall), "process": process,
         "memory": {"target_gb_decimal": memory_gb, "sample_interval_seconds": 0.5,
-                   "qualified": sample_count > 0 and sampler_error is None and not budget_exceeded,
+                   "sampling_policy": TERMINAL_SAMPLING_POLICY,
+                   "qualified": sample_count > 0 and terminal_sample_count == 1
+                                and sampler_error is None and not budget_exceeded,
                    "peak_bytes": peak, "sample_count": sample_count, "samples_artifact": "memory.jsonl",
+                   "live_sample_count": live_sample_count,
+                   "terminal_sample_count": terminal_sample_count,
+                   "terminal_exit_abstime": terminal_exit_abstime,
+                   "terminal_lifetime_peak_bytes": terminal_lifetime_peak,
                    "sampler_error": sampler_error},
         "vm": {"before": before, "after": after},
         "result": {"exit_code": exit_code, "functional_success": functional_success,
@@ -271,7 +363,7 @@ def archive(binary: Path, output: Path, *, repo_root: Path = ROOT) -> int:
 def self_test() -> int:
     import unittest
     suite = unittest.TestSuite()
-    for module in ("test_launcher", "test_receipts"):
+    for module in ("test_launcher", "test_receipts", "test_observe"):
         suite.addTests(unittest.defaultTestLoader.loadTestsFromName(module))
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if result.testsRun <= 0 or result.failures or result.errors or result.skipped:

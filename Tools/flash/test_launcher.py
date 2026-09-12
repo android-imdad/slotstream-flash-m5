@@ -21,14 +21,22 @@ from receipts import validate_receipt_file
 
 class FakeSampler:
     footprint = 1024 * 1024
+    terminal_peak = footprint
 
     def __init__(self, pid: int):
         self.pid = pid
         self.start_identity = 12345
 
     def sample(self):
-        return {"start_abstime": self.start_identity, "physical_footprint_bytes": self.footprint,
+        return {"start_abstime": self.start_identity, "exit_abstime": 0,
+                "physical_footprint_bytes": self.footprint,
                 "lifetime_peak_bytes": self.footprint, "resident_bytes": self.footprint}
+
+    def terminal_sample(self, exited):
+        return {"start_abstime": self.start_identity, "exit_abstime": self.start_identity + 1,
+                "physical_footprint_bytes": 0, "lifetime_peak_bytes": self.terminal_peak,
+                "resident_bytes": 0, "wait_pid": exited["pid"], "wait_code": exited["code"],
+                "wait_status": exited["status"], "exit_code": exited["exit_code"]}
 
 
 class LauncherTests(unittest.TestCase):
@@ -72,6 +80,73 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(read_json(self.output / "completion.json")["receipt_sha256"], sha256(self.output / "receipt.json"))
         validate_receipt_file(self.output / "receipt.json")
 
+    def test_terminal_peak_is_captured_before_reap_and_can_exceed_last_live(self):
+        class HigherTerminal(FakeSampler):
+            terminal_peak = FakeSampler.footprint + 4096
+        self.assertEqual(self.run_child(sampler_factory=HigherTerminal), 0)
+        receipt = read_json(self.output / "receipt.json")
+        self.assertEqual(receipt["memory"]["terminal_sample_count"], 1)
+        self.assertEqual(receipt["memory"]["terminal_lifetime_peak_bytes"],
+                         HigherTerminal.terminal_peak)
+        self.assertEqual(receipt["memory"]["peak_bytes"], HigherTerminal.terminal_peak)
+
+    def test_terminal_only_positive_sample_qualifies_memory(self):
+        class ImmediateExit:
+            def __init__(self, pid): self.pid = pid
+            def observe(self):
+                return {"pid": self.pid, "code": 1, "status": 0, "exit_code": 0}
+        self.assertEqual(self.run_child("pass", exit_observer_factory=ImmediateExit), 0)
+        memory = read_json(self.output / "receipt.json")["memory"]
+        self.assertEqual(memory["live_sample_count"], 0)
+        self.assertEqual(memory["terminal_sample_count"], 1)
+        self.assertTrue(memory["qualified"])
+
+    def test_exit_between_wait_check_and_live_read_uses_terminal_path(self):
+        class ExitBetween(FakeSampler):
+            def sample(self):
+                raise benchmark.ProcessExitedDuringSample("injected race")
+        class SecondObservationExits:
+            def __init__(self, pid): self.pid = pid; self.calls = 0
+            def observe(self):
+                self.calls += 1
+                if self.calls == 1: return None
+                return {"pid": self.pid, "code": 1, "status": 0, "exit_code": 0}
+        self.assertEqual(self.run_child("pass", sampler_factory=ExitBetween,
+                                       exit_observer_factory=SecondObservationExits), 0)
+        memory = read_json(self.output / "receipt.json")["memory"]
+        self.assertEqual((memory["live_sample_count"], memory["terminal_sample_count"]), (0, 1))
+
+    def test_terminal_sampler_failure_and_reap_status_mismatch_fail(self):
+        class BrokenTerminal(FakeSampler):
+            def terminal_sample(self, exited): raise SamplingError("terminal injected")
+        self.assertEqual(self.run_child(sampler_factory=BrokenTerminal), 1)
+        self.assertFalse(read_json(self.output / "receipt.json")["memory"]["qualified"])
+        self.tearDown(); self.setUp()
+        class WrongExit:
+            def __init__(self, pid): self.pid = pid
+            def observe(self):
+                return {"pid": self.pid, "code": 1, "status": 7, "exit_code": 7}
+        self.assertEqual(self.run_child("pass", exit_observer_factory=WrongExit), 1)
+        receipt = read_json(self.output / "receipt.json")
+        reasons = receipt["qualification_reasons"]
+        self.assertTrue(any("differs" in reason for reason in reasons))
+        self.assertEqual(receipt["result"]["exit_code"], 0)
+        self.assertTrue(receipt["result"]["evidence_failure"])
+        self.assertEqual(receipt["memory"]["terminal_sample_count"], 0)
+        self.assertIn("rejected-terminal-sample.json", receipt["artifacts"])
+        validate_receipt_file(self.output / "receipt.json")
+
+    def test_persistent_exit_observation_error_still_drains_owned_child(self):
+        class PersistentError:
+            def __init__(self, pid): self.pid = pid
+            def observe(self): raise SamplingError("persistent waitid error")
+        self.assertEqual(self.run_child("import time; time.sleep(30)",
+                                       exit_observer_factory=PersistentError), 1)
+        receipt = read_json(self.output / "receipt.json")
+        with self.assertRaises(ProcessLookupError):
+            os.kill(receipt["process"]["pid"], 0)
+        self.assertFalse((self.output / "completion.json").exists())
+
     def test_child_stats_are_hashed_without_parent_buffering(self):
         stats = self.output / "stats.json"
         source = f"import pathlib,time; pathlib.Path({str(stats)!r}).write_text('{{\"ok\":true}}'); time.sleep(.05)"
@@ -95,6 +170,13 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.run_child("import time,sys; time.sleep(.05); sys.exit(7)"), 1)
         self.assertEqual(read_json(self.output / "receipt.json")["result"]["exit_code"], 7)
         self.assertFalse((self.output / "completion.json").exists())
+        validate_receipt_file(self.output / "receipt.json")
+
+    def test_signal_exit_is_preserved(self):
+        source = "import os,signal,time; time.sleep(.03); os.kill(os.getpid(),signal.SIGTERM)"
+        self.assertEqual(self.run_child(source), 1)
+        self.assertEqual(read_json(self.output / "receipt.json")["result"]["exit_code"], -15)
+        validate_receipt_file(self.output / "receipt.json")
 
     def test_timeout_drains_owned_child(self):
         self.assertEqual(self.run_child("import time; time.sleep(30)", max_seconds=0.06), 1)

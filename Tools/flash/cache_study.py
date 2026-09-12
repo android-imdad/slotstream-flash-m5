@@ -21,7 +21,7 @@ sys.path.insert(0, str(HERE))
 import benchmark
 from common import (EvidenceError, atomic_json, fresh_output, harness_hashes, read_json,
                     sha256, validate_build_identity)
-from receipts import validate_receipt_file
+from receipts import require_terminal_sampling, validate_receipt_file
 from replay import (AGE_METADATA_BYTES_PER_SLOT, CACHE_RECORD_BYTES, LAYERS, parse_trace,
                     replay, validate_runtime_stats)
 
@@ -365,6 +365,7 @@ def validate_collection(
             if not root.is_relative_to(collection.resolve()): raise EvidenceError("collection arm escapes its root")
             validate_artifact_hashes(root, info["artifacts"])
             receipt = validate_receipt_file(root / "receipt.json")
+            require_terminal_sampling(receipt)
             if (not receipt["result"]["functional_success"]
                     or receipt["identities"].get("executable", {}).get("sha256") != sha256(binary)
                     or "stats.json" not in receipt["artifacts"]
@@ -459,6 +460,7 @@ def collect(model: Path, output: Path) -> int:
                 finally: _set_trace(prior)
                 atomic_json(evidence / "settling.json", settle)
                 receipt = validate_receipt_file(evidence / "receipt.json")
+                require_terminal_sampling(receipt)
                 if code != 0 or not receipt["result"]["functional_success"]:
                     raise EvidenceError(f"{prompt['id']} {arm} monitored generation failed")
                 stats = read_json(stats_path); validate_stats(stats, prompt)
