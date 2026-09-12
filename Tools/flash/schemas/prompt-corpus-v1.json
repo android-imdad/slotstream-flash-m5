@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["bytes", "sha256"],
+      "properties": {"bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/hash"}}
+    },
+    "tokenizerFile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"enum": ["tokenizer.json", "tokenizer_config.json", "config.json"]},
+        "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/hash"}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schema_version", "qualification", "model_loaded", "tokenizer_only", "source_manifest_path", "source_manifest_sha256", "source_provenance_scope", "tokenizer_identity", "executable_identity", "canonical_test_vector", "context", "documents", "aggregate", "artifacts"],
+  "properties": {
+    "format": {"const": "slotstream-prompt-corpus-v1"},
+    "schema_version": {"const": 1},
+    "qualification": {"const": false}, "model_loaded": {"const": false}, "tokenizer_only": {"const": true},
+    "source_manifest_path": {"type": "string", "minLength": 1},
+    "source_manifest_sha256": {"$ref": "#/$defs/hash"},
+    "source_provenance_scope": {"type": "string", "minLength": 1},
+    "tokenizer_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model_revision", "swift_transformers_revision", "files", "embedded_chat_template_sha256", "text_add_special_tokens", "thinking"],
+      "properties": {
+        "model_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "swift_transformers_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "files": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/tokenizerFile"}},
+        "embedded_chat_template_sha256": {"$ref": "#/$defs/hash"},
+        "text_add_special_tokens": {"const": false}, "thinking": {"const": false}
+      }
+    },
+    "executable_identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "binary_sha256", "metallib_sha256", "build_identity_sha256", "source_archive_sha256", "historical"],
+      "properties": {
+        "path": {"type": "string"}, "binary_sha256": {"$ref": "#/$defs/hash"}, "metallib_sha256": {"$ref": "#/$defs/hash"},
+        "build_identity_sha256": {"$ref": "#/$defs/hash"}, "source_archive_sha256": {"$ref": "#/$defs/hash"},
+        "historical": {"type": "boolean"}, "archive_receipt_path": {"type": "string"}, "archive_receipt_sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "canonical_test_vector": {
+      "type": "object", "additionalProperties": false,
+      "required": ["value", "canonical_json", "sha256"],
+      "properties": {"value": {"type": "object"}, "canonical_json": {"type": "string"}, "sha256": {"$ref": "#/$defs/hash"}}
+    },
+    "context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_token_limit", "inference_context_limit", "artifact_limit_is_inference_permission"],
+      "properties": {"artifact_token_limit": {"const": 8192}, "inference_context_limit": {"const": 2048}, "artifact_limit_is_inference_permission": {"const": false}}
+    },
+    "documents": {
+      "type": "array", "minItems": 1, "maxItems": 2048,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "path", "prompt_count", "prompt_ids_sha256", "source_hash", "artifact_bytes", "artifact_sha256"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$"},
+          "path": {"type": "string", "pattern": "^prompts/prompt-[0-9]{4}\\.json$"},
+          "prompt_count": {"type": "integer", "minimum": 1, "maximum": 8192},
+          "prompt_ids_sha256": {"$ref": "#/$defs/hash"}, "source_hash": {"$ref": "#/$defs/hash"},
+          "artifact_bytes": {"type": "integer", "minimum": 1}, "artifact_sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["document_count", "prompt_token_count", "prompt_artifact_bytes"],
+      "properties": {
+        "document_count": {"type": "integer", "minimum": 1, "maximum": 2048},
+        "prompt_token_count": {"type": "integer", "minimum": 1, "maximum": 4000000},
+        "prompt_artifact_bytes": {"type": "integer", "minimum": 1, "maximum": 134217728}
+      }
+    },
+    "artifacts": {"type": "object", "additionalProperties": {"$ref": "#/$defs/artifact"}}
+  }
+}

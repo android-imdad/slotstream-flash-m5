@@ -1,0 +1,85 @@
+{
+  "format": "slotstream-prompt-source-v1",
+  "schemaVersion": 1,
+  "manifestSHA256": "a1a164e1038b50dd4b98d849894e217586ff5b38256e859b226b3f8eb9beb028",
+  "documents": [
+    {
+      "id": "synthetic-english",
+      "kind": "raw",
+      "category": "prose",
+      "split": "development",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-english-v1",
+      "text": "Sunlight scatters through the atmosphere, making a clear daytime sky appear blue.",
+      "textSHA256": "94be8155c819489c03088c4a1cc6234b7f18ba405bc83263dfa59509be00f822"
+    },
+    {
+      "id": "synthetic-code",
+      "kind": "raw",
+      "category": "code",
+      "split": "training",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-code-v1",
+      "text": "def unique(values):\n    return list(dict.fromkeys(values))\n",
+      "textSHA256": "3c21a5d7cecb780bc53a62ac3f68caa5624b2f94c17c9501b436549b44ea1f09"
+    },
+    {
+      "id": "synthetic-french",
+      "kind": "raw",
+      "category": "multilingual",
+      "split": "development",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-french-v1",
+      "text": "Bonjour le monde. Le ciel est bleu aujourd’hui.",
+      "textSHA256": "4f2376cb76f4f74a269f079c066b382bf545a98355fdcb3b738a93934f13890c"
+    },
+    {
+      "id": "synthetic-chinese",
+      "kind": "raw",
+      "category": "multilingual",
+      "split": "development",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-chinese-v1",
+      "text": "今天的天空很蓝。请用一句话描述天气。",
+      "textSHA256": "fdabb84f2a362b9dd433200a6d9c4c6f77e9772db099b57dd3c3e7dbcd47539a"
+    },
+    {
+      "id": "synthetic-chat-short",
+      "kind": "chat",
+      "category": "instruction",
+      "split": "development",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-chat-short-v1",
+      "system": "Answer briefly and clearly.",
+      "user": "What is 37 multiplied by 42?",
+      "contentSHA256": "732ba8fa3930417c16a7fd9957418ca8225200c352e9d5cb5a8e35f59b3b2e90"
+    },
+    {
+      "id": "synthetic-no-target",
+      "kind": "raw",
+      "category": "boundary",
+      "split": "development",
+      "sourceID": "repository/synthetic/plan010",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-no-target-v1",
+      "text": "Hi",
+      "textSHA256": "3639efcd08abb273b1619e82e78c29a7df02c1051b1820e99fc395dcaa3326b8"
+    },
+    {
+      "id": "synthetic-long-boundary",
+      "kind": "raw",
+      "category": "boundary",
+      "split": "qualification",
+      "sourceID": "repository/synthetic/plan010-quota-repetition",
+      "license": "CC0-1.0",
+      "partitionKey": "synthetic-long-boundary-v1",
+      "text": "quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota quota",
+      "textSHA256": "7b37e3225b07a2f96f96bf507b9a193eef69a778e8daf932f28b20c2814f354f"
+    }
+  ]
+}
