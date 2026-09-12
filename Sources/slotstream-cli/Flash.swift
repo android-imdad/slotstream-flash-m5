@@ -151,6 +151,54 @@ private struct CaptureManifest: Codable {
     var documents: [CaptureDocument]
 }
 
+private struct TokenizedCaptureDocument: Codable {
+    var id: String
+    var category: String
+    var sourceID: String
+    var sourceHash: String
+    var split: String
+    var warmupIDs: [Int]
+    var positions: [CapturePosition]
+}
+
+private struct TokenizedCaptureManifest: Codable {
+    var format: String
+    var schemaVersion: Int
+    var manifestSHA256: String
+    var tokenSource: String
+    var split: String
+    var sourceCorpusSHA256: String
+    var tokenizerIdentity: [String: JSONValue]
+    var shardID: String
+    var documents: [TokenizedCaptureDocument]
+}
+
+private enum JSONValue: Codable {
+    case string(String), int(Int), bool(Bool), array([JSONValue]), object([String: JSONValue]), null
+
+    init(from decoder: Decoder) throws {
+        let box = try decoder.singleValueContainer()
+        if box.decodeNil() { self = .null }
+        else if let value = try? box.decode(String.self) { self = .string(value) }
+        else if let value = try? box.decode(Int.self) { self = .int(value) }
+        else if let value = try? box.decode(Bool.self) { self = .bool(value) }
+        else if let value = try? box.decode([JSONValue].self) { self = .array(value) }
+        else { self = .object(try box.decode([String: JSONValue].self)) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var box = encoder.singleValueContainer()
+        switch self {
+        case .string(let value): try box.encode(value)
+        case .int(let value): try box.encode(value)
+        case .bool(let value): try box.encode(value)
+        case .array(let value): try box.encode(value)
+        case .object(let value): try box.encode(value)
+        case .null: try box.encodeNil()
+        }
+    }
+}
+
 private final class NativeCaptureSink: FlashObservationSink {
     let root: URL
     let liveLimit: Int
@@ -278,10 +326,10 @@ struct FlashCapture: ParsableCommand {
         guard mode == "reference-off" || mode == "reference-on" else {
             throw ValidationError("--mode must be reference-off or reference-on; approximate modes are refused")
         }
-        guard split == "development", maxContext == 2048, memoryGB == 14, (32...64).contains(liveLimitMB),
+        guard ["training", "development", "qualification"].contains(split), maxContext == 2048, memoryGB == 14, (32...64).contains(liveLimitMB),
               (1...32).contains(activationQuotaGB), (1...8).contains(logitsQuotaGB),
               positionLimit == 64, !requireResidentSplit || mode == "reference-on" else {
-            throw ValidationError("capture requires the development split, --memory-gb 14, --max-context 2048, position limit 64 and live limit 32...64 MiB")
+            throw ValidationError("capture requires training/development, --memory-gb 14, --max-context 2048, position limit 64 and live limit 32...64 MiB")
         }
         let environment = ProcessInfo.processInfo.environment
         let allowedSlotstream = requireResidentSplit ? Set(["SLOTSTREAM_OPT_RESIDENT_OVERLAP"]) : Set<String>()
@@ -300,6 +348,9 @@ struct FlashCapture: ParsableCommand {
         }
         try fm.createDirectory(at: destination, withIntermediateDirectories: false)
         do {
+            guard split != "qualification" else {
+                throw ValidationError("qualification capture is locked until a later frozen run-set")
+            }
             let manifestURL = URL(fileURLWithPath: manifest, relativeTo: root).standardizedFileURL
             var manifestBefore=stat()
             guard lstat(manifestURL.path,&manifestBefore)==0,
@@ -319,39 +370,93 @@ struct FlashCapture: ParsableCommand {
                   manifestBefore.st_mtimespec.tv_sec==manifestAfter.st_mtimespec.tv_sec,
                   manifestBefore.st_mtimespec.tv_nsec==manifestAfter.st_mtimespec.tv_nsec,
                   let raw=try JSONSerialization.jsonObject(with:manifestData) as? [String:Any],
-                  Set(raw.keys)==Set(["format","schemaVersion","manifestSHA256","developmentOnly","tokenSource","documents"]) else {
+                  let format=raw["format"] as? String else {
                 throw ValidationError("capture manifest changed while read or has unknown fields")
             }
-            let request = try JSONDecoder().decode(CaptureManifest.self, from: manifestData)
             var canonical = raw
             canonical.removeValue(forKey: "manifestSHA256")
             let canonicalData = try JSONSerialization.data(withJSONObject: canonical, options: [.sortedKeys])
             let canonicalHash = SHA256.hash(data: canonicalData).map { String(format: "%02x", $0) }.joined()
-            guard request.format == "slotstream-flash-capture-v1", request.schemaVersion == 1,
-                  request.manifestSHA256 == canonicalHash,
-                  request.developmentOnly, request.tokenSource == "arbitrary-valid-diagnostic-ids-not-training-text",
-                  request.documents.filter({ $0.split == split }).count > 0 else {
-                throw ValidationError("capture manifest identity or split is invalid")
+            let captureDocuments: [CaptureDocument]
+            var tokenizedMetadata: [String: Any]? = nil
+            if format == "slotstream-flash-capture-v1" {
+                guard Set(raw.keys)==Set(["format","schemaVersion","manifestSHA256","developmentOnly","tokenSource","documents"]),
+                      split == "development" else {
+                    throw ValidationError("v1 capture remains development-only")
+                }
+                let request = try JSONDecoder().decode(CaptureManifest.self, from: manifestData)
+                guard request.schemaVersion == 1, request.manifestSHA256 == canonicalHash,
+                      request.developmentOnly,
+                      request.tokenSource == "arbitrary-valid-diagnostic-ids-not-training-text" else {
+                    throw ValidationError("v1 capture manifest identity is invalid")
+                }
+                captureDocuments = request.documents
+            } else if format == "slotstream-tokenized-capture-shard-v2" {
+                guard Set(raw.keys)==Set(["format","schemaVersion","manifestSHA256","tokenSource","split",
+                                          "sourceCorpusSHA256","tokenizerIdentity","shardID","documents"]),
+                      let rawIdentity=raw["tokenizerIdentity"] as? [String:Any] else {
+                    throw ValidationError("v2 tokenized capture has unknown fields")
+                }
+                let request = try JSONDecoder().decode(TokenizedCaptureManifest.self, from: manifestData)
+                let tokenizedHash = try CorpusSupport.canonicalHash(raw, omitting:"manifestSHA256")
+                let shardSuffix = request.shardID.hasPrefix("shard-")
+                    ? request.shardID.dropFirst("shard-".count) : Substring()
+                guard request.schemaVersion == 2, request.manifestSHA256 == tokenizedHash,
+                      request.tokenSource == "slotstream-auto-tokenizer-chat-template-v1",
+                      request.split == split, ["training","development"].contains(split),
+                      request.sourceCorpusSHA256.utf8.count == 64,
+                      request.sourceCorpusSHA256.utf8.allSatisfy({ (48...57).contains($0) || (97...102).contains($0) }),
+                      (3...4).contains(shardSuffix.count),
+                      shardSuffix.utf8.allSatisfy({ (48...57).contains($0) }) else {
+                    throw ValidationError("v2 tokenized capture identity or split is invalid")
+                }
+                let modelURL = ModelLocator.resolve(model).resolvingSymlinksInPath()
+                let currentIdentity = try CorpusSupport.tokenizerIdentity(model: modelURL)
+                guard NSDictionary(dictionary: rawIdentity).isEqual(to: currentIdentity) else {
+                    throw ValidationError("v2 tokenizer identity differs from the local pinned model")
+                }
+                captureDocuments = request.documents.map {
+                    CaptureDocument(id:$0.id,split:$0.split,warmupIDs:$0.warmupIDs,positions:$0.positions)
+                }
+                tokenizedMetadata = ["format":format,"split":split,"shard_id":request.shardID,
+                                     "source_corpus_sha256":request.sourceCorpusSHA256,
+                                     "tokenizer_identity":rawIdentity,
+                                     "documents":request.documents.map { ["id":$0.id,"category":$0.category,
+                                         "source_id":$0.sourceID,"source_hash":$0.sourceHash] }]
+            } else {
+                throw ValidationError("unsupported capture manifest version")
             }
             var documentIDs=Set<String>(), totalPositions=0
-            guard let rawDocuments=raw["documents"] as? [[String:Any]], rawDocuments.count==request.documents.count,
-                  rawDocuments.allSatisfy({ Set($0.keys)==Set(["id","split","warmupIDs","positions"])
+            let v2DocumentKeys=Set(["id","category","sourceID","sourceHash","split","warmupIDs","positions"])
+            guard let rawDocuments=raw["documents"] as? [[String:Any]], rawDocuments.count==captureDocuments.count,
+                  rawDocuments.allSatisfy({ Set($0.keys)==(format == "slotstream-flash-capture-v1"
+                    ? Set(["id","split","warmupIDs","positions"]):v2DocumentKeys)
                     && (($0["positions"] as? [[String:Any]])?.allSatisfy({Set($0.keys)==Set(["position","inputID","nextTokenID"])}) ?? false) }) else {
                 throw ValidationError("capture manifest has unknown nested fields")
             }
-            for document in request.documents {
+            for (document,rawDocument) in zip(captureDocuments,rawDocuments) {
                 let safeID = !document.id.isEmpty && document.id.utf8.allSatisfy {
                     (48...57).contains($0) || (65...90).contains($0) ||
                         (97...122).contains($0) || $0 == 45 || $0 == 95
                 }
                 guard documentIDs.insert(document.id).inserted,
-                      document.split == "development",
+                      document.split == split,
                       document.id.utf8.count <= 64,
                       safeID,
                       document.warmupIDs.count <= 256,
                       document.warmupIDs.count + document.positions.count <= maxContext,
                       document.warmupIDs.allSatisfy({(0..<248320).contains($0)}) else {
                     throw ValidationError("capture document ID, count or context is invalid")
+                }
+                if format == "slotstream-tokenized-capture-shard-v2" {
+                    guard let category=rawDocument["category"] as? String,CorpusSupport.safeID(category),
+                          let sourceID=rawDocument["sourceID"] as? String,!sourceID.isEmpty,sourceID.utf8.count<=256,
+                          sourceID.utf8.allSatisfy({$0>=32 && $0 != 127}),
+                          let sourceHash=rawDocument["sourceHash"] as? String,sourceHash.utf8.count==64,
+                          sourceHash.utf8.allSatisfy({(48...57).contains($0) || (97...102).contains($0)}),
+                          !document.positions.isEmpty else {
+                        throw ValidationError("v2 capture source metadata is invalid")
+                    }
                 }
                 var expected=document.warmupIDs.count, prior:Int?
                 for position in document.positions {
@@ -409,7 +514,7 @@ struct FlashCapture: ParsableCommand {
                     catch { reuseRefused = String(describing:error).contains("incomplete forward") }
                     guard reuseRefused else { throw PlanError("partially advanced state was reusable after sink failure") }
                     var documents: [[String: Any]] = []
-                    for document in request.documents where document.split == split {
+                    for document in captureDocuments where document.split == split {
                         let state = engine.model.makeState()
                         if !document.warmupIDs.isEmpty {
                             let warm = try engine.model.lastLogitsChecked(document.warmupIDs, state: state); eval(warm)
@@ -440,7 +545,7 @@ struct FlashCapture: ParsableCommand {
                         }
                         documents.append(["id": document.id, "positions": positions])
                     }
-                    let payload: [String: Any] = ["format": "slotstream-flash-capture-output-v1",
+                    var payload: [String: Any] = ["format": "slotstream-flash-capture-output-v1",
                         "schema_version": 1, "qualification": false, "mode": mode,
                         "manifest_sha256": SHA256.hash(data: manifestData).map { String(format: "%02x", $0) }.joined(),
                         "binary": CommandLine.arguments[0], "model": modelURL.path,
@@ -459,6 +564,7 @@ struct FlashCapture: ParsableCommand {
                         "resident_split_evidence":["required":requireResidentSplit,
                             "split_layers":sink.splitLayerKeys],
                         "files": sink.files, "activation_bytes": sink.activationBytes, "logits_bytes": sink.logitsBytes]
+                    if let tokenizedMetadata { payload["tokenized_corpus"] = tokenizedMetadata }
                     guard !requireResidentSplit || !sink.splitLayerKeys.isEmpty else {
                         throw PlanError("resident-overlap control did not execute both resident and miss branches")
                     }

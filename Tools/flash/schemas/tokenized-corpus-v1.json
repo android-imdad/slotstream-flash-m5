@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "tokenizerFile": {"type": "object", "additionalProperties": false, "required": ["path", "bytes", "sha256"], "properties": {"path": {"enum": ["tokenizer.json", "tokenizer_config.json", "config.json"]}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/hash"}}},
+    "position": {"type": "object", "additionalProperties": false, "required": ["position", "inputID", "nextTokenID"], "properties": {"position": {"type": "integer", "minimum": 0, "maximum": 2047}, "inputID": {"type": "integer", "minimum": 0, "maximum": 248319}, "nextTokenID": {"type": "integer", "minimum": 0, "maximum": 248319}}},
+    "capture": {"type": "object", "additionalProperties": false, "required": ["id", "category", "sourceID", "sourceHash", "split", "warmupIDs", "positions"], "properties": {"id": {"type": "string"}, "category": {"type": "string"}, "sourceID": {"type": "string"}, "sourceHash": {"$ref": "#/$defs/hash"}, "split": {"enum": ["training", "development", "qualification"]}, "warmupIDs": {"type": "array", "maxItems": 256, "items": {"type": "integer", "minimum": 0, "maximum": 248319}}, "positions": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/position"}}}},
+    "document": {"type": "object", "additionalProperties": false, "required": ["id", "kind", "category", "split", "sourceID", "license", "partitionKey", "source_hash", "full_ids", "full_count", "warmup_count", "scored_range", "unscored_range", "capture"], "properties": {"id": {"type": "string"}, "kind": {"enum": ["raw", "chat"]}, "category": {"type": "string"}, "split": {"enum": ["training", "development", "qualification"]}, "sourceID": {"type": "string"}, "license": {"type": "string"}, "partitionKey": {"type": "string"}, "source_hash": {"$ref": "#/$defs/hash"}, "full_ids": {"type": "array", "maxItems": 2048, "items": {"type": "integer", "minimum": 0, "maximum": 248319}}, "full_count": {"type": "integer", "minimum": 2, "maximum": 2048}, "warmup_count": {"type": "integer", "minimum": 0, "maximum": 256}, "prompt_count": {"type": "integer", "minimum": 1, "maximum": 257}, "scored_range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer"}}, "unscored_range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer"}}, "capture": {"$ref": "#/$defs/capture"}}}
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schema_version", "qualification", "model_loaded", "tokenizer_only", "source_manifest_path", "source_manifest_sha256", "source_provenance_scope", "tokenizer_identity", "executable_identity", "canonical_test_vector", "documents", "shards", "artifacts"],
+  "properties": {
+    "format": {"const": "slotstream-tokenized-corpus-v1"},
+    "schema_version": {"const": 1},
+    "qualification": {"const": false},
+    "model_loaded": {"const": false},
+    "tokenizer_only": {"const": true},
+    "source_manifest_path": {"type": "string", "minLength": 1},
+    "source_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_provenance_scope": {"type": "string", "minLength": 1},
+    "tokenizer_identity": {"type": "object", "additionalProperties": false, "required": ["model_revision", "swift_transformers_revision", "files", "embedded_chat_template_sha256", "text_add_special_tokens", "thinking"], "properties": {"model_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "swift_transformers_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "files": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/tokenizerFile"}}, "embedded_chat_template_sha256": {"$ref": "#/$defs/hash"}, "text_add_special_tokens": {"const": false}, "thinking": {"const": false}}},
+    "executable_identity": {"type": "object", "additionalProperties": false, "required": ["path", "binary_sha256", "metallib_sha256", "build_identity_sha256", "source_archive_sha256", "historical"], "properties": {"path": {"type": "string"}, "binary_sha256": {"$ref": "#/$defs/hash"}, "metallib_sha256": {"$ref": "#/$defs/hash"}, "build_identity_sha256": {"$ref": "#/$defs/hash"}, "source_archive_sha256": {"$ref": "#/$defs/hash"}, "historical": {"type": "boolean"}, "archive_receipt_path": {"type": "string"}, "archive_receipt_sha256": {"$ref": "#/$defs/hash"}}},
+    "canonical_test_vector": {
+      "type": "object", "additionalProperties": false,
+      "required": ["value", "canonical_json", "sha256"],
+      "properties": {"value": {"type": "object"}, "canonical_json": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+    },
+    "documents": {"type": "array", "minItems": 1, "maxItems": 2048, "items": {"$ref": "#/$defs/document"}},
+    "shards": {
+      "type": "array", "minItems": 1, "maxItems": 2048,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "split", "positions", "sha256"],
+        "properties": {"path": {"type": "string"}, "split": {"enum": ["training", "development", "qualification"]}, "positions": {"type": "integer", "minimum": 1, "maximum": 64}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+      }
+    },
+    "artifacts": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": false, "required": ["bytes", "sha256"], "properties": {"bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/hash"}}}}
+  }
+}

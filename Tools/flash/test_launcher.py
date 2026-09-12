@@ -116,6 +116,45 @@ class LauncherTests(unittest.TestCase):
         memory = read_json(self.output / "receipt.json")["memory"]
         self.assertEqual((memory["live_sample_count"], memory["terminal_sample_count"]), (0, 1))
 
+    def test_delayed_terminal_event_is_bounded_and_exhaustion_fails(self):
+        class ExitBetween(FakeSampler):
+            def sample(self): raise benchmark.ProcessExitedDuringSample("injected race")
+        class DelayedExit:
+            def __init__(self, pid): self.pid = pid; self.calls = 0
+            def observe(self):
+                self.calls += 1
+                if self.calls < 4: return None
+                return {"pid": self.pid, "code": 1, "status": 0, "exit_code": 0}
+        self.assertEqual(self.run_child("pass", sampler_factory=ExitBetween,
+                                       exit_observer_factory=DelayedExit), 0)
+        self.tearDown(); self.setUp()
+        now = [0.0]
+        class NeverExit:
+            def __init__(self, pid): self.pid = pid
+            def observe(self): return None
+        self.assertEqual(self.run_child("pass", sampler_factory=ExitBetween,
+            exit_observer_factory=NeverExit, clock=lambda: now[0],
+            sleep=lambda seconds: now.__setitem__(0, now[0] + seconds)), 1)
+        receipt = read_json(self.output / "receipt.json")
+        self.assertFalse(receipt["memory"]["qualified"])
+        self.assertIn("process exit was not confirmed", receipt["memory"]["sampler_error"])
+
+    def test_cancellation_during_terminal_confirmation_stops_owned_child(self):
+        class ExitBetween(FakeSampler):
+            def sample(self): raise benchmark.ProcessExitedDuringSample("injected race")
+        class NeverExit:
+            def __init__(self, pid): self.pid = pid
+            def observe(self): return None
+        calls = [0]
+        def cancelled():
+            calls[0] += 1
+            return calls[0] > 1
+        self.assertEqual(self.run_child("import time; time.sleep(30)", sampler_factory=ExitBetween,
+                                       exit_observer_factory=NeverExit, cancelled=cancelled), 1)
+        receipt = read_json(self.output / "receipt.json")
+        self.assertTrue(receipt["result"]["interrupted"])
+        with self.assertRaises(ProcessLookupError): os.kill(receipt["process"]["pid"], 0)
+
     def test_terminal_sampler_failure_and_reap_status_mismatch_fail(self):
         class BrokenTerminal(FakeSampler):
             def terminal_sample(self, exited): raise SamplingError("terminal injected")

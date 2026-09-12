@@ -1,0 +1,73 @@
+{
+  "format": "slotstream-authored-corpus-v1",
+  "schemaVersion": 1,
+  "manifestSHA256": "950687ecbf3fadf8ec4c811de538cdc3dbe1e7a549fa51bf2e5c8829884bb3a1",
+  "documents": [
+    {
+      "id": "natural-english",
+      "kind": "raw",
+      "category": "prose",
+      "split": "development",
+      "sourceID": "repository/authored/plan007",
+      "license": "CC0-1.0",
+      "partitionKey": "natural-english-v1",
+      "text": "Sunlight scatters through the atmosphere, making a clear daytime sky appear blue.",
+      "textSHA256": "94be8155c819489c03088c4a1cc6234b7f18ba405bc83263dfa59509be00f822",
+      "warmupTokens": 2,
+      "scoreTokens": 4
+    },
+    {
+      "id": "natural-code",
+      "kind": "raw",
+      "category": "code",
+      "split": "training",
+      "sourceID": "repository/authored/plan007",
+      "license": "CC0-1.0",
+      "partitionKey": "natural-code-v1",
+      "text": "def unique(values):\n    return list(dict.fromkeys(values))\n",
+      "textSHA256": "3c21a5d7cecb780bc53a62ac3f68caa5624b2f94c17c9501b436549b44ea1f09",
+      "warmupTokens": 2,
+      "scoreTokens": 4
+    },
+    {
+      "id": "natural-multilingual",
+      "kind": "raw",
+      "category": "multilingual",
+      "split": "development",
+      "sourceID": "repository/authored/plan007",
+      "license": "CC0-1.0",
+      "partitionKey": "natural-multilingual-v1",
+      "text": "Bonjour le monde. 今天的天空很蓝。",
+      "textSHA256": "61bac34e05e6d616469070f93c44c266723a7b13ec17a5d666356baebccb0eee",
+      "warmupTokens": 2,
+      "scoreTokens": 4
+    },
+    {
+      "id": "natural-chat",
+      "kind": "chat",
+      "category": "math",
+      "split": "development",
+      "sourceID": "repository/authored/plan007",
+      "license": "CC0-1.0",
+      "partitionKey": "natural-chat-v1",
+      "system": "Answer briefly and clearly.",
+      "user": "What is 37 multiplied by 42?",
+      "reference": "37 multiplied by 42 is 1,554.",
+      "contentSHA256": "64d9a98256ae07959427c97ed1b0263e81176e3b477670a93398a4fb21d18274",
+      "scoreTokens": 4
+    },
+    {
+      "id": "natural-qualification-placeholder",
+      "kind": "raw",
+      "category": "structured",
+      "split": "qualification",
+      "sourceID": "repository/authored/plan007",
+      "license": "CC0-1.0",
+      "partitionKey": "natural-qualification-placeholder-v1",
+      "text": "Return a JSON object with the key status and the value ready.",
+      "textSHA256": "eea22658cea7a9971eab43bb86f8283716c52d21fbd22caf7f58f32f4093fbfb",
+      "warmupTokens": 2,
+      "scoreTokens": 4
+    }
+  ]
+}

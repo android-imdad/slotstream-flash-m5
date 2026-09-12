@@ -24,6 +24,9 @@ def canonical_manifest_hash(d):
     value.pop('manifestSHA256', None)
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
 
+def foundation_manifest_hash(d):
+    return canonical_manifest_hash(d)
+
 def read_bounded_manifest(path: Path) -> dict[str, Any]:
     try:
         before = path.lstat()
@@ -45,15 +48,38 @@ def read_bounded_manifest(path: Path) -> dict[str, Any]:
 
 def validate_manifest(path: Path) -> dict[str, Any]:
     d = read_bounded_manifest(path)
-    if set(d) != {'format', 'schemaVersion', 'manifestSHA256', 'developmentOnly', 'tokenSource', 'documents'} or d['format'] != 'slotstream-flash-capture-v1' or d['schemaVersion'] != 1 or (d['developmentOnly'] is not True) or (d['tokenSource'] != 'arbitrary-valid-diagnostic-ids-not-training-text'):
-        raise EvidenceError('unknown capture manifest fields or version')
-    if d['manifestSHA256'] != canonical_manifest_hash(d):
-        raise EvidenceError('capture manifest hash mismatch')
+    v1 = d.get('format') == 'slotstream-flash-capture-v1'
+    if v1:
+        if (set(d) != {'format', 'schemaVersion', 'manifestSHA256', 'developmentOnly', 'tokenSource', 'documents'}
+                or d.get('schemaVersion') != 1 or d.get('developmentOnly') is not True
+                or d.get('tokenSource') != 'arbitrary-valid-diagnostic-ids-not-training-text'
+                or d.get('manifestSHA256') != canonical_manifest_hash(d)):
+            raise EvidenceError('unknown capture manifest fields, version or hash')
+        selected_split = 'development'
+    else:
+        required = {'format', 'schemaVersion', 'manifestSHA256', 'tokenSource', 'split',
+                    'sourceCorpusSHA256', 'tokenizerIdentity', 'shardID', 'documents'}
+        if (set(d) != required or d.get('format') != 'slotstream-tokenized-capture-shard-v2'
+                or d.get('schemaVersion') != 2 or d.get('manifestSHA256') != foundation_manifest_hash(d)
+                or d.get('tokenSource') != 'slotstream-auto-tokenizer-chat-template-v1'
+                or d.get('split') not in ('training', 'development', 'qualification')
+                or re.fullmatch(r'shard-[0-9]{3,4}', d.get('shardID', '')) is None
+                or re.fullmatch(r'[0-9a-f]{64}', d.get('sourceCorpusSHA256', '')) is None
+                or not isinstance(d.get('tokenizerIdentity'), dict)):
+            raise EvidenceError('unknown capture manifest fields, version or hash')
+        selected_split = d['split']
     ids = set()
     total_positions = 0
     for doc in d['documents']:
-        if set(doc) != {'id', 'split', 'warmupIDs', 'positions'} or not isinstance(doc['id'], str) or (not doc['id']) or (len(doc['id']) > 64) or (doc['id'] in ids) or (doc['split'] != SUPPORTED_SPLIT) or (not isinstance(doc['warmupIDs'], list)) or (len(doc['warmupIDs']) > 256) or (not isinstance(doc['positions'], list)) or (re.fullmatch('[A-Za-z0-9_-]+', doc['id']) is None) or any((type(token) is not int or not 0 <= token < VOCAB for token in doc['warmupIDs'])) or (len(doc['warmupIDs']) + len(doc['positions']) > CONTEXT_LIMIT):
+        expected_keys = ({'id', 'split', 'warmupIDs', 'positions'} if v1 else
+                         {'id', 'category', 'sourceID', 'sourceHash', 'split', 'warmupIDs', 'positions'})
+        if set(doc) != expected_keys or not isinstance(doc['id'], str) or (not doc['id']) or (len(doc['id']) > 64) or (doc['id'] in ids) or (doc['split'] != selected_split) or (not isinstance(doc['warmupIDs'], list)) or (len(doc['warmupIDs']) > 256) or (not isinstance(doc['positions'], list)) or (re.fullmatch('[A-Za-z0-9_-]+', doc['id']) is None) or any((type(token) is not int or not 0 <= token < VOCAB for token in doc['warmupIDs'])) or (len(doc['warmupIDs']) + len(doc['positions']) > CONTEXT_LIMIT):
             raise EvidenceError('invalid document identity or warmup tokens')
+        if not v1 and (re.fullmatch(r'[A-Za-z0-9_-]{1,64}', doc['category']) is None
+                or not doc['sourceID'] or len(doc['sourceID'].encode()) > 256
+                or any(ord(character) < 32 or ord(character) == 127 for character in doc['sourceID'])
+                or re.fullmatch(r'[0-9a-f]{64}', doc['sourceHash']) is None or not doc['positions']):
+            raise EvidenceError('invalid tokenized document source metadata')
         ids.add(doc['id'])
         sequence = list(doc['warmupIDs'])
         expected = len(sequence)
@@ -72,8 +98,15 @@ def validate_manifest(path: Path) -> dict[str, Any]:
     return d
 
 def documents_for_split(request: dict[str, Any], split: str) -> list[dict[str, Any]]:
-    if split != SUPPORTED_SPLIT:
-        raise EvidenceError('only the development diagnostic split is supported')
+    if split == 'qualification':
+        raise EvidenceError('qualification capture is locked until a later frozen run-set')
+    if split not in ('training', 'development'):
+        raise EvidenceError('capture split is unsupported')
+    request_format = request.get('format', 'slotstream-flash-capture-v1')
+    if request_format == 'slotstream-flash-capture-v1' and split != SUPPORTED_SPLIT:
+        raise EvidenceError('v1 capture remains development-only')
+    if request_format == 'slotstream-tokenized-capture-shard-v2' and request['split'] != split:
+        raise EvidenceError('tokenized capture split differs from shard')
     documents = [doc for doc in request['documents'] if doc['split'] == split]
     if not documents or not any((doc['positions'] for doc in documents)):
         raise EvidenceError('requested split is empty')
@@ -123,6 +156,9 @@ def _expected_state_fields(model: Path) -> list[str]:
 
 def validate_native_report(report, root, manifest, mode, binary, model, request, *, require_split=False):
     report_keys = {'format', 'schema_version', 'qualification', 'mode', 'manifest_sha256', 'binary', 'model', 'source_identity', 'plan', 'memory_ledger', 'documents', 'files', 'activation_bytes', 'logits_bytes', 'invalid_state_reuse_refused', 'optimizations', 'numerical_environment', 'resident_split_evidence'}
+    v2 = request.get('format', 'slotstream-flash-capture-v1') == 'slotstream-tokenized-capture-shard-v2'
+    if v2:
+        report_keys.add('tokenized_corpus')
     if set(report) != report_keys or report.get('format') != 'slotstream-flash-capture-output-v1' or report.get('schema_version') != 1 or (report.get('mode') != mode) or (report.get('qualification') is not False):
         raise EvidenceError('invalid native capture report')
     if report.get('manifest_sha256') != sha256(manifest) or report.get('invalid_state_reuse_refused') is not True:
@@ -132,6 +168,21 @@ def validate_native_report(report, root, manifest, mode, binary, model, request,
     expected = {'binary_sha256': sha256(binary), 'metallib_sha256': sha256(directory / 'mlx.metallib'), 'build_identity_sha256': sha256(directory / 'build-identity.json'), 'source_archive_sha256': sha256(directory / 'build-source.tar.gz'), 'model_config_sha256': sha256(model / 'config.json'), 'model_index_sha256': sha256(model / 'model.safetensors.index.json')}
     if source != expected or Path(report.get('model', '')).resolve() != model.resolve():
         raise EvidenceError('native source or model identity mismatch')
+    if v2:
+        identity = request['tokenizerIdentity']
+        files = identity.get('files') if isinstance(identity, dict) else None
+        if (identity.get('model_revision') != '3781190c6bbdf0a7637beda49ba179822612058a'
+                or identity.get('swift_transformers_revision') != '2fa33e1f5e7131a7fc64c28e6d161dcec0d24820'
+                or identity.get('text_add_special_tokens') is not False
+                or identity.get('thinking') is not False or not isinstance(files, list)):
+            raise EvidenceError('tokenized shard tokenizer identity is unsupported')
+        for item in files:
+            if (set(item) != {'path', 'bytes', 'sha256'} or item['path'] not in
+                    ('tokenizer.json', 'tokenizer_config.json', 'config.json')):
+                raise EvidenceError('tokenized shard tokenizer file identity is malformed')
+            path = model / item['path']
+            if not path.is_file() or path.stat().st_size != item['bytes'] or sha256(path) != item['sha256']:
+                raise EvidenceError('tokenized shard tokenizer file changed')
     if report.get('memory_ledger', {}).get('diagnostic_reserved_bytes') != 128 << 20 or report.get('plan', {}).get('target_gb') != 14:
         raise EvidenceError('native diagnostic reservation or plan mismatch')
     files = report.get('files', [])
@@ -161,7 +212,19 @@ def validate_native_report(report, root, manifest, mode, binary, model, request,
             raise EvidenceError('native capture contains non-finite values')
     if report.get('logits_bytes') != category_bytes['logits'] or report.get('activation_bytes') != category_bytes['activation']:
         raise EvidenceError('native capture byte totals mismatch')
-    expected_docs = {d['id']: d for d in documents_for_split(request, SUPPORTED_SPLIT)}
+    selected_split = request.get('split', SUPPORTED_SPLIT)
+    expected_docs = {d['id']: d for d in documents_for_split(request, selected_split)}
+    if v2:
+        expected_tokenized = {'format': request['format'], 'split': selected_split,
+                              'shard_id': request['shardID'],
+                              'source_corpus_sha256': request['sourceCorpusSHA256'],
+                              'tokenizer_identity': request['tokenizerIdentity'],
+                              'documents': [{'id': item['id'], 'category': item['category'],
+                                             'source_id': item['sourceID'],
+                                             'source_hash': item['sourceHash']}
+                                            for item in request['documents']]}
+        if report.get('tokenized_corpus') != expected_tokenized:
+            raise EvidenceError('native tokenized corpus provenance mismatch')
     config = read_json(model / 'config.json')
     expected_optimizations = report.get('optimizations')
     if not isinstance(expected_optimizations, dict) or expected_optimizations.get('overlapResidentExperts') is not require_split:
@@ -282,6 +345,18 @@ def _stable_plan(plan):
         result.pop(key, None)
     return result
 
+def _capture_identity(report):
+    documents = []
+    for document in report['documents']:
+        documents.append({'id': document['id'], 'positions': [
+            {'position': position['position'], 'routes': position['routes'],
+             'state_sha256': position['state_sha256'], 'state': position['state'],
+             'continuation_id': position['continuation_id'], 'input_id': position['input_id'],
+             'next_token_id': position['next_token_id']} for position in document['positions']]})
+    logits = sorted((item['name'], item['sha256'], item['bytes']) for item in report['files']
+                    if item['category'] == 'logits')
+    return {'documents': documents, 'logits': logits}
+
 def parity(model: Path, reference: Path, manifest: Path, split: str, memory: float, context: int, output: Path) -> int:
     output = fresh_output(output)
     try:
@@ -314,15 +389,9 @@ def parity(model: Path, reference: Path, manifest: Path, split: str, memory: flo
         if split_report['optimizations'] != expected_split_optimizations or _stable_plan(split_report['plan']) != _stable_plan(on['plan']) or split_report['memory_ledger'] != on['memory_ledger'] or (split_report['numerical_environment'] != on['numerical_environment']) or (split_receipt['environment'] != split_environment):
             raise EvidenceError('resident split control changed more than the explicit overlap setting')
 
-        def identity(report):
-            docs = []
-            for doc in report['documents']:
-                docs.append({'id': doc['id'], 'positions': [{'position': p['position'], 'routes': p['routes'], 'state_sha256': p['state_sha256'], 'state': p['state'], 'continuation_id': p['continuation_id'], 'input_id': p['input_id'], 'next_token_id': p['next_token_id']} for p in doc['positions']]})
-            logits = sorted(((f['name'], f['sha256'], f['bytes']) for f in report['files'] if f['category'] == 'logits'))
-            return {'documents': docs, 'logits': logits}
-        if identity(off) != identity(on):
+        if _capture_identity(off) != _capture_identity(on):
             raise EvidenceError('observer on/off logits, routes, state or continuation parity failed')
-        if identity(on) != identity(split_report):
+        if _capture_identity(on) != _capture_identity(split_report):
             raise EvidenceError('resident split control changed logits, routes, state or continuation')
         (oldstats, old_receipt, old_settle) = _ordinary(old, model, output / 'ordinary-old')
         (newstats, new_receipt, new_settle) = _ordinary(current, model, output / 'ordinary-new')
@@ -353,6 +422,78 @@ def parity(model: Path, reference: Path, manifest: Path, split: str, memory: flo
         atomic_json(output / 'failure.json', {'format': 'slotstream-flash-parity-failure-v1', 'error': f'{type(e).__name__}: {e}'})
         return 1
 
+def anchor_parity(model: Path, anchor: Path, corpus: Path, output: Path) -> int:
+    output = fresh_output(output)
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('flash_tokenize_validation', HERE / 'tokenize_corpus.py')
+        module = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(module)
+        corpus_result = module.validate_corpus(corpus, model=model.resolve())
+        current = ROOT / '.build/release/slotstream'
+        anchor_binary = anchor / 'bin/slotstream'
+        validate_build_identity(current)
+        anchor_identity, _ = validate_build_identity(anchor_binary, historical=True)
+        if anchor_identity['binary_sha256'] != '4ce7f4e05ba3e374dd790f88d05b15587f6339588796188af84218a1f838638b':
+            raise EvidenceError('immutable diagnostic reference anchor identity changed')
+        v1 = ROOT / 'Tools/fixtures/flash/capture-development.json'
+        anchor_off, _, anchor_settle = _native(anchor_binary, model, v1, 'development',
+                                                'reference-off', output / 'anchor-v1-off')
+        current_off, _, current_off_settle = _native(current, model, v1, 'development',
+                                                      'reference-off', output / 'adapter-v1-off')
+        current_on, _, current_on_settle = _native(current, model, v1, 'development',
+                                                   'reference-on', output / 'adapter-v1-on')
+        if (_capture_identity(anchor_off) != _capture_identity(current_off)
+                or _capture_identity(current_off) != _capture_identity(current_on)):
+            raise EvidenceError('new adapter does not preserve immutable v1 capture identity')
+        development = [entry for entry in corpus_result['index']['shards']
+                       if entry['split'] == 'development']
+        if not development:
+            raise EvidenceError('tokenized corpus has no development shard')
+        shard = corpus.resolve() / 'corpus' / development[0]['path']
+        v2_off, _, v2_off_settle = _native(current, model, shard, 'development',
+                                            'reference-off', output / 'adapter-v2-off')
+        v2_on, _, v2_on_settle = _native(current, model, shard, 'development',
+                                          'reference-on', output / 'adapter-v2-on')
+        if _capture_identity(v2_off) != _capture_identity(v2_on):
+            raise EvidenceError('tokenized v2 observer changed computational capture identity')
+        evidence = {}
+        for name in ('anchor-v1-off', 'adapter-v1-off', 'adapter-v1-on',
+                     'adapter-v2-off', 'adapter-v2-on'):
+            root = output / name
+            evidence[name] = {
+                'receipt_sha256': sha256(root / 'receipt.json'),
+                'native_report_sha256': sha256(root / 'native/report.json'),
+                'native_completion_sha256': sha256(root / 'native/completion.json'),
+            }
+        report = {
+            'format': 'slotstream-tokenizer-anchor-parity-v1',
+            'schema_version': 1,
+            'qualification': False,
+            'v1_anchor_parity': True,
+            'v2_observer_parity': True,
+            'anchor_parsed_v2': False,
+            'anchor_binary_sha256': sha256(anchor_binary),
+            'adapter_binary_sha256': sha256(current),
+            'corpus_sha256': sha256(corpus.resolve() / 'corpus/corpus.json'),
+            'development_shard_sha256': sha256(shard),
+            'settling': {'anchor_v1_off': anchor_settle, 'adapter_v1_off': current_off_settle,
+                         'adapter_v1_on': current_on_settle, 'adapter_v2_off': v2_off_settle,
+                         'adapter_v2_on': v2_on_settle},
+            'evidence': evidence,
+            'harness_hashes': harness_hashes(),
+        }
+        atomic_json(output / 'report.json', report)
+        atomic_json(output / 'completion.json', {
+            'format': 'slotstream-tokenizer-anchor-parity-completion-v1',
+            'report_sha256': sha256(output / 'report.json'), 'qualification': False})
+        return 0
+    except Exception as error:
+        atomic_json(output / 'failure.json', {'format': 'slotstream-tokenizer-anchor-parity-failure-v1',
+                                              'error': f'{type(error).__name__}: {error}'})
+        return 1
+
 def self_test():
     import unittest
     r = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromName('test_capture'))
@@ -374,6 +515,11 @@ def main(argv=None):
     q.add_argument('--memory-gb', type=float, required=True)
     q.add_argument('--max-context', type=int, required=True)
     q.add_argument('--output', type=Path, required=True)
+    anchor = s.add_parser('anchor-parity')
+    anchor.add_argument('--model', type=Path, required=True)
+    anchor.add_argument('--anchor', type=Path, required=True)
+    anchor.add_argument('--corpus', type=Path, required=True)
+    anchor.add_argument('--output', type=Path, required=True)
     a = p.parse_args(argv)
     if a.self_test:
         return self_test()
@@ -381,6 +527,8 @@ def main(argv=None):
         return dry_run(a.manifest, a.split, a.output)
     if a.cmd == 'parity':
         return parity(a.model, a.reference, a.manifest, a.split, a.memory_gb, a.max_context, a.output)
-    p.error('choose --self-test, dry-run or parity')
+    if a.cmd == 'anchor-parity':
+        return anchor_parity(a.model, a.anchor, a.corpus, a.output)
+    p.error('choose --self-test, dry-run, parity or anchor-parity')
 if __name__ == '__main__':
     raise SystemExit(main())

@@ -80,6 +80,32 @@ public struct ChatMessage {
     }
 }
 
+public final class SlotstreamTokenizer {
+    private let tokenizer: any Tokenizers.Tokenizer
+
+    public init(modelDir: URL) async throws {
+        tokenizer = try await AutoTokenizer.from(modelFolder: modelDir)
+    }
+
+    public func encodeText(_ text: String, addSpecialTokens: Bool = false) -> [Int] {
+        tokenizer.encode(text: text, addSpecialTokens: addSpecialTokens)
+    }
+
+    public func encodeChat(
+        _ messages: [ChatMessage], thinking: Bool = false,
+        addGenerationPrompt: Bool = true, tools: [ToolDefinition] = [], effort: String? = nil
+    ) throws -> [Int] {
+        try tokenizer.applyChatTemplate(
+            messages: messages.map { $0.templateValue },
+            chatTemplate: nil,
+            addGenerationPrompt: addGenerationPrompt,
+            truncation: false,
+            maxLength: nil,
+            tools: tools.isEmpty ? nil : tools.map { $0.templateValue },
+            additionalContext: Engine.additionalContext(thinking: thinking, effort: effort))
+    }
+}
+
 public final class Engine {
     public let modelDir: URL
     public let model: Qwen4ExpModel
@@ -506,13 +532,20 @@ public final class Engine {
     /// so the singleton guard correctly rejected the check it was meant to run.
     public static func encodeChatWithoutModel(
         modelDir: URL, messages: [ChatMessage], thinking: Bool,
-        tools: [ToolDefinition] = [], effort: String? = nil
+        tools: [ToolDefinition] = [], effort: String? = nil,
+        addGenerationPrompt: Bool = true
     ) async throws -> [Int] {
-        let tokenizer = try await AutoTokenizer.from(modelFolder: modelDir)
-        return try tokenizer.applyChatTemplate(
-            messages: messages.map { $0.templateValue },
-            tools: tools.isEmpty ? nil : tools.map { $0.templateValue },
-            additionalContext: additionalContext(thinking: thinking, effort: effort))
+        let tokenizer = try await SlotstreamTokenizer(modelDir: modelDir)
+        return try tokenizer.encodeChat(messages, thinking: thinking,
+                                        addGenerationPrompt: addGenerationPrompt,
+                                        tools: tools, effort: effort)
+    }
+
+    public static func encodeTextWithoutModel(
+        modelDir: URL, text: String, addSpecialTokens: Bool = false
+    ) async throws -> [Int] {
+        let tokenizer = try await SlotstreamTokenizer(modelDir: modelDir)
+        return tokenizer.encodeText(text, addSpecialTokens: addSpecialTokens)
     }
 
     /// OpenAI path: messages already contain image_url parts, and content may

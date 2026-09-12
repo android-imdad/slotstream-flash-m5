@@ -3,7 +3,9 @@ import copy, json, struct, sys, tempfile, unittest
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from capture import FF, H, LAYERS, TOPK, VOCAB, canonical_manifest_hash, dry_run, validate_manifest, validate_native_output
+from capture import (FF, H, LAYERS, TOPK, VOCAB, canonical_manifest_hash, dry_run,
+                     documents_for_split, foundation_manifest_hash,
+                     validate_manifest, validate_native_output)
 from common import EvidenceError, FLASH_ROOT, atomic_json, read_json, sha256
 
 class CaptureTests(unittest.TestCase):
@@ -28,6 +30,26 @@ class CaptureTests(unittest.TestCase):
     def test_valid_manifest_and_i_plus_one_offset(self):
         d = validate_manifest(self.source)
         self.assertEqual(len(d['documents']), 2)
+
+    def tokenized_shard(self, split='development'):
+        value = {'format': 'slotstream-tokenized-capture-shard-v2', 'schemaVersion': 2,
+                 'manifestSHA256': '', 'tokenSource': 'slotstream-auto-tokenizer-chat-template-v1',
+                 'split': split, 'sourceCorpusSHA256': 'a' * 64,
+                 'tokenizerIdentity': {'revision': 'test'}, 'shardID': 'shard-000',
+                 'documents': [{'id': 'natural', 'category': 'prose', 'sourceID': 'fixture',
+                                'sourceHash': 'b' * 64, 'split': split, 'warmupIDs': [1],
+                                'positions': [{'position': 1, 'inputID': 2, 'nextTokenID': 3}]}]}
+        value['manifestSHA256'] = foundation_manifest_hash(value)
+        path = self.root / f'{split}.json'
+        path.write_text(json.dumps(value))
+        return path
+
+    def test_v2_manifest_and_qualification_capture_gate(self):
+        development = validate_manifest(self.tokenized_shard())
+        self.assertEqual(len(documents_for_split(development, 'development')), 1)
+        qualification = validate_manifest(self.tokenized_shard('qualification'))
+        with self.assertRaisesRegex(EvidenceError, 'locked'):
+            documents_for_split(qualification, 'qualification')
 
     def test_unknown_field_rejected(self):
         p = self.mutated(lambda d: d.update(extra=True))

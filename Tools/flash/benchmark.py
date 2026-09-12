@@ -28,6 +28,8 @@ ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MO
                        "SLOTSTREAM_M5_DISPATCH_LOG", "SLOTSTREAM_M5_TRACE_CASE",
                        "SLOTSTREAM_ROUTER_TRACE", "SLOTSTREAM_OPT_RESIDENT_OVERLAP")
 MODEL_SETTLE_SECONDS = 2.0
+TERMINAL_CONFIRM_SECONDS = 0.1
+TERMINAL_CONFIRM_INTERVAL_SECONDS = 0.005
 
 
 def settle_before_model_launch(*, seconds: float = MODEL_SETTLE_SECONDS,
@@ -208,6 +210,27 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
                     if exit_code != 0:
                         failures.append(f"child exited {exit_code}")
 
+                def confirm_terminal_exit(now: float) -> dict[str, int] | None:
+                    nonlocal timed_out, interrupted
+                    deadline = min(started + max_seconds, now + TERMINAL_CONFIRM_SECONDS)
+                    while True:
+                        if cancelled():
+                            interrupted = True
+                            failures.append("cancelled during terminal exit confirmation")
+                            return None
+                        current = clock()
+                        if current - started > max_seconds:
+                            timed_out = True
+                            failures.append("timeout during terminal exit confirmation")
+                            return None
+                        exited = exit_observer.observe()
+                        if exited is not None:
+                            return exited
+                        if current >= deadline:
+                            raise SamplingError(
+                                "process exit was not confirmed after terminal rusage appeared")
+                        sleep(min(TERMINAL_CONFIRM_INTERVAL_SECONDS, deadline - current))
+
                 while True:
                     now = clock()
                     if cancelled():
@@ -227,10 +250,9 @@ def launch(output: Path, memory_gb: float, max_seconds: float, command: list[str
                             observed = dict(sampler.sample())
                             record_sample(observed, "live", now)
                         except ProcessExitedDuringSample:
-                            exited = exit_observer.observe()
+                            exited = confirm_terminal_exit(now)
                             if exited is None:
-                                raise SamplingError(
-                                    "process exit was not confirmed after terminal rusage appeared")
+                                break
                             finish_exited(exited, now)
                             break
                         except Exception as error:
