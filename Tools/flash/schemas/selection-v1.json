@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slotstream.local/schemas/flash/selection-v1.json",
+  "title": "Slotstream Flash experiment selection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schema_version", "selected_stage_ids", "selected_arm_ids", "stages"],
+  "properties": {
+    "format": {"const": "slotstream-flash-selection-v1"},
+    "schema_version": {"const": 1},
+    "selected_stage_ids": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 7}, "uniqueItems": true},
+    "selected_arm_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "stages": {"type": "array", "minItems": 8, "maxItems": 8}
+  }
+}

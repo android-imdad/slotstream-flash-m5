@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slotstream.local/schemas/flash/receipt-v1.json",
+  "title": "Slotstream Flash evidence receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schema_version", "kind", "qualified", "qualification_reasons", "command", "environment", "started_at_unix", "ended_at_unix", "duration_seconds", "process", "memory", "vm", "result", "artifacts", "identities"],
+  "properties": {
+    "format": {"const": "slotstream-flash-receipt-v1"},
+    "schema_version": {"const": 1},
+    "kind": {"enum": ["launch", "archive", "stage0"]},
+    "qualified": {"type": "boolean"},
+    "qualification_reasons": {"type": "array", "items": {"type": "string"}},
+    "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "environment": {"type": "object", "additionalProperties": {"type": "string"}},
+    "started_at_unix": {"type": "number", "minimum": 0},
+    "ended_at_unix": {"type": "number", "minimum": 0},
+    "duration_seconds": {"type": "number", "minimum": 0},
+    "process": {"type": "object"},
+    "memory": {"type": "object"},
+    "vm": {"type": "object"},
+    "result": {"type": "object"},
+    "artifacts": {"type": "object"},
+    "identities": {"type": "object"}
+  }
+}
