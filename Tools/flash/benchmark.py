@@ -24,7 +24,8 @@ from observe import DarwinSampler, SamplingError
 from prefill_bench import preflight, terminate_child_tree, vm_snapshot
 
 ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MODE",
-                       "SLOTSTREAM_M5_DISPATCH_LOG", "SLOTSTREAM_M5_TRACE_CASE")
+                       "SLOTSTREAM_M5_DISPATCH_LOG", "SLOTSTREAM_M5_TRACE_CASE",
+                       "SLOTSTREAM_ROUTER_TRACE")
 
 
 def _environment() -> dict[str, str]:

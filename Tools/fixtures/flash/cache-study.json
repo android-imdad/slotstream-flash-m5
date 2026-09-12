@@ -1,0 +1,35 @@
+{
+  "format": "slotstream-cache-study-fixture-v1",
+  "schema_version": 1,
+  "content_sha256": "f5fd1554ca17d3a957037d541a5af0f8a27e994f4986a07a3a95b6b8a5c5cb25",
+  "development_only": true,
+  "options": {
+    "greedy": true,
+    "max_context": 2048,
+    "max_tokens": 128,
+    "memory_gb_decimal": 14,
+    "mtp": "off",
+    "seed": 7,
+    "vision": "off"
+  },
+  "prompts": [
+    {
+      "id": "sky-blue",
+      "max_ascii_bytes": 160,
+      "max_output_utf8_bytes": 4096,
+      "text": "In one sentence, explain why the sky is blue."
+    },
+    {
+      "id": "python-deduplicate",
+      "max_ascii_bytes": 160,
+      "max_output_utf8_bytes": 4096,
+      "text": "Write a short Python function that removes duplicates from a list while preserving order."
+    },
+    {
+      "id": "multiply-37-by-42",
+      "max_ascii_bytes": 160,
+      "max_output_utf8_bytes": 4096,
+      "text": "Briefly explain how to multiply 37 by 42."
+    }
+  ]
+}
