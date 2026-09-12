@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slotstream.local/schemas/flash/quality-prepared-suite-v2.json",
+  "$defs": {
+    "hash": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "identity": {"type":"object","additionalProperties":false,"required":["bytes","sha256"],"properties":{"bytes":{"type":"integer","minimum":1},"sha256":{"$ref":"#/$defs/hash"}}},
+    "promptBase":{"type":"object","required":["id","prompt","promptRawSHA256"],"properties":{"id":{"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},"prompt":{"type":"string","minLength":1},"promptRawSHA256":{"$ref":"#/$defs/hash"}}},
+    "gsm8k":{"type":"object","additionalProperties":false,"required":["id","sourceRow","prompt","promptRawSHA256","promptMode","system","promptContentSHA256","expectedAnswer","expectedFinal","scorer"],"properties":{"id":{"type":"string"},"sourceRow":{"type":"integer","minimum":0,"maximum":199},"prompt":{"type":"string","minLength":1},"promptRawSHA256":{"$ref":"#/$defs/hash"},"promptMode":{"const":"chat"},"system":{"type":"string","minLength":1},"promptContentSHA256":{"$ref":"#/$defs/hash"},"expectedAnswer":{"type":"string","minLength":1},"expectedFinal":{"type":"string","minLength":1},"scorer":{"const":"gsm8k-final-number-v1"}}},
+    "humaneval":{"type":"object","additionalProperties":false,"required":["id","taskID","entryPoint","prompt","promptRawSHA256","promptMode","canonicalSolution","test","scorer","executionAvailable"],"properties":{"id":{"type":"string"},"taskID":{"type":"string","pattern":"^HumanEval/[0-9]+$"},"entryPoint":{"type":"string","minLength":1},"prompt":{"type":"string","minLength":1},"promptRawSHA256":{"$ref":"#/$defs/hash"},"promptMode":{"const":"raw-completion"},"canonicalSolution":{"type":"string"},"test":{"type":"string"},"scorer":{"const":"official-humaneval-unexecuted-v1"},"executionAvailable":{"const":false}}},
+    "xnli":{"type":"object","additionalProperties":false,"required":["id","promptID","pairID","language","premise","hypothesis","englishPartitionText","englishPartitionSHA256","prompt","promptRawSHA256","promptMode","system","promptContentSHA256","expectedLabel","scorer"],"properties":{"id":{"type":"string"},"promptID":{"type":"string"},"pairID":{"type":"string"},"language":{"enum":["en","fr","zh"]},"premise":{"type":"string"},"hypothesis":{"type":"string"},"englishPartitionText":{"type":"string"},"englishPartitionSHA256":{"$ref":"#/$defs/hash"},"prompt":{"type":"string"},"promptRawSHA256":{"$ref":"#/$defs/hash"},"promptMode":{"const":"chat"},"system":{"type":"string","minLength":1},"promptContentSHA256":{"$ref":"#/$defs/hash"},"expectedLabel":{"enum":["entailment","neutral","contradiction"]},"scorer":{"const":"xnli-exact-label-v1"}}},
+    "structured":{"type":"object","additionalProperties":false,"required":["id","kind","prompt","expected","expectedCanonicalJSON","seed","ordinal","scorer","promptRawSHA256","promptMode","system","promptContentSHA256"],"properties":{"id":{"type":"string"},"kind":{"enum":["json_extraction","tool_arguments","nested_json","computed_json"]},"prompt":{"type":"string"},"expected":{},"expectedCanonicalJSON":{"type":"string"},"seed":{"const":1},"ordinal":{"type":"integer","minimum":0,"maximum":199},"scorer":{"const":"structured-canonical-json-v1"},"promptRawSHA256":{"$ref":"#/$defs/hash"},"promptMode":{"const":"chat"},"system":{"type":"string","minLength":1},"promptContentSHA256":{"$ref":"#/$defs/hash"}}},
+    "teacher": {
+      "type":"object","additionalProperties":false,
+      "required":["id","kind","category","split","sourceID","license","partitionText","partitionNormalizedSHA256","partitionBucket","rawSHA256","normalizedSHA256","text","warmupTokens","scoreTokens","selector"],
+      "properties": {
+        "id":{"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},"kind":{"const":"raw"},
+        "category":{"enum":["prose","code","math","multilingual","structured"]},
+        "split":{"enum":["training","development","qualification"]},"sourceID":{"type":"string","minLength":1,"maxLength":256},
+        "license":{"type":"string","minLength":1,"maxLength":256},"partitionText":{"type":"string","minLength":1},
+        "partitionNormalizedSHA256":{"$ref":"#/$defs/hash"},"partitionBucket":{"type":"integer","minimum":0,"maximum":4},
+        "rawSHA256":{"$ref":"#/$defs/hash"},"normalizedSHA256":{"$ref":"#/$defs/hash"},"text":{"type":"string","minLength":1},
+        "warmupTokens":{"type":"integer","minimum":0,"maximum":256},"scoreTokens":{"type":"integer","minimum":1,"maximum":64},
+        "selector":{"type":"object"}
+      }
+    }
+  },
+  "type":"object","additionalProperties":false,
+  "required":["format","schemaVersion","qualification","normalization","structuredMessageCanonicalization","sources","authoredFixtureSHA256","teacherForced","finalScored","unavailable","contractSHA256"],
+  "properties": {
+    "format":{"const":"slotstream-quality-prepared-suite-v2"},"schemaVersion":{"const":2},"qualification":{"const":false},
+    "normalization":{"const":"NFKC then Unicode-whitespace collapse; checks only"},
+    "structuredMessageCanonicalization":{"const":"UTF-8 compact canonical JSON object with sorted system/user keys"},"sources":{"type":"object"},
+    "authoredFixtureSHA256":{"$ref":"#/$defs/hash"},"contractSHA256":{"$ref":"#/$defs/hash"},
+    "teacherForced":{"type":"object","additionalProperties":false,"required":["documents","selectionDecisions"],"properties":{"documents":{"type":"array","minItems":1,"maxItems":2048,"items":{"$ref":"#/$defs/teacher"}},"selectionDecisions":{"type":"object","required":["prose","code","math","multilingual","structured"],"additionalProperties":false}}},
+    "finalScored":{"type":"object","additionalProperties":false,"required":["executionAvailable","promptTokenIDsAvailable","promptTokenIDBlocker","settings","scorerContracts","gsm8k","humaneval","xnli","structured"],"properties":{"executionAvailable":{"const":false},"promptTokenIDsAvailable":{"type":"boolean"},"promptTokenIDBlocker":{"type":"string","minLength":1},"settings":{"type":"object","additionalProperties":false,"required":["decoding","reasoning","seed","eos","benchmarks"],"properties":{"decoding":{"const":"greedy"},"reasoning":{"const":false},"seed":{"type":"null"},"eos":{"const":"model_eos"},"benchmarks":{"type":"object"}}},"scorerContracts":{"type":"object"},"gsm8k":{"type":"array","minItems":200,"maxItems":200,"items":{"$ref":"#/$defs/gsm8k"}},"humaneval":{"type":"array","minItems":164,"maxItems":164,"items":{"$ref":"#/$defs/humaneval"}},"xnli":{"type":"array","minItems":600,"maxItems":600,"items":{"$ref":"#/$defs/xnli"}},"structured":{"type":"array","minItems":200,"maxItems":200,"items":{"$ref":"#/$defs/structured"}}}},
+    "unavailable":{"type":"array","minItems":1,"items":{"type":"string"},"uniqueItems":true}
+  }
+}

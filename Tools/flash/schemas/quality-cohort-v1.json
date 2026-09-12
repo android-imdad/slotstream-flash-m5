@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://slotstream.local/schemas/flash/quality-cohort-v1.json",
+  "$defs":{"hash":{"type":"string","pattern":"^[0-9a-f]{64}$"},"artifact":{"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"type":"string"},"sha256":{"$ref":"#/$defs/hash"}}}},
+  "type":"object","additionalProperties":false,
+  "required":["format","schemaVersion","qualification","kind","split","suite","tokenized","expectedCategories","shards","positions","manifestSHA256"],
+  "properties":{
+    "format":{"const":"slotstream-quality-cohort-v1"},"schemaVersion":{"const":1},"qualification":{"const":false},
+    "kind":{"enum":["full-study","diagnostic-control"]},"split":{"enum":["training","development"]},
+    "suite":{"oneOf":[{"type":"null"},{"$ref":"#/$defs/artifact"}]},
+    "tokenized":{"type":"object","additionalProperties":false,"required":["path","corpusSHA256","completionSHA256","sourceManifestSHA256","tokenizerIdentitySHA256"],"properties":{"path":{"type":"string"},"corpusSHA256":{"$ref":"#/$defs/hash"},"completionSHA256":{"$ref":"#/$defs/hash"},"sourceManifestSHA256":{"$ref":"#/$defs/hash"},"tokenizerIdentitySHA256":{"$ref":"#/$defs/hash"}}},
+    "expectedCategories":{"type":"array","minItems":1,"items":{"type":"string"},"uniqueItems":true},
+    "shards":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["ordinal","path","sha256","documents","positions","capture"],"properties":{"ordinal":{"type":"integer","minimum":0},"path":{"type":"string","pattern":"^shards/shard-[0-9]{3,4}\\.json$"},"sha256":{"$ref":"#/$defs/hash"},"documents":{"type":"array","minItems":1},"positions":{"type":"integer","minimum":1,"maximum":64},"capture":{"type":"object"}}}},
+    "positions":{"type":"integer","minimum":1},"manifestSHA256":{"$ref":"#/$defs/hash"}
+  }
+}
