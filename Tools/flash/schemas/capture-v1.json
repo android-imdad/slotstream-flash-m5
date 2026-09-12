@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Slotstream bounded capture manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "schemaVersion", "manifestSHA256", "developmentOnly", "tokenSource", "documents"],
+  "properties": {
+    "format": {"const": "slotstream-flash-capture-v1"},
+    "schemaVersion": {"const": 1},
+    "developmentOnly": {"const": true},
+    "tokenSource": {"const": "arbitrary-valid-diagnostic-ids-not-training-text"},
+    "manifestSHA256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "documents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "split", "warmupIDs", "positions"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$", "minLength": 1, "maxLength": 64},
+          "split": {"const": "development"},
+          "warmupIDs": {"type": "array", "maxItems": 256, "items": {"type": "integer", "minimum": 0, "maximum": 248319}},
+          "positions": {
+            "type": "array",
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["position", "inputID", "nextTokenID"],
+              "properties": {
+                "position": {"type": "integer", "minimum": 0, "maximum": 2047},
+                "inputID": {"type": "integer", "minimum": 0, "maximum": 248319},
+                "nextTokenID": {"type": "integer", "minimum": 0, "maximum": 248319}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

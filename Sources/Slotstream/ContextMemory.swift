@@ -83,9 +83,11 @@ public struct ContextMemoryLedger: Sendable {
     public let mtpResidentBytes: Int
     public let visionResidentBytes: Int
     public let planningMarginBytes: Int
+    public let diagnosticReservedBytes: Int
 
     public init(slots: Int, context: Int, chunk: Int, retentionTokens: Int,
-                mtp: Bool, visionResident: Bool, checkpoint: CheckpointMemory? = nil) {
+                mtp: Bool, visionResident: Bool, checkpoint: CheckpointMemory? = nil,
+                diagnosticReservedBytes: Int = 0) {
         fixedBytes = checkpoint?.fixedBytes ?? PlannerCostModel.fixedBytes
         poolBytes = ContextBytes.product(slots, checkpoint?.recordBytes ?? Int(Geometry.recordBytes))
         activeCapacityBytes = ContextGeometry.sequenceBytes(tokens: context, mtp: mtp)
@@ -98,6 +100,7 @@ public struct ContextMemoryLedger: Sendable {
         mtpResidentBytes = mtp ? PlannerCostModel.mtpResidentBytes : 0
         visionResidentBytes = visionResident ? PlannerCostModel.visionResidentBytes : 0
         planningMarginBytes = PlannerCostModel.planningMarginBytes
+        self.diagnosticReservedBytes = diagnosticReservedBytes >= 0 ? diagnosticReservedBytes : Int.max
     }
 
     /// The Hermes envelope is anchored permanently at 65K. Above it, reserve
@@ -112,15 +115,17 @@ public struct ContextMemoryLedger: Sendable {
     public var expectedPeakBytes: Int {
         ContextBytes.sum(fixedBytes, poolBytes, additionalActiveBytes, retainedCapacityBytes,
             retainedRecurrentBytes, prefillBytes, longContextReserveBytes,
-            mtpResidentBytes, visionResidentBytes)
+            mtpResidentBytes, visionResidentBytes, diagnosticReservedBytes)
     }
     public var json: [String: Any] {
-        ["version": 1, "fixed_bytes": fixedBytes, "pool_bytes": poolBytes,
+        var result: [String: Any] = ["version": 1, "fixed_bytes": fixedBytes, "pool_bytes": poolBytes,
          "active_capacity_bytes": activeCapacityBytes, "additional_active_bytes": additionalActiveBytes,
          "retained_capacity_bytes": retainedCapacityBytes, "retained_recurrent_bytes": retainedRecurrentBytes,
          "prefill_bytes": prefillBytes, "long_context_reserve_bytes": longContextReserveBytes,
          "mtp_resident_bytes": mtpResidentBytes, "vision_resident_bytes": visionResidentBytes,
          "planning_margin_bytes": planningMarginBytes, "expected_peak_bytes": expectedPeakBytes]
+        if diagnosticReservedBytes > 0 { result["diagnostic_reserved_bytes"] = diagnosticReservedBytes }
+        return result
     }
 }
 

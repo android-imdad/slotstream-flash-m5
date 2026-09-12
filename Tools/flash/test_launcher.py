@@ -51,6 +51,17 @@ class LauncherTests(unittest.TestCase):
                                 sampler_factory=kwargs.pop("sampler_factory", FakeSampler),
                                 preflight_func=lambda needed: self.vm(), vm_provider=self.vm, **kwargs)
 
+    def test_fixed_model_settle_is_injected_and_measured(self):
+        calls = []
+        ticks = iter((10.0, 12.25))
+        result = benchmark.settle_before_model_launch(seconds=2.0,
+            sleep=lambda seconds: calls.append(seconds), clock=lambda: next(ticks))
+        self.assertEqual(calls, [2.0])
+        self.assertEqual(result, {"policy": "fixed-before-full-model-launch",
+            "requested_seconds": 2.0, "observed_elapsed_seconds": 2.25})
+        with self.assertRaises(EvidenceError):
+            benchmark.settle_before_model_launch(seconds=0, sleep=lambda _: None)
+
     def test_success_writes_hashed_completion(self):
         self.assertEqual(self.run_child(), 0)
         receipt = read_json(self.output / "receipt.json")

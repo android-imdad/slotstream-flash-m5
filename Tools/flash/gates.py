@@ -24,6 +24,7 @@ from receipts import validate_selection
 
 REQUIRED_CHECKS = {"jang-formats", "jang-numerics"}
 M5_REQUIRED_CHECKS = {"m5-eligibility", "m5-dispatch"}
+FLASH_REQUIRED_CHECKS = {"flash-identity", "flash-observation"}
 
 
 def validate_checks(
@@ -83,7 +84,8 @@ def _flatten(suite):
 def run_python_tests() -> dict[str, Any]:
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    for name in ("test_launcher", "test_receipts", "test_m5_probe"):
+    for name in ("test_launcher", "test_receipts", "test_m5_probe", "test_cache_study",
+                 "test_replay", "test_capture"):
         suite.addTests(loader.loadTestsFromModule(importlib.import_module(name)))
     tests = list(_flatten(suite))
     ids = [test.id() for test in tests]
@@ -173,7 +175,8 @@ def stage_zero(output: Path, *, runner: Callable[[list[str]], subprocess.Complet
         return 1
 
 
-def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.CompletedProcess[str]] = _run) -> int:
+def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.CompletedProcess[str]] = _run,
+             label: str = "m5", required_checks: set[str] = M5_REQUIRED_CHECKS) -> int:
     output = fresh_output(output)
     started = time.time()
     commands: list[dict[str, Any]] = []
@@ -187,7 +190,7 @@ def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.Completed
         binary = ROOT / ".build" / "release" / "slotstream"
         identity, _ = validate_build_identity(binary)
         check_command = [str(ROOT / ".build" / "release" / "slotstream-checks"),
-                         "--tier", "t0", "--tier", "t1", "--filter", "m5", "--json"]
+                         "--tier", "t0", "--tier", "t1", "--filter", label, "--json"]
         checked = runner(check_command)
         commands.append({"argv": check_command, "exit_code": checked.returncode,
                          "stdout": checked.stdout, "stderr": checked.stderr})
@@ -195,25 +198,26 @@ def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.Completed
             raise EvidenceError("M5 native check catalogue failed")
         try: checks = json.loads(checked.stdout)
         except json.JSONDecodeError as error: raise EvidenceError(f"malformed M5 check JSON: {error}") from error
-        validate_checks(checks, required=M5_REQUIRED_CHECKS, exact_names=True)
+        validate_checks(checks, required=required_checks, exact_names=True)
         atomic_json(output / "checks.json", checks)
         test_result = run_python_tests()
         test_count = validate_python_test_result(test_result,
-            {"LauncherTests", "ReceiptTests", "M5ProbeTests"})
+            {"LauncherTests", "ReceiptTests", "M5ProbeTests", "CacheStudyTests", "ReplayTests", "CaptureTests"})
         commands.append({"argv": [sys.executable, "-m", "unittest", "discover", "-s", "Tools/flash"],
                          "exit_code": 0, "structured_result": test_result})
         atomic_json(output / "commands.json", {"commands": commands})
         ended = time.time()
         receipt = {
-            "format": RECEIPT_FORMAT, "schema_version": 1, "kind": "m5", "qualified": True,
-            "qualification_reasons": [], "command": ["gates.py", "--stage", "m5", "--output", str(output)],
+            "format": RECEIPT_FORMAT, "schema_version": 1, "kind": label, "qualified": True,
+            "qualification_reasons": [], "command": ["gates.py", "--stage", label, "--output", str(output)],
             "environment": {}, "started_at_unix": started, "ended_at_unix": ended,
             "duration_seconds": ended - started, "process": {"pid": os.getpid()},
             "memory": {"qualified": False, "reason": "per-case MLX peak is recorded in checks.json"}, "vm": {},
             "result": {"exit_code": 0, "functional_success": True,
-                       "qualification_scope": "m5-component-diagnostic",
+                       "qualification_scope": f"{label}-component-diagnostic",
                        "native_checks": len(checks["checks"]), "python_tests": test_count,
-                       "observation_status": "unverified", "catalogue": checks["checks"]},
+                       "observation_status": "unverified" if label == "m5" else "reference-unaccepted",
+                       "catalogue": checks["checks"]},
             "artifacts": {name: {"bytes": (output / name).stat().st_size, "sha256": sha256(output / name)}
                           for name in ("checks.json", "commands.json")},
             "identities": {"build_identity": identity, "harness_hashes": harness_hashes()},
@@ -232,10 +236,12 @@ def stage_m5(output: Path, *, runner: Callable[[list[str]], subprocess.Completed
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--stage", choices=("0", "m5"), required=True)
+    parser.add_argument("--stage", choices=("0", "m5", "flash"), required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
-    return stage_zero(args.output) if args.stage == "0" else stage_m5(args.output)
+    if args.stage == "0": return stage_zero(args.output)
+    if args.stage == "m5": return stage_m5(args.output)
+    return stage_m5(args.output, label="flash", required_checks=FLASH_REQUIRED_CHECKS)
 
 
 if __name__ == "__main__":

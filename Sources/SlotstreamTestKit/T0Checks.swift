@@ -12,6 +12,8 @@ extension Catalogue {
             Check("jang-numerics", tier: .t1) { try Diagnostics.jangNumerics() },
             Check("m5-eligibility", tier: .t0) { Diagnostics.m5Eligibility() },
             Check("m5-dispatch", tier: .t1) { try Diagnostics.m5Dispatch() },
+            Check("flash-identity", tier: .t0) { try Diagnostics.flashIdentity() },
+            Check("flash-observation", tier: .t0) { try Diagnostics.flashObservation() },
             Check("prefill-schedule", tier: .t0) { Diagnostics.prefillSchedule() },
             Check("context-policy", tier: .t0) { contextPolicy() },
             Check("configurable-context", tier: .t0) { try Diagnostics.configurableContext() },

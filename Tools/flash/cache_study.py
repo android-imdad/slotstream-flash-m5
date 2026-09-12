@@ -301,7 +301,7 @@ def validate_cohort_shape(pairs: Any, fixture: dict[str, Any]) -> None:
             raise EvidenceError("collection pair or arms are malformed")
         for arm in ("untraced", "traced"):
             info = pair["arms"][arm]
-            expected_artifacts = {"receipt.json", "stats.json", "environment.json"}
+            expected_artifacts = {"receipt.json", "stats.json", "environment.json", "settling.json"}
             if arm == "traced": expected_artifacts.add("router-trace.bin")
             if (not isinstance(info, dict) or set(info) != {"path", "artifacts"}
                     or not isinstance(info["artifacts"], dict)
@@ -323,10 +323,12 @@ def validate_collection(
 ) -> dict[str, Any]:
     collection = collection.resolve(strict=True)
     required = {"format", "schema_version", "complete", "qualification", "fixture_sha256",
-                "binary", "model", "pairs", "harness_hashes"}
+                "binary", "model", "pairs", "harness_hashes", "model_settling_policy"}
     if (set(manifest) != required or manifest.get("format") != "slotstream-cache-collection-v1"
             or manifest.get("schema_version") != 1 or manifest.get("complete") is not True
-            or manifest.get("qualification") is not False):
+            or manifest.get("qualification") is not False
+            or manifest.get("model_settling_policy") != {"kind": "fixed-before-full-model-launch",
+                                                           "seconds": benchmark.MODEL_SETTLE_SECONDS}):
         raise EvidenceError("collection manifest is incomplete or malformed")
     fixture = load_fixture()
     if manifest["fixture_sha256"] != sha256(FIXTURE) or manifest["harness_hashes"] != harness_hashes():
@@ -384,6 +386,12 @@ def validate_collection(
                 raise EvidenceError(f"collection command differs from frozen options: {pair['prompt_id']} {arm}")
             documents[arm] = read_json(root / "stats.json"); validate_stats(documents[arm], prompt)
             environments[arm] = read_json(root / "environment.json")
+            settling = read_json(root / "settling.json")
+            if (settling.get("policy") != "fixed-before-full-model-launch"
+                    or settling.get("requested_seconds") != benchmark.MODEL_SETTLE_SECONDS
+                    or type(settling.get("observed_elapsed_seconds")) not in (int, float)
+                    or settling["observed_elapsed_seconds"] < 0):
+                raise EvidenceError("collection settling evidence is malformed")
             if environments[arm] != receipt["environment"]:
                 raise EvidenceError("collection environment does not match launcher receipt")
         trace_value = environments["traced"].pop("SLOTSTREAM_ROUTER_TRACE", None)
@@ -446,8 +454,10 @@ def collect(model: Path, output: Path) -> int:
                            "--prompt", prompt["text"], "--max-tokens", "128", "--greedy",
                            "--seed", "7", "--sample-footprint", "--stats-json", str(stats_path)]
                 prior = _set_trace(str(trace_path) if traced else None)
+                settle = benchmark.settle_before_model_launch()
                 try: code = benchmark.launch(evidence, 14.0, 900.0, command)
                 finally: _set_trace(prior)
+                atomic_json(evidence / "settling.json", settle)
                 receipt = validate_receipt_file(evidence / "receipt.json")
                 if code != 0 or not receipt["result"]["functional_success"]:
                     raise EvidenceError(f"{prompt['id']} {arm} monitored generation failed")
@@ -460,7 +470,7 @@ def collect(model: Path, output: Path) -> int:
                     native = replay(groups, stats["effective_pool_slots"], source["layer_source_record_bytes"])
                     validate_runtime_stats(stats, groups, native)
                 atomic_json(evidence / "environment.json", environment)
-                names = ["receipt.json", "stats.json", "environment.json"] + (["router-trace.bin"] if traced else [])
+                names = ["receipt.json", "stats.json", "environment.json", "settling.json"] + (["router-trace.bin"] if traced else [])
                 arms[arm] = {"path": str(evidence.relative_to(output)),
                              "artifacts": {name: sha256(evidence / name) for name in names}}
             untraced = read_json(output / arms["untraced"]["path"] / "stats.json")
@@ -479,6 +489,8 @@ def collect(model: Path, output: Path) -> int:
                                "build_identity": identity, "archive_receipt": str(archive_receipt_path),
                                "archive_receipt_sha256": sha256(archive_receipt_path)},
                     "model": source, "pairs": pairs, "harness_hashes": harness_hashes()}
+        manifest["model_settling_policy"] = {"kind": "fixed-before-full-model-launch",
+                                             "seconds": benchmark.MODEL_SETTLE_SECONDS}
         atomic_json(output / "collection.json", manifest)
         validate_collection(output, manifest, require_completion=False)
         atomic_json(output / "completion.json", {"format": "slotstream-cache-collection-completion-v1",

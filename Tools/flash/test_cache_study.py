@@ -136,8 +136,8 @@ class CacheStudyTests(unittest.TestCase):
         pairs = [{"prompt_id": prompt["id"], "prompt_tokens": 2, "output_tokens": 1,
                   "arms": {arm: {"path": f"{prompt['id']}/{arm}",
                                   "artifacts": {name: "x" for name in
-                                      ({"receipt.json", "stats.json", "environment.json", "router-trace.bin"}
-                                       if arm == "traced" else {"receipt.json", "stats.json", "environment.json"})}}
+                                      ({"receipt.json", "stats.json", "environment.json", "settling.json", "router-trace.bin"}
+                                       if arm == "traced" else {"receipt.json", "stats.json", "environment.json", "settling.json"})}}
                            for arm in ("untraced", "traced")}} for prompt in fixture["prompts"]]
         validate_cohort_shape(pairs, fixture)
         with self.assertRaises(EvidenceError): validate_cohort_shape(pairs[:-1], fixture)
@@ -192,6 +192,8 @@ class CacheStudyTests(unittest.TestCase):
         (directory / "memory.jsonl").write_text(json.dumps(sample) + "\n")
         atomic_json(directory / "stats.json", stats)
         atomic_json(directory / "environment.json", environment)
+        atomic_json(directory / "settling.json", {"policy": "fixed-before-full-model-launch",
+                    "requested_seconds": 2.0, "observed_elapsed_seconds": 2.0})
         names = ["stdout.txt", "stderr.txt", "memory.jsonl", "stats.json"]
         if trace_path is not None: names.append("router-trace.bin")
         prompt = stats["fixture_prompt"]
@@ -267,7 +269,7 @@ class CacheStudyTests(unittest.TestCase):
                                    "memoryPressureCancelled": False,
                                    "sampledFootprint": {"peakBytes": 1, "samples": 1}}}
                 self._launch_receipt(directory, binary, stats, trace, environment)
-                names = {"receipt.json", "stats.json", "environment.json"}
+                names = {"receipt.json", "stats.json", "environment.json", "settling.json"}
                 if trace: names.add("router-trace.bin")
                 arms[arm] = {"path": str(directory.relative_to(collection)),
                              "artifacts": {name: sha256(directory / name) for name in names}}
@@ -278,7 +280,8 @@ class CacheStudyTests(unittest.TestCase):
                     "binary": {"path": str(binary), "sha256": sha256(binary),
                                "build_identity": identity, "archive_receipt": str(archive / "receipt.json"),
                                "archive_receipt_sha256": sha256(archive / "receipt.json")},
-                    "model": source, "pairs": pairs, "harness_hashes": harness_hashes()}
+                    "model": source, "pairs": pairs, "harness_hashes": harness_hashes(),
+                    "model_settling_policy": {"kind": "fixed-before-full-model-launch", "seconds": 2.0}}
         atomic_json(collection / "collection.json", manifest)
         atomic_json(collection / "completion.json", {"format": "slotstream-cache-collection-completion-v1",
                     "collection_sha256": sha256(collection / "collection.json"), "complete": True,

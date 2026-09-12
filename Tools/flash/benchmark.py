@@ -25,7 +25,21 @@ from prefill_bench import preflight, terminate_child_tree, vm_snapshot
 
 ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MODE",
                        "SLOTSTREAM_M5_DISPATCH_LOG", "SLOTSTREAM_M5_TRACE_CASE",
-                       "SLOTSTREAM_ROUTER_TRACE")
+                       "SLOTSTREAM_ROUTER_TRACE", "SLOTSTREAM_OPT_RESIDENT_OVERLAP")
+MODEL_SETTLE_SECONDS = 2.0
+
+
+def settle_before_model_launch(*, seconds: float = MODEL_SETTLE_SECONDS,
+                               sleep: Callable[[float], None] = time.sleep,
+                               clock: Callable[[], float] = time.monotonic) -> dict[str, Any]:
+    """Apply the fixed post-process VM-stat settling window outside model timing."""
+    if type(seconds) not in (int, float) or not (0 < seconds <= 60):
+        raise EvidenceError("model settle seconds must be finite and between 0 and 60")
+    started = clock()
+    sleep(float(seconds))
+    ended = clock()
+    return {"policy": "fixed-before-full-model-launch", "requested_seconds": float(seconds),
+            "observed_elapsed_seconds": max(0.0, ended - started)}
 
 
 def _environment() -> dict[str, str]:

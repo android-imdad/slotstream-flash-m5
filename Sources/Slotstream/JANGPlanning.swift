@@ -31,12 +31,16 @@ public struct CheckpointMemory: Equatable, Sendable {
         let limit = min(device.ramGB, device.workingSetGB - 2, available - 3)
         let target = memoryGB ?? min(33, device.ramGB * ramPercent / 100, limit)
         guard target.isFinite, target > 0, target <= limit else {
-            throw PlanError("JANG memory target must fit current RAM, Metal working set and reclaimable headroom")
+            throw PlanError(String(format:
+                "JANG memory target must fit current RAM, Metal working set and reclaimable headroom "
+                    + "(target %.2f GB, RAM %.2f GB, Metal working set %.2f GB, reclaimable %.2f GB)",
+                target, device.ramGB, device.workingSetGB, available))
         }
         let chunk = policy.prefillChunkOverride ?? 256
         let retention = policy.prefixCacheEnabled ? min(4096, maxContext) : 0
         let empty = ContextMemoryLedger(slots: 0, context: maxContext, chunk: chunk,
-            retentionTokens: retention, mtp: false, visionResident: false, checkpoint: self)
+            retentionTokens: retention, mtp: false, visionResident: false, checkpoint: self,
+            diagnosticReservedBytes: policy.diagnosticReservedBytes)
         let availablePool = target * 1e9 - Double(empty.expectedPeakBytes) - 1e9
         guard availablePool >= Double(Geometry.floorSlots * recordBytes) else {
             throw PlanError("JANG target cannot hold its resident weights, runtime and minimum expert cache")

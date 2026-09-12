@@ -1,0 +1,26 @@
+{
+  "format": "slotstream-flash-capture-v1",
+  "schemaVersion": 1,
+  "developmentOnly": true,
+  "tokenSource": "arbitrary-valid-diagnostic-ids-not-training-text",
+  "manifestSHA256": "f86a0fe7eb433409057ebf5057d366d4a8651e7c4d83545be8af5417eb884ea5",
+  "documents": [
+    {
+      "id": "diagnostic-sequence-a",
+      "split": "development",
+      "warmupIDs": [2000, 21],
+      "positions": [
+        {"position": 2, "inputID": 907, "nextTokenID": 34},
+        {"position": 3, "inputID": 34, "nextTokenID": 55}
+      ]
+    },
+    {
+      "id": "diagnostic-sequence-b",
+      "split": "development",
+      "warmupIDs": [101, 202],
+      "positions": [
+        {"position": 2, "inputID": 303, "nextTokenID": 404}
+      ]
+    }
+  ]
+}

@@ -59,13 +59,19 @@ public struct PlanError: Error, CustomStringConvertible {
 public struct RuntimeAllocationPolicy: Equatable, Sendable {
     public let prefillChunkOverride: Int?
     public let prefixCacheEnabled: Bool
+    public let diagnosticReservedBytes: Int
 
-    public init(prefillChunkOverride: Int? = nil, prefixCacheEnabled: Bool = true) throws {
+    public init(prefillChunkOverride: Int? = nil, prefixCacheEnabled: Bool = true,
+                diagnosticReservedBytes: Int = 0) throws {
         if let chunk = prefillChunkOverride, !(256 ... 4096).contains(chunk) {
             throw PlanError("runtime allocation planning requires a prefill chunk between 256 and 4096")
         }
         self.prefillChunkOverride = prefillChunkOverride
         self.prefixCacheEnabled = prefixCacheEnabled
+        guard diagnosticReservedBytes >= 0, diagnosticReservedBytes <= 1 << 30 else {
+            throw PlanError("diagnostic reservation must be between 0 and 1 GiB")
+        }
+        self.diagnosticReservedBytes = diagnosticReservedBytes
     }
 }
 
@@ -159,7 +165,8 @@ public struct MemoryPlan {
     public var memoryLedger: ContextMemoryLedger {
         ContextMemoryLedger(slots: slots, context: maxContextTokens, chunk: prefillChunk,
             retentionTokens: prefixCacheTokens, mtp: mtpEnabled, visionResident: visionResidentReserved,
-            checkpoint: checkpointMemory)
+            checkpoint: checkpointMemory,
+            diagnosticReservedBytes: runtimeAllocationPolicy?.diagnosticReservedBytes ?? 0)
     }
     public var expectedPeakGB: Double { Double(memoryLedger.expectedPeakBytes) / 1e9 }
 
@@ -325,6 +332,12 @@ public enum Planner {
     public static func applyingRuntimePolicy(
         _ p: MemoryPlan, policy: RuntimeAllocationPolicy
     ) throws -> MemoryPlan {
+        guard policy.diagnosticReservedBytes == 0 || p.checkpointMemory?.format.isJANG == true else {
+            throw PlanError("diagnostic reservation is supported only by checkpoint-priced JANG plans")
+        }
+        guard policy.diagnosticReservedBytes == 0 || p.runtimeAllocationPolicy != nil else {
+            throw PlanError("diagnostic reservation must be priced while creating a fresh JANG plan")
+        }
         if let previous = p.runtimeAllocationPolicy {
             guard previous == policy else { throw PlanError("runtime allocation policy requires a fresh base plan") }
             return p // Never credit the same reservation twice.

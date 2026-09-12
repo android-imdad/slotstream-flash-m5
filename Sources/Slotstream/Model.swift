@@ -106,6 +106,7 @@ public final class Qwen4ExpModel {
     public private(set) var mtpHead: MTPHead? = nil
     /// Diagnostic observer; called on the serialized model thread with router-rank IDs.
     public var routerObserver: ((Int, [Int32]) -> Void)?
+    public var flashObservationSink: (any FlashObservationSink)?
     package var contextNumericsObserver: ((Int, String, MLXArray) -> Void)?
     package var gdnPhaseProfile: GDNPhaseProfile? {
         didSet { for layer in gdn.values { layer.phaseProfile = gdnPhaseProfile } }
@@ -399,6 +400,7 @@ public final class Qwen4ExpModel {
     ) throws -> MLXArray? {
         let optimizations = executionOptions ?? self.optimizations
         try validateForward(ids, state: state)
+        try flashObservationSink?.validateForward(tokens: ids.count)
         state.recordedTokenIds = state.recordingEnabled ? ids : nil
         state.recordingBaseTokenCount = state.recordingEnabled ? state.tokenCount : nil
         state.committedBoundaryValid = false
@@ -618,9 +620,11 @@ public final class Qwen4ExpModel {
             }
             if l == dbgLayer { Self.debugDump("x2", x2) }
             contextNumericsObserver?(l, "x2", x2)
+            try flashObservationSink?.observeInput(layer: l, value: x2)
             contextNumericsObserver?(l, "inj2", inj2!)
             MemTrace.mark("hc2", x2)
             moe[l]!.routerObserver = routerObserver
+            moe[l]!.flashObservationSink = flashObservationSink
             moe[l]!.useLayerWorkspace = optimizations.layerExpertWorkspace
             moe[l]!.disjointOutput = optimizations.disjointSweepOutput
             moe[l]!.boundedRows = optimizations.boundedSweepRows

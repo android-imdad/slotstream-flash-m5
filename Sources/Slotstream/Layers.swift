@@ -1050,6 +1050,7 @@ final class MoELayer {
     private(set) var residentJoins = 0
     private(set) var residentJoinSeconds = 0.0
     var routerObserver: ((Int, [Int32]) -> Void)?
+    weak var flashObservationSink: (any FlashObservationSink)?
     var useLayerWorkspace = false
     var workspaceTokenTile = 256
     var workspaceComputeRanges: [Range<Int>] = []
@@ -1095,6 +1096,7 @@ final class MoELayer {
 
         // routing decision to CPU
         let expertIds = idx.asType(.int32).asArray(Int32.self)  // B*S*topK
+        try flashObservationSink?.observeRoute(layer: layer, expertIDs: expertIds)
         if RouterTrace.on {
             RouterTrace.record(layer: layer, tokens: B * S, topK: cfg.topK, ids: expertIds)
         }
@@ -1246,7 +1248,8 @@ final class MoELayer {
                 uniq.append(key)
             }
         }
-        func project(_ slotIds: [Int32]) -> MLXArray {
+        var observationError: Error?
+        func project(_ slotIds: [Int32], ranks: [Int]?) -> MLXArray {
             let count = slotIds.count / (B * S)
             let slotIdx = MLXArray(slotIds, [B, S, count])
             let xe = x.expandedDimensions(axes: [-2, -3])
@@ -1257,6 +1260,11 @@ final class MoELayer {
                 xe, pool.pools[3], scales: pool.pools[4], biases: pool.pools[5],
                 rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
             let hidden = MLXNN.silu(g) * u
+            if let sink = flashObservationSink, let ranks, observationError == nil {
+                do { try sink.observeHidden(layer: layer, routerRanks: ranks,
+                    expertIDs: ranks.map { expertIds[$0] }, value: hidden) }
+                catch { observationError = error }
+            }
             return gatherQuantizedMM(
                 hidden, pool.pools[6], scales: pool.pools[7], biases: pool.pools[8],
                 rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
@@ -1272,7 +1280,7 @@ final class MoELayer {
                 readyRanks = expertIds.indices.filter { existing[seen[ExpertKey(self.layer, Int(expertIds[$0]))]!] >= 0 }
                 guard !readyRanks.isEmpty else { return }
                 let slots = readyRanks.map { Int32(existing[seen[ExpertKey(self.layer, Int(expertIds[$0]))]!]) }
-                ready = project(slots)
+                ready = project(slots, ranks: readyRanks)
                 asyncEval(ready!)
                 self.residentPrelaunches += 1
             }, finishReaders: {
@@ -1284,11 +1292,18 @@ final class MoELayer {
                 }
             })
         } else { slotOf = try pool.ensureChecked(uniq) }
+        if let observationError { throw observationError }
         let slotIds = expertIds.map { Int32(slotOf[seen[ExpertKey(layer, Int($0))]!]) }
-        guard let ready else { return project(slotIds) }
+        guard let ready else {
+            let result = project(slotIds,
+                ranks: flashObservationSink == nil ? nil : Array(expertIds.indices))
+            if let observationError { throw observationError }
+            return result
+        }
         let readySet = Set(readyRanks)
         let missingRanks = expertIds.indices.filter { !readySet.contains($0) }
-        let missing = project(missingRanks.map { slotIds[$0] })
+        let missing = project(missingRanks.map { slotIds[$0] }, ranks: missingRanks)
+        if let observationError { throw observationError }
         let order = readyRanks + missingRanks
         var inverse = Array(repeating: Int32(0), count: expertIds.count)
         for (position, rank) in order.enumerated() { inverse[rank] = Int32(position) }
