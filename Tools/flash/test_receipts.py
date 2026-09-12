@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (EvidenceError, FLASH_ROOT, RECEIPT_FORMAT, ROOT, build_source_paths,
-                    regular_file, sha256, validate_source_map)
+                    regular_file, sha256, validate_build_identity, validate_source_map)
 from gates import validate_checks, validate_python_test_result
 import benchmark
 import build_identity
@@ -143,6 +143,17 @@ class ReceiptTests(unittest.TestCase):
         empty = good_checks(); empty["checks"][1]["items"] = []
         with self.assertRaises(EvidenceError): validate_checks(empty)
 
+    def test_m5_filtered_check_names_are_exact(self):
+        document = {"checks": [
+            {"name": "m5-eligibility", "items": [{"passed": True}], "skipped": None},
+            {"name": "m5-dispatch", "items": [{"passed": True}], "skipped": None},
+        ], "passed": 2, "failed": 0, "skipped": 0}
+        validate_checks(document, required={"m5-eligibility", "m5-dispatch"}, exact_names=True)
+        document["checks"].append({"name": "m5-dispatch-extra", "items": [{"passed": True}], "skipped": None})
+        document["passed"] = 3
+        with self.assertRaises(EvidenceError):
+            validate_checks(document, required={"m5-eligibility", "m5-dispatch"}, exact_names=True)
+
     def test_skipped_failed_and_malformed_checks_rejected(self):
         skipped = good_checks(); skipped["checks"][0]["skipped"] = "unavailable"; skipped["skipped"] = 1; skipped["passed"] = 1
         with self.assertRaises(EvidenceError): validate_checks(skipped)
@@ -195,6 +206,13 @@ class ReceiptTests(unittest.TestCase):
             output = self.root / f"archive-failure-{index}"
             self.assertEqual(benchmark.archive(release / "slotstream", output, repo_root=fake), 1)
             self.assertFalse((output / "completion.json").exists())
+
+    def test_historical_archive_survives_legitimate_source_change_but_fresh_does_not(self):
+        fake, release = self.make_fake_build("historical")
+        (fake / "Sources" / "Later.swift").write_text("legitimate later source")
+        validate_build_identity(release / "slotstream", root=fake, historical=True)
+        with self.assertRaises(EvidenceError):
+            validate_build_identity(release / "slotstream", root=fake)
 
     def test_selection_requires_all_pending_future_stages(self):
         selection = {"format": "slotstream-flash-selection-v1", "schema_version": 1,

@@ -35,7 +35,7 @@ def validate_receipt(value: dict[str, Any], evidence_dir: Path | None = None, *,
     _exact(value, required, "receipt")
     if value["format"] != RECEIPT_FORMAT or value["schema_version"] != 1:
         raise EvidenceError("unsupported receipt format")
-    if value["kind"] not in ("launch", "archive", "stage0"):
+    if value["kind"] not in ("launch", "archive", "stage0", "m5"):
         raise EvidenceError("unknown receipt kind")
     if (type(value["qualified"]) is not bool or not isinstance(value["qualification_reasons"], list)
             or not all(isinstance(reason, str) and reason for reason in value["qualification_reasons"])):

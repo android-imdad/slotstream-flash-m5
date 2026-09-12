@@ -168,7 +168,9 @@ def _validate_source_archive(path: Path, source: dict[str, str]) -> None:
         raise EvidenceError(f"invalid source archive: {error}") from error
 
 
-def validate_build_identity(binary: Path, *, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, Path]]:
+def validate_build_identity(
+    binary: Path, *, root: Path = ROOT, historical: bool = False
+) -> tuple[dict[str, Any], dict[str, Path]]:
     binary = regular_file(binary)
     directory = binary.parent
     paths = {
@@ -190,7 +192,8 @@ def validate_build_identity(binary: Path, *, root: Path = ROOT) -> tuple[dict[st
     for key, actual in expected.items():
         if identity.get(key) != actual:
             raise EvidenceError(f"{key} does not match build identity")
-    validate_source_map(identity, root=root)
+    if not historical:
+        validate_source_map(identity, root=root)
     if read_json(paths["source_before"]) != identity["source"]:
         raise EvidenceError("pre-build source receipt does not match build identity")
     _validate_source_archive(paths["source_archive"], identity["source"])

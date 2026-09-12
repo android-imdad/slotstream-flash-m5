@@ -23,7 +23,8 @@ from common import (EvidenceError, RECEIPT_FORMAT, atomic_json, copy_verified, f
 from observe import DarwinSampler, SamplingError
 from prefill_bench import preflight, terminate_child_tree, vm_snapshot
 
-ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MODE")
+ALLOWED_ENVIRONMENT = ("LANG", "LC_ALL", "MLX_ENABLE_TF32", "SLOTSTREAM_FLASH_MODE",
+                       "SLOTSTREAM_M5_DISPATCH_LOG", "SLOTSTREAM_M5_TRACE_CASE")
 
 
 def _environment() -> dict[str, str]:
