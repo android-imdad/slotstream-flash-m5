@@ -84,9 +84,15 @@ public struct WeightStore: Sendable {
 
     /// The directory the weights live in.
     public let modelDirectory: URL
+    public let jangModel: JANGModel?
 
     public init(modelDirectory: URL) {
         self.modelDirectory = modelDirectory
+        self.jangModel = nil
+    }
+
+    public init(modelDirectory: URL, jangModel: JANGModel) {
+        self.modelDirectory = modelDirectory; self.jangModel = jangModel
     }
 
     /// `~/.slotstream/models/<pinned dir>`, or the dev checkout's copy when
@@ -97,7 +103,10 @@ public struct WeightStore: Sendable {
 
     /// The store for whatever `--model` named: a path, or the pinned name.
     public static func resolving(_ spec: String) -> WeightStore {
-        WeightStore(modelDirectory: ModelLocator.resolve(spec))
+        if let jang = JANGModels.named(spec) {
+            return WeightStore(modelDirectory: ModelLocator.resolve(spec), jangModel: jang)
+        }
+        return WeightStore(modelDirectory: ModelLocator.resolve(spec))
     }
 
     /// Whether this copy can be loaded, and what it would cost to fix it.
@@ -107,6 +116,15 @@ public struct WeightStore: Sendable {
     /// seconds and is the reason a damaged tokenizer never reaches the engine.
     public func status() -> WeightStatus {
         let free = Self.freeDiskBytes(near: modelDirectory)
+        if let jangModel {
+            let remaining = Self.remainingBytes(at: modelDirectory, files: jangModel.files, compressed: false)
+            if remaining > 0 {
+                return remaining == jangModel.totalBytes ? .missing(needBytes: remaining, freeDiskBytes: free)
+                    : .incomplete(remainingBytes: remaining, freeDiskBytes: free)
+            }
+            let bad = jangModel.files.filter { !Self.fileMatches(modelDirectory.appendingPathComponent($0.path), size: $0.size, sha256: $0.sha256) }
+            return bad.isEmpty ? .ready : .corrupt(paths: bad.map(\.path), repairBytes: bad.reduce(0) { $0 + $1.size }, freeDiskBytes: free)
+        }
         let remaining = Self.remainingBytes(at: modelDirectory)
         if remaining > 0 {
             let have = PinnedModel.requiredBytes - remaining
@@ -135,12 +153,24 @@ public struct WeightStore: Sendable {
 
     /// Re-hash this copy against the pinned digests.
     public func verify(log: Log = { _ in }) throws {
+        if let jangModel { try jangModel.verify(at: modelDirectory, log: log); return }
         try Self.verify(at: modelDirectory, log: log)
     }
 
     /// Fetch what is missing. Resumable: rerunning continues an interrupted
     /// pull from its chunk map.
     public func download(_ options: PullOptions = .init(), log: Log = { _ in }) throws {
+        if let jangModel {
+            guard options.transport != .compressed else { throw SlotstreamError.pull("JANG compressed packages are unavailable") }
+            try withoutActuallyEscaping(log) { sink in
+                let forwarding = DownloadLog(sink)
+                defer { forwarding.close() }
+                try jangModel.download(to: modelDirectory, connections: options.connections,
+                    cancellation: options.cancellation ?? .init(), sources: options.sources,
+                    log: { forwarding.write($0) })
+            }
+            return
+        }
         try Self.download(
             to: modelDirectory, connections: options.connections, sources: options.sources,
             transport: options.transport, cancellation: options.cancellation, log: log)
@@ -289,10 +319,14 @@ public struct WeightStore: Sendable {
     /// Bytes still to download at `dest` (counting chunk-map progress), by size
     /// only — hashes are verify's job. 0 means every file is present whole.
     public static func remainingBytes(at dest: URL) -> Int64 {
+        remainingBytes(at: dest, files: PinnedModel.files, compressed: true)
+    }
+
+    private static func remainingBytes(at dest: URL, files: [PinnedModel.File], compressed: Bool) -> Int64 {
         let fm = FileManager.default
         var remaining: Int64 = 0
-        let compressedHave = SlotpackDownload.resumeModelBytes(at: dest)
-        for f in PinnedModel.files {
+        let compressedHave = compressed ? SlotpackDownload.resumeModelBytes(at: dest) : [:]
+        for f in files {
             let final = dest.appendingPathComponent(f.path)
             if f.optional && !fm.fileExists(atPath: final.path) { continue }
             let resolved = final.resolvingSymlinksInPath()

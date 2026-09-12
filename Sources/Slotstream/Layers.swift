@@ -1069,7 +1069,7 @@ final class MoELayer {
         self.layer = layer
         self.pool = pool
         let b = "model.layers.\(layer).mlp"
-        routerProjection = RouterProjection(w.tensor(b + ".gate.weight"))
+        routerProjection = RouterProjection(w.linear(b + ".gate"))
         sharedGate = w.linear(b + ".shared_expert_gate")
         sharedGateProj = w.linear(b + ".shared_expert.gate_proj")
         sharedUpProj = w.linear(b + ".shared_expert.up_proj")
@@ -1214,11 +1214,11 @@ final class MoELayer {
             }
             let indices = MLXArray(ridx)
             let g = gatherQuantizedMM(gathered, w[0], scales: w[1], biases: w[2], rhsIndices: indices,
-                transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
             let u = gatherQuantizedMM(gathered, w[3], scales: w[4], biases: w[5], rhsIndices: indices,
-                transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
             let d = gatherQuantizedMM(MLXNN.silu(g) * u, w[6], scales: w[7], biases: w[8], rhsIndices: indices,
-                transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
             let canonical = d[0 ..< rows].squeezed(axis: 1)[MLXArray(inverse)].reshaped([n, K, H])
             let reduced = (canonical * routeWeights[lo ..< hi].expandedDimensions(axis: -1))
                 .sum(axis: -2).asType(x.dtype)
@@ -1252,14 +1252,14 @@ final class MoELayer {
             let xe = x.expandedDimensions(axes: [-2, -3])
             let g = gatherQuantizedMM(
                 xe, pool.pools[0], scales: pool.pools[1], biases: pool.pools[2],
-                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits)
+                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
             let u = gatherQuantizedMM(
                 xe, pool.pools[3], scales: pool.pools[4], biases: pool.pools[5],
-                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits)
+                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
             let hidden = MLXNN.silu(g) * u
             return gatherQuantizedMM(
                 hidden, pool.pools[6], scales: pool.pools[7], biases: pool.pools[8],
-                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits)
+                rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
                 .squeezed(axis: -2)
         }
         var readyRanks: [Int] = []
@@ -1401,13 +1401,13 @@ final class MoELayer {
                     let ridx = MLXArray(local)
                     let g = gatherQuantizedMM(
                         xg, w[0], scales: w[1], biases: w[2], rhsIndices: ridx, transpose: true,
-                        groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                        groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
                     let u = gatherQuantizedMM(
                         xg, w[3], scales: w[4], biases: w[5], rhsIndices: ridx, transpose: true,
-                        groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                        groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
                     let dAll = gatherQuantizedMM(
                         MLXNN.silu(g) * u, w[6], scales: w[7], biases: w[8], rhsIndices: ridx,
-                        transpose: true, groupSize: cfg.qGroup, bits: cfg.qBits, sortedIndices: true)
+                        transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits, sortedIndices: true)
                     let d = pad > 0 ? dAll[0 ..< n] : dAll
                     let completed: MLXArray
                     if let output = orderedOutput {

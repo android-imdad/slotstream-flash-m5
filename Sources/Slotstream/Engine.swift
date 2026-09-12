@@ -129,7 +129,8 @@ public final class Engine {
                     prefixCacheTokens: capped, mtpEnabled: p.mtpEnabled, visionEnabled: p.visionEnabled,
                     visionResidentReserved: p.visionResidentReserved, maxContextTokens: newValue,
                     notes: p.notes, runtimeAllocationPolicy: p.runtimeAllocationPolicy,
-                    maxPrefillWaitMinutes: p.maxPrefillWaitMinutes, contextQualification: p.contextQualification))
+                    maxPrefillWaitMinutes: p.maxPrefillWaitMinutes, contextQualification: p.contextQualification,
+                    checkpointMemory: p.checkpointMemory))
             }
         }
     }
@@ -271,6 +272,15 @@ public final class Engine {
         // allocation and 39 GB of swap. The flag travels on the plan so this
         // cannot be forgotten at a call site.
         if plan?.simulated == true { throw SlotstreamError.simulatedDeviceCannotLoad }
+        let index = try CheckpointIndex(dir: modelDir)
+        let layout = index.config.format.isJANG ? try CheckpointMemory(index: index) : nil
+        guard plan == nil || plan?.checkpointMemory == layout else {
+            throw SlotstreamError.invalidPlan("memory plan belongs to a different checkpoint layout")
+        }
+        if layout != nil, plan?.mtpEnabled == true || plan?.visionEnabled == true {
+            throw SlotstreamError.invalidPlan("JANG MTP and vision are not qualified")
+        }
+        if layout != nil, plan?.source == .auto { throw SlotstreamError.invalidPlan("JANG requires a fixed cache plan") }
         let context = try ContextConfiguration(maxContextTokens: plan?.maxContextTokens ?? ContextPolicy.defaultTokens,
             maxPrefillWaitMinutes: plan?.maxPrefillWaitMinutes ?? ContextConfiguration.defaultWaitMinutes,
             qualification: plan?.contextQualification ?? false)
@@ -281,7 +291,7 @@ public final class Engine {
         let initialLedger = plan?.memoryLedger ?? ContextMemoryLedger(slots: poolSlots,
             context: context.maxContextTokens, chunk: 256,
             retentionTokens: Planner.prefixCacheTokensFor(poolBudgetGB: Geometry.gb(poolSlots)),
-            mtp: false, visionResident: false)
+            mtp: false, visionResident: false, checkpoint: layout)
         let initial = RequestController(configuration: context,
             slackBytes: Int(Planner.availabilitySlackGB(ramGB: plan?.ramGB ?? Planner.deviceRAMGB()) * 1e9))
         try initial.check(nextAllocationBytes: initialLedger.expectedPeakBytes, phase: "model allocation")
@@ -303,15 +313,14 @@ public final class Engine {
         // per-token reallocation churn away while making real process memory
         // track the announced plan.
         MLX.Memory.cacheLimit = 2 << 30
-        self.modelName = "qwen3.8-flash-next:4bit"
+        self.modelName = index.config.format.modelName
         let t0 = Date()
-        let index = try CheckpointIndex(dir: modelDir)
         self.model = try Qwen4ExpModel(index: index, poolSlots: poolSlots)
-        self.responsiveGovernor = model.optimizations.responsiveGovernor
+        self.responsiveGovernor = layout == nil && model.optimizations.responsiveGovernor
         try model.validate()
         // Read from the index that is already open — no tensor is touched, and
         // nothing is allocated until an image actually arrives.
-        self.visionAvailable = VisionTower.present(index: index)
+        self.visionAvailable = layout == nil && VisionTower.present(index: index)
         self.visionAllowed = plan?.visionEnabled ?? visionAvailable
         if plan?.mtpEnabled == true {
             try model.enableMTP(modelDir: modelDir)

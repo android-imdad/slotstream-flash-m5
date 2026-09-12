@@ -255,6 +255,7 @@ public final class PrefillProgressReporter {
     private var nextMark = 0.25
     private var lastLine: UInt64 = 0
     public var tailAware = false
+    public var referenceEstimateEnabled = true
 
     public init(quietBelowTokens: Int, maxChunk: Int, sink: @escaping (String) -> Void) {
         self.quietBelowTokens = quietBelowTokens
@@ -274,9 +275,11 @@ public final class PrefillProgressReporter {
             announced = total
             announcedBase = base
             nextMark = 0.25
-            let eta = PrefillSchedule.estSeconds(tokens: total, from: base, maxChunk: maxChunk, tailAware: tailAware)
-            sink("prefill: reading \(total) prompt tokens, ~\(PrefillSchedule.describe(seconds: eta)) "
-                + "to the first token at this plan (follow-up turns read only what is new)")
+            if referenceEstimateEnabled {
+                let eta = PrefillSchedule.estSeconds(tokens: total, from: base, maxChunk: maxChunk, tailAware: tailAware)
+                sink("prefill: reading \(total) prompt tokens, ~\(PrefillSchedule.describe(seconds: eta)) "
+                    + "to the first token at this plan (follow-up turns read only what is new)")
+            } else { sink("prefill: reading \(total) prompt tokens; this checkpoint has no qualified time estimate") }
         }
         if done <= 0 { return }
         let frac = Double(done) / Double(total)

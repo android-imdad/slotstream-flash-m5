@@ -13,7 +13,7 @@ struct Pull: ParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Download losslessly compressed model weights (resumable and hash-verified). Then: slotstream serve")
 
-    @Argument(help: "Model to pull (only \(PinnedModel.name) exists in v0)")
+    @Argument(help: "Model to pull: \(PinnedModel.name), JANG_4M, or JANG_6S")
     var model: String = PinnedModel.name
 
     @Option(name: .customLong("dir"), help: "Destination directory (default ~/.slotstream/models/\(PinnedModel.dirName))")
@@ -29,9 +29,24 @@ struct Pull: ParsableCommand {
     var verifyOnly = false
 
     func run() throws {
+        if let jang = JANGModels.named(model) {
+            guard connections.map({ (1...32).contains($0) }) ?? true else { throw ValidationError("connections must be 1–32") }
+            guard transport == "automatic" || transport == "raw" else {
+                throw ValidationError("JANG downloads use the pinned raw transport; compressed packages are unavailable")
+            }
+            let dest = dir.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) } ?? ModelLocator.resolve(model)
+            if verifyOnly { try jang.verify(at: dest, log: { print($0) }); return }
+            try withInterruptiblePull { cancellation in
+                try jang.download(to: dest, connections: connections, cancellation: cancellation,
+                    log: { print($0); fflush(stdout) })
+            }
+            let quoted = "'" + dest.path.replacingOccurrences(of: "'", with: "'\\''") + "'"
+            print("ready. next: slotstream serve --model \(quoted)")
+            return
+        }
         guard model == PinnedModel.name || model == PinnedModel.dirName else {
             throw ValidationError(
-                "unknown model '\(model)' — v0 ships exactly one: \(PinnedModel.name)")
+                "unknown model '\(model)' — choose \(PinnedModel.name), JANG_4M, or JANG_6S")
         }
         guard connections.map({ (1...32).contains($0) }) ?? true else { throw ValidationError("connections must be 1–32") }
         guard let selectedTransport = WeightTransport(rawValue: transport) else { throw ValidationError("transport must be automatic, compressed, or raw") }

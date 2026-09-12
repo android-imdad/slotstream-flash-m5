@@ -41,6 +41,7 @@ public final class MTPWeights: TensorSource {
     }
 
     public init(modelDir: URL, config: ModelConfig) throws {
+        guard !config.format.isJANG else { throw ModelError("JANG MTP is not qualified in this runtime") }
         self.config = config
         let url = Self.fileURL(modelDir: modelDir)
         guard FileManager.default.fileExists(atPath: url.path) else {

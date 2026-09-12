@@ -21,6 +21,9 @@ and raw runs. `PLAN.md` and `MEASUREMENTS.md` are generated from its records.
 For AI agents, [llms.txt](../llms.txt) is the index and
 [llms-full.txt](../llms-full.txt) combines the documentation.
 
+The [JANG guide](JANG.md) documents the experimental alternative checkpoint
+loader, original-value preservation and qualification boundaries in this checkout.
+
 ## How it works
 
 Qwen3.8-Flash-Next is a *mixture-of-experts* model: each token uses only a

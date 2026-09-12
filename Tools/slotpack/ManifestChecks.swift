@@ -125,7 +125,9 @@ import CSlotpack
         try FileManager.default.moveItem(at: progressFinal, to: progressPart)
         done[progressIndex] = 2; try writeProgressMap()
         try expect("invalid resume bits do not report downloaded bytes", SlotpackDownload.resumeModelBytes(at: progressRoot).isEmpty)
-        let impossibleSize = WeightStore.freeDiskBytes(near: temp) + 4_000_000_000
+        // A free-space-sized fixture exceeds the manifest object limit on
+        // large disks, testing manifest rejection instead of this guard.
+        let impossibleSize: Int64 = 16 << 20
         let largeFile = PinnedModel.File(path: "impossible.bin", size: impossibleSize, sha256: digest)
         var objects = [SlotpackManifest.Object]()
         var offset: Int64 = 0
@@ -135,7 +137,7 @@ import CSlotpack
         }
         let large = SlotpackManifest(format: "slotpack-v1", files: [largeFile], objects: objects)
         var diskRejected = false
-        do { try SlotpackDownload(manifest: large, digest: hash, dest: temp, bases: [], rawBases: [], connections: 1, cancellation: .init(), log: { _ in }).run() }
+        do { try SlotpackDownload(manifest: large, digest: hash, dest: temp, bases: [], rawBases: [], connections: 1, cancellation: .init(), availableDiskBytes: { 8 << 20 }, log: { _ in }).run() }
         catch { diskRejected = String(describing: error).contains("not enough disk") }
         try expect("disk space checked before creating large parts", diskRejected && !FileManager.default.fileExists(atPath: temp.appendingPathComponent("impossible.bin.slotpack.part").path))
         print(String(data: try JSONSerialization.data(withJSONObject: ["pass":true,"checks":checks], options: [.prettyPrinted,.sortedKeys]), encoding:.utf8)!)

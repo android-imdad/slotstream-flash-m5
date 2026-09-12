@@ -4303,3 +4303,31 @@ Every commit that has landed on `main` after the released build changes document
 Expert lookahead and expert prefetching are reviewed, planned and unimplemented. This release ships the plan, not that acceleration.
 
 At closure no Slotstream process remained, the native model lock was free, no application was closed or paused, and no persistent production instrumentation or environment setting changed.
+
+## JANG local source validation
+Local implementation based on upstream `f60e9a83037fea576bf210a3650d6f29e164f183`.
+The accepted binary is `0014844a367f513aa3dac20906f592e1af1b77df4ae8dfa3c48e2c18370c067b`. All 156
+compiled-source inputs match its build receipt.
+
+The native catalogue completed with 46 groups, no failures or skips, and
+27,484 assertions. Both JANG fixture layouts passed production expert reads,
+contiguous reads, source-byte accounting, insertion, cache hits, growth and
+shrink/refill. Original packed rows matched the native MLX decoder; exact
+code/metadata expansion preserved represented values. Projection checks keep
+the BF16 activation/cache contract explicit.
+
+The independent source-policy executable passed 964,167 assertions and marked
+hardware qualification false. The complete static suite passed, including
+transport fault injection, memory guards, installer checks, fixture hashes,
+projections and brain validation. The brain retains its two existing log
+warnings and has no validation errors.
+
+Reproduction and raw evidence: [[sources/runs/2026/09/jang-support-validation]].
+The bounded fixture generator and original metadata/row samples are included
+in Tools/jang_fixture.py and Tools/fixtures/jang/.
+
+Qualification boundary: complete model weights were not downloaded; no
+full-model generation, long-context answer test, KL reproduction, or actual
+inference memory/throughput measurement was performed. JANG MTP and vision
+remain disabled. This is experimental local source support, not an upstream
+release or proof of end-to-end inference on this Mac.

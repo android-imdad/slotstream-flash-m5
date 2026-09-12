@@ -1,0 +1,1 @@
+{"passed": true, "hardware_qualified": false, "failures": [], "contracts": {"assertions": 964167, "failures": [], "gates": {"C01": 12, "C02": 4152, "C03": 7, "C04": 1221, "C05": 77, "C06": 958624, "C08": 5, "C09": 9, "C10": 19, "C13": 13, "C14": 12, "C15": 16}, "hardware_qualified": false, "model_loaded": false, "passed": true}}

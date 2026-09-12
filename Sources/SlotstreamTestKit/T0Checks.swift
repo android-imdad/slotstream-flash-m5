@@ -8,6 +8,8 @@ import SlotstreamDiagnostics
 extension Catalogue {
     static var t0Checks: [Check] {
         [
+            Check("jang-formats", tier: .t0) { try Diagnostics.jangFormats() },
+            Check("jang-numerics", tier: .t1) { try Diagnostics.jangNumerics() },
             Check("prefill-schedule", tier: .t0) { Diagnostics.prefillSchedule() },
             Check("context-policy", tier: .t0) { contextPolicy() },
             Check("configurable-context", tier: .t0) { try Diagnostics.configurableContext() },

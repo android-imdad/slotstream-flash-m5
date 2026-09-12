@@ -8,6 +8,7 @@ package final class EmbeddingRows {
     package let refs: [TensorRef]
     private let handles: [TensorReadHandle]
     private let config: ModelConfig
+    private let quant: AffineQuantization
     private let capacity: Int
     private let offsets: [Int]
     private let rowBytes: Int
@@ -27,15 +28,17 @@ package final class EmbeddingRows {
             guard let ref = index.tensors[name] else { throw ModelError("missing embedding tensor \(name)") }
             return ref
         }
-        guard cfg.qBits == 4, cfg.qGroup == 64, cfg.hiddenSize == 2560,
-              refs[0].shape == [cfg.vocabSize, cfg.hiddenSize / 8], refs[0].dtype == "U32",
-              refs[1].shape == [cfg.vocabSize, cfg.hiddenSize / cfg.qGroup], refs[1].dtype == "BF16",
-              refs[2].shape == refs[1].shape, refs[2].dtype == "BF16" else {
+        let quant = cfg.quantization(for: "model.embed_tokens")
+        guard [4, 6, 8].contains(quant.bits), quant.groupSize == 64, cfg.hiddenSize == 2560,
+              refs[0].shape == [cfg.vocabSize, cfg.hiddenSize * quant.bits / 32], refs[0].dtype == "U32",
+              refs[1].shape == [cfg.vocabSize, cfg.hiddenSize / quant.groupSize],
+              refs[1].dtype == (cfg.format.isJANG ? "F16" : "BF16"),
+              refs[2].shape == refs[1].shape, refs[2].dtype == refs[1].dtype else {
             throw ModelError("embedding row candidate requires the exact curated quantized geometry")
         }
         try ModelProcessGuard.acquire()
         self.refs = refs; self.handles = refs.map { index.readHandle(for: $0) }
-        self.config = cfg; self.capacity = capacity; self.order = FIFOKeys(capacity: capacity)
+        self.config = cfg; self.quant = quant; self.capacity = capacity; self.order = FIFOKeys(capacity: capacity)
         self.offsets = [0, refs[0].rowBytes, refs[0].rowBytes + refs[1].rowBytes]
         self.rowBytes = refs.reduce(0) { $0 + $1.rowBytes }
     }
@@ -111,9 +114,10 @@ package final class EmbeddingRows {
             }
             // MLX dequantization requires a matrix even for a scalar ID.
             // Preserve the caller's shape only after independent row math.
-            pieces.append(MLXArray(data, [ids.count, refs[p].shape[1]], dtype: p == 0 ? .uint32 : .bfloat16))
+            pieces.append(MLXArray(data, [ids.count, refs[p].shape[1]],
+                dtype: p == 0 ? .uint32 : (config.format.isJANG ? .float16 : .bfloat16)))
         }
         return dequantized(pieces[0], scales: pieces[1], biases: pieces[2],
-            groupSize: config.qGroup, bits: config.qBits).reshaped(shape + [config.hiddenSize])
+            groupSize: quant.groupSize, bits: quant.bits).reshaped(shape + [config.hiddenSize])
     }
 }

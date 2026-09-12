@@ -731,7 +731,7 @@ public final class Generator {
                 stats.mlxPeakMemoryGB = Double(MLX.Memory.peakMemory) / 1e9
                 stats.prefillRecords = model.pool.recordsFetched
                 stats.prefillLocalVictims = model.pool.floorLocalVictims
-                stats.prefillReadBytes = model.pool.recordsFetched * model.pool.recordBytes
+                stats.prefillReadBytes = model.pool.readBytes
                 stats.allocatedSequenceBytes = state.allocatedSequenceBytes
                 stats.requestSeconds = RuntimeClock.seconds(since: requestStart)
                 stats.sampledFootprint = footprint?.finish()
@@ -916,7 +916,7 @@ public final class Generator {
                 stats.prefillIOSeconds = model.pool.ioSeconds
                 stats.prefillScatterSeconds = model.pool.scatterSeconds
                 stats.prefillRecords = model.pool.recordsFetched
-                stats.prefillReadBytes = model.pool.recordsFetched * model.pool.recordBytes
+                stats.prefillReadBytes = model.pool.readBytes
                 stats.allocatedSequenceBytes = state.allocatedSequenceBytes
                 stats.mlxPeakMemoryGB = Double(MLX.Memory.peakMemory) / 1e9
                 stats.sampledFootprint = footprint?.finish()
@@ -995,7 +995,7 @@ public final class Generator {
         stats.prefillMLXActiveBytes = MLX.Memory.activeMemory
         stats.prefillMLXCacheBytes = MLX.Memory.cacheMemory
         stats.prefillPhysicalFootprintBytes = ProcessMemory.residentBytes()
-        stats.prefillReadBytes = model.pool.recordsFetched * model.pool.recordBytes
+        stats.prefillReadBytes = model.pool.readBytes
         stats.prefillGPUWaitSeconds = model.pool.sweepWaitSeconds
         stats.prefillRowSortSeconds = model.pool.sweepSortSeconds
         if Self.sweepTrace {
@@ -1089,7 +1089,7 @@ public final class Generator {
         stats.decodeSlotWordBatches = model.pool.slotWordBatches
         stats.decodeSlotWordBuffers = model.pool.slotWordBuffers
         stats.decodeSlotCPUBatches = model.pool.slotCPUBatches
-        stats.decodeReadBytes = model.pool.recordsFetched * model.pool.recordBytes
+        stats.decodeReadBytes = model.pool.readBytes
         stats.ngramRowHits = model.ngram.rowHits
         stats.ngramRowMisses = model.ngram.rowMisses
         stats.ngramLookaheadRows = model.ngram.lookaheadRowsConsumed

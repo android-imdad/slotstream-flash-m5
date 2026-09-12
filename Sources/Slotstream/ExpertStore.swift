@@ -86,7 +86,8 @@ public final class ExpertStore {
                 guard try self.packedModelIdentity() == identity else { throw ModelError("checkpoint changed during expert repack") }
             },reader: { layer,expert,piece,dst in
                 let bytes = self.pieceRowBytes[piece]
-                try self.index.preadChecked(into:dst,self.refs[layer][piece],offset:expert*bytes,count:bytes)
+                _ = bytes
+                try self.readRows(into: dst, layer: layer, piece: piece, first: expert, count: 1)
             })
         return PackedLayoutReport(bytes:bytes,seconds:ProcessInfo.processInfo.systemUptime-start,modelIdentity:identity)
     }
@@ -127,6 +128,49 @@ public final class ExpertStore {
         else { try index.preadChecked(into: dst, refs[layer][piece], offset: offset, count: count) }
     }
     public private(set) var pieceRowBytes: [Int] = []  // bytes per expert per piece
+    package func sourceRecordBytes(layer: Int) -> Int { refs[layer].reduce(0) { $0 + $1.rowBytes } }
+    private var pieceShapes: [[Int]] = []
+    private var scaleDType: DType { cfg.format.isJANG ? .float32 : .bfloat16 }
+
+    /// Read original packed bytes; widen only integer codes when a six-bit
+    /// shared pool receives a four-bit projection. At most one source record
+    /// per worker is scratch, including during contiguous prefill reads.
+    private func readRows(into dst: UnsafeMutableRawPointer, layer: Int, piece: Int, first: Int, count: Int) throws {
+        let sourceBytes = refs[layer][piece].rowBytes
+        let targetBytes = pieceRowBytes[piece]
+        if sourceBytes == targetBytes {
+            try read(into: dst, layer: layer, piece: piece, offset: first * sourceBytes, count: count * sourceBytes)
+            return
+        }
+        if piece % 3 != 0 {
+            guard cfg.format.isJANG, targetBytes == 2 * sourceBytes else { throw ModelError("unsupported expert scale layout") }
+            var raw = Data(count: sourceBytes)
+            for row in 0 ..< count {
+                try raw.withUnsafeMutableBytes { bytes in
+                    try read(into: bytes.baseAddress!, layer: layer, piece: piece,
+                             offset: (first + row) * sourceBytes, count: sourceBytes)
+                    let output = (dst + row * targetBytes).assumingMemoryBound(to: Float.self)
+                    for i in 0 ..< sourceBytes / 2 {
+                        let bits = UInt16(bytes[2 * i]) | UInt16(bytes[2 * i + 1]) << 8
+                        output[i] = Float(Float16(bitPattern: bits))
+                    }
+                }
+            }
+            return
+        }
+        let base = "model.layers.\(layer).mlp.switch_mlp." + Self.pieces[piece].replacingOccurrences(of: ".weight", with: "")
+        let bits = cfg.quantization(for: base).bits
+        var raw = Data(count: sourceBytes)
+        for row in 0 ..< count {
+            try raw.withUnsafeMutableBytes { bytes in
+                try read(into: bytes.baseAddress!, layer: layer, piece: piece,
+                         offset: (first + row) * sourceBytes, count: sourceBytes)
+                try AffineCodes.widen(UnsafeRawBufferPointer(bytes),
+                    to: UnsafeMutableRawBufferPointer(start: dst + row * targetBytes, count: targetBytes),
+                    count: cfg.hiddenSize * cfg.moeIntermediate, from: bits, to: cfg.expertBits)
+            }
+        }
+    }
     public var recordBytes: Int {
         var total = 0
         for bytes in pieceRowBytes {
@@ -143,34 +187,37 @@ public final class ExpertStore {
         let h = cfg.hiddenSize
         let ff = cfg.moeIntermediate
         let g = cfg.qGroup
-        let expected: [(shape: [Int], dtype: String)] = [
-            ([cfg.numExperts, ff, h / 8], "U32"),
-            ([cfg.numExperts, ff, h / g], "BF16"),
-            ([cfg.numExperts, ff, h / g], "BF16"),
-            ([cfg.numExperts, ff, h / 8], "U32"),
-            ([cfg.numExperts, ff, h / g], "BF16"),
-            ([cfg.numExperts, ff, h / g], "BF16"),
-            ([cfg.numExperts, h, ff / 8], "U32"),
-            ([cfg.numExperts, h, ff / g], "BF16"),
-            ([cfg.numExperts, h, ff / g], "BF16"),
+        let scaleType = cfg.format.isJANG ? "F16" : "BF16"
+        pieceShapes = [
+            [ff, h * cfg.expertBits / 32], [ff, h / g], [ff, h / g],
+            [ff, h * cfg.expertBits / 32], [ff, h / g], [ff, h / g],
+            [h, ff * cfg.expertBits / 32], [h, ff / g], [h, ff / g],
         ]
         for l in 0 ..< cfg.numLayers {
             let base = "model.layers.\(l).mlp.switch_mlp."
             let layer = Self.pieces.map { index.ref(base + $0) }
             for p in layer.indices {
-                guard layer[p].shape == expected[p].shape,
-                    layer[p].dtype == expected[p].dtype,
+                let projection = base + Self.pieces[p].components(separatedBy: ".")[0]
+                let quant = cfg.quantization(for: projection)
+                let rows = p < 6 ? ff : h, columns = p < 6 ? h : ff
+                let expectedShape = [cfg.numExperts, rows, p % 3 == 0 ? columns * quant.bits / 32 : columns / g]
+                let expectedType = p % 3 == 0 ? "U32" : scaleType
+                guard [4, 6].contains(quant.bits), quant.bits <= cfg.expertBits, quant.groupSize == g,
+                    layer[p].shape == expectedShape,
+                    layer[p].dtype == expectedType,
                     layer[p].rowBytes > 0
                 else {
                     throw ModelError(
                         "tensor `\(base + Self.pieces[p])` has \(layer[p].dtype) "
-                            + "\(layer[p].shape), expected \(expected[p].dtype) "
-                            + "\(expected[p].shape) — check --model")
+                            + "\(layer[p].shape), expected \(expectedType) "
+                            + "\(expectedShape) — check --model")
                 }
             }
             refs.append(layer)
         }
-        pieceRowBytes = refs[0].map { $0.rowBytes }
+        pieceRowBytes = pieceShapes.enumerated().map { p, shape in
+            shape.reduce(1, *) * (p % 3 == 0 || cfg.format.isJANG ? 4 : 2)
+        }
     }
 
     /// Read lanes for the sweep's long contiguous runs. Swept 2026-08-30 and
@@ -253,7 +300,7 @@ public final class ExpertStore {
                 let (p, s) = jobs[j]
                 let key = keys[s]
                 let pb = pieceRowBytes[p]
-                do { try read(into: buffers[p] + s * pb, layer: key.layer, piece: p, offset: key.expert * pb, count: pb) }
+                do { try readRows(into: buffers[p] + s * pb, layer: key.layer, piece: p, first: key.expert, count: 1) }
                 catch { failure.record(error) }
                 j += lanes
             }
@@ -316,8 +363,8 @@ public final class ExpertStore {
                 let (p, row, len) = jobs[j]
                 let pb = pieceRowBytes[p]
                 do {
-                    try read(into: buffers[p] + row * pb, layer: layer, piece: p,
-                        offset: experts[row] * pb, count: len * pb)
+                    try readRows(into: buffers[p] + row * pb, layer: layer, piece: p,
+                        first: experts[row], count: len)
                 } catch { failure.record(error) }
             }
         }
@@ -364,11 +411,11 @@ public final class ExpertStore {
         let start = profile == nil ? 0 : RuntimeClock.now()
         var out: [MLXArray] = []
         for (p, r) in refs[0][0 ..< 9].enumerated() {
-            let shape = [n] + Array(r.shape.dropFirst())
+            let shape = [n] + pieceShapes[p]
             let dtype: DType
             switch r.dtype {
             case "U32": dtype = .uint32
-            case "BF16": dtype = .bfloat16
+            case "BF16", "F16": dtype = scaleDType
             default:
                 for q in p ..< buffers.count { free(buffers[q]) }
                 fatalError("unexpected expert dtype \(r.dtype)")
@@ -397,7 +444,8 @@ public final class ExpertStore {
 /// A fixed pool of expert slots shared across all layers (uniform shape), with
 /// CLOCK eviction. `ensure` maps (layer, expert) keys to slot indices, loading
 /// misses in one batched read + scatter. Bit-exact: the pool holds the same
-/// quantized bytes the checkpoint does.
+/// quantized bytes the checkpoint does for PipeNetwork. JANG's cache expands
+/// codes/metadata losslessly while preserving their numerical values.
 public final class SlotPool {
     public private(set) var slots: Int
     private let cfg: ModelConfig
@@ -468,7 +516,7 @@ public final class SlotPool {
     public private(set) var misses = 0
 
     public var poolBytes: Int { pools.reduce(0) { $0 + $1.nbytes } }
-    /// Bytes per expert record, measured from the checkpoint headers.
+    /// Bytes per cache record, including any lossless JANG expansion.
     public var recordBytes: Int { store.recordBytes }
     /// The cache size in the per-layer unit of intuition (the pool itself is
     /// global and shared -- hot layers borrow from cold ones).
@@ -479,10 +527,12 @@ public final class SlotPool {
         let h = cfg.hiddenSize
         let ff = cfg.moeIntermediate
         let g = cfg.qGroup
+        let bits = cfg.expertBits
+        let scale: DType = cfg.format.isJANG ? .float32 : .bfloat16
         return [
-            ([n, ff, h / 8], .uint32), ([n, ff, h / g], .bfloat16), ([n, ff, h / g], .bfloat16),
-            ([n, ff, h / 8], .uint32), ([n, ff, h / g], .bfloat16), ([n, ff, h / g], .bfloat16),
-            ([n, h, ff / 8], .uint32), ([n, h, ff / g], .bfloat16), ([n, h, ff / g], .bfloat16),
+            ([n, ff, h * bits / 32], .uint32), ([n, ff, h / g], scale), ([n, ff, h / g], scale),
+            ([n, ff, h * bits / 32], .uint32), ([n, ff, h / g], scale), ([n, ff, h / g], scale),
+            ([n, h, ff * bits / 32], .uint32), ([n, h, ff / g], scale), ([n, h, ff / g], scale),
         ]
     }
 
@@ -734,6 +784,9 @@ public final class SlotPool {
                     profile.scatterExecutionSeconds += RuntimeClock.seconds(since: start)
                 }
                 recordsFetched += hi - lo
+                readBytes += store.usePackedLayout && store.hasPackedLayout
+                    ? (hi - lo) * recordBytes
+                    : missKeys[lo..<hi].reduce(0) { $0 + store.sourceRecordBytes(layer: $1.layer) }
                 lo = hi
             }
             fillSeconds += RuntimeClock.seconds(since: tMiss)
@@ -801,6 +854,7 @@ public final class SlotPool {
         let out = try store.readRunsChecked(layer: layer, experts: experts)
         misses += experts.count
         recordsFetched += experts.count
+        readBytes += experts.count * store.sourceRecordBytes(layer: layer)
         return out
     }
 
@@ -889,6 +943,9 @@ public final class SlotPool {
     public private(set) var scatterSeconds = 0.0
     public private(set) var fillSeconds = 0.0
     public private(set) var recordsFetched = 0
+    /// Completed expert payload bytes requested from the selected storage
+    /// representation. Cache expansion is not reported as SSD traffic.
+    public private(set) var readBytes = 0
 
     /// Sweep diagnostics (`SLOTSTREAM_SWEEP_TRACE=1`): time spent waiting for
     /// the GPU to finish a staging group, and sorting rows on the CPU.
@@ -914,6 +971,7 @@ public final class SlotPool {
         scatterSeconds = 0
         fillSeconds = 0
         recordsFetched = 0
+        readBytes = 0
         sweepWaitSeconds = 0
         sweepSortSeconds = 0
     }

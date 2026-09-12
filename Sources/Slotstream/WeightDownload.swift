@@ -63,6 +63,9 @@ public enum ModelLocator {
             if FileManager.default.fileExists(atPath: repoLocalDir.path) { return repoLocalDir }
             return userModelsDir.appendingPathComponent(PinnedModel.dirName)
         }
+        if let jang = JANGModels.named(spec) {
+            return userModelsDir.appendingPathComponent(jang.directoryName)
+        }
         return URL(fileURLWithPath: expanded)
     }
 }

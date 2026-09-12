@@ -245,7 +245,7 @@ public final class NgramStore {
     private func fetchRow(_ gid: Int64) throws -> [Float] {
         if compactRows, let r = compactCache[gid] {
             rowHits += 1
-            return r.map(bf16ToFloat)
+            return cfg.format.isJANG ? r.map { Float(Float16(bitPattern: $0)) } : r.map(bf16ToFloat)
         }
         if let r = cache[gid] {
             rowHits += 1
@@ -283,6 +283,9 @@ public final class NgramStore {
             try fault?.beforeRead()
             let shard = Int(gid) / rowsPerShard
             let row = Int(gid) % rowsPerShard
+            let wRowBytes = wRefs[shard].rowBytes
+            let sRowBytes = sRefs[shard].rowBytes
+            let bits = wRowBytes * 8 / headDim
             var wRaw = [UInt8](repeating: 0, count: wRowBytes)
             var sRaw = [UInt8](repeating: 0, count: sRowBytes)
             var bRaw = [UInt8](repeating: 0, count: sRowBytes)
@@ -296,24 +299,8 @@ public final class NgramStore {
                 try bRaw.withUnsafeMutableBytes { try index.preadChecked(into: $0.baseAddress!, bRefs[shard], offset: row * sRowBytes, count: sRowBytes,shouldContinue:shouldContinue) }
             }
 
-            let g = qGroup
-            var out = [Float](repeating: 0, count: headDim)
-            wRaw.withUnsafeBytes { wp in
-                sRaw.withUnsafeBytes { sp in
-                    bRaw.withUnsafeBytes { bp in
-                        let words = wp.bindMemory(to: UInt32.self)
-                        let scales = sp.bindMemory(to: UInt16.self)
-                        let biases = bp.bindMemory(to: UInt16.self)
-                        for j in 0 ..< headDim {
-                            let q = Float((words[j / 8] >> UInt32(4 * (j % 8))) & 0xF)
-                            let sc = bf16ToFloat(scales[j / g])
-                            let bi = bf16ToFloat(biases[j / g])
-                            out[j] = bf16Round(sc * q + bi)
-                        }
-                    }
-                }
-            }
-            return out
+            return try AffineRow.decode(weights: wRaw, scales: sRaw, biases: bRaw,
+                columns: headDim, bits: bits, group: qGroup, fp16: sRefs[shard].dtype == "F16")
         }
     }
 
@@ -329,7 +316,9 @@ public final class NgramStore {
             }
             if !ringEvictionOrder { cacheOrder.removeFirst(n) }
         }
-        if compactRows { compactCache[gid] = row.map { UInt16(truncatingIfNeeded: $0.bitPattern >> 16) } }
+        if compactRows {
+            compactCache[gid] = AffineRow.compact(row, fp16: cfg.format.isJANG)
+        }
         else { cache[gid] = row }
         if ringEvictionOrder { ringOrder.append(gid) }
         else { cacheOrder.append(gid) }
@@ -450,10 +439,10 @@ public final class NgramStore {
             for pos in gids {
                 for gid in pos {
                     if let row = compactCache[gid] { flat.append(contentsOf: row) }
-                    else { flat.append(contentsOf: try fetchRow(gid).map { UInt16(truncatingIfNeeded: $0.bitPattern >> 16) }) }
+                    else { flat.append(contentsOf: AffineRow.compact(try fetchRow(gid), fp16: cfg.format.isJANG)) }
                 }
             }
-            return MLXArray(flat, [1, nNew, cfg.pleEmbedDim]).view(dtype: .bfloat16)
+            return MLXArray(flat, [1, nNew, cfg.pleEmbedDim]).view(dtype: cfg.format.isJANG ? .float16 : .bfloat16)
         }
         var flat = [Float]()
         flat.reserveCapacity(nNew * cfg.pleEmbedDim)
@@ -463,6 +452,6 @@ public final class NgramStore {
                 flat.append(contentsOf: try cache[gid] ?? fetchRow(gid))
             }
         }
-        return MLXArray(flat, [1, nNew, cfg.pleEmbedDim]).asType(.bfloat16)
+        return MLXArray(flat, [1, nNew, cfg.pleEmbedDim]).asType(cfg.format.isJANG ? .float16 : .bfloat16)
     }
 }

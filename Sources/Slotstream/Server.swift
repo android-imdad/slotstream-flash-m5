@@ -516,7 +516,7 @@ public final class Server {
         let pool = engine.poolSnapshot()
         var d: [String: Any] = [
             "format": "safetensors", "family": "qwen4_exp",
-            "parameter_size": "176B-A6B", "quantization_level": "4bit",
+            "parameter_size": "176B-A6B", "quantization_level": engine.model.cfg.format.isJANG ? engine.model.cfg.format.rawValue : "4bit",
             "expert_cache_per_layer": Int(pool.slotsPerLayer.rounded()),
             "experts_per_layer": engine.model.cfg.numExperts,
         ]
@@ -661,10 +661,14 @@ public final class Server {
         guard !requested.isEmpty else { return "model must not be empty" }
         // Ollama clients routinely drop the tag or ask for ":latest". Both name
         // the only model here, and a name is not a semantic knob.
-        let accepted = [
+        let accepted: [String]
+        if let jang = JANGModels.all.first(where: { $0.format == engine.model.cfg.format }) {
+            accepted = [engine.modelName, jang.directoryName, jang.repository,
+                        jang.format == .jang4M ? "JANG_4M" : "JANG_6S"]
+        } else { accepted = [
             engine.modelName, "qwen3.8-flash-next:4bit", "qwen38-flash-next-mlx-4bit",
             "qwen3.8-flash-next", "qwen3.8-flash-next:latest",
-        ]
+        ] }
         return accepted.contains(requested)
             ? nil : "model '\(requested)' is not loaded; this server has only '\(engine.modelName)'"
     }

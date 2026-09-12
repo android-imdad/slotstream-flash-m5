@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: records/design
-updated: 2026-09-11T17:03:43.083129Z
+updated: 2026-09-12T09:01:11.539800Z
 ---
 
 # records/design
 
+- [[records/design/jang-checkpoint-support]] — Experimental pinned JANG checkpoint loading and expert streaming, original-value preservation, fixed memory planning and explicit qualification limits.
 - [[records/design/measured-operating-policies]] — Measured operating policies and revision criteria
 - [[records/design/m9-addendum-built-and-measured-2026-09-01]] — M9 addendum — built and measured (2026-09-01)
 - [[records/design/sevra-maintained-model-integration]] — Sevra integration: versioned hardware/model profiles, full-stack qualification, maintained updates and documentation tied to implementation.

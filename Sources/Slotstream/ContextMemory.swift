@@ -85,9 +85,9 @@ public struct ContextMemoryLedger: Sendable {
     public let planningMarginBytes: Int
 
     public init(slots: Int, context: Int, chunk: Int, retentionTokens: Int,
-                mtp: Bool, visionResident: Bool) {
-        fixedBytes = PlannerCostModel.fixedBytes
-        poolBytes = ContextBytes.product(slots, Int(Geometry.recordBytes))
+                mtp: Bool, visionResident: Bool, checkpoint: CheckpointMemory? = nil) {
+        fixedBytes = checkpoint?.fixedBytes ?? PlannerCostModel.fixedBytes
+        poolBytes = ContextBytes.product(slots, checkpoint?.recordBytes ?? Int(Geometry.recordBytes))
         activeCapacityBytes = ContextGeometry.sequenceBytes(tokens: context, mtp: mtp)
         additionalActiveBytes = ContextGeometry.additionalActiveBytes(tokens: context, mtp: mtp)
         retainedCapacityBytes = ContextBytes.product(retentionTokens, PrefixCache.bytesPerToken)

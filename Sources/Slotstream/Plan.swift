@@ -37,13 +37,13 @@ public enum Geometry {
     /// the user is shown is wrong, so fail loudly instead of drifting.
     public static func check(against cfg: ModelConfig, recordBytes actual: Int) throws {
         guard cfg.numLayers == layers, cfg.numExperts == expertsPerLayer,
-            Double(actual) == recordBytes
+            actual == cfg.format.expertRecordBytes
         else {
             throw ModelError(
                 "model geometry does not match the supported checkpoint: config has "
                     + "\(cfg.numLayers) layers x \(cfg.numExperts) experts x \(actual) "
                     + "B/record, expected \(layers) x \(expertsPerLayer) x "
-                    + "\(Int(recordBytes)) B — check --model")
+                    + "\(cfg.format.expertRecordBytes) B — check --model")
         }
     }
 }
@@ -117,6 +117,7 @@ public struct MemoryPlan {
     public let runtimeAllocationPolicy: RuntimeAllocationPolicy?
     public let maxPrefillWaitMinutes: Double
     public let contextQualification: Bool
+    public let checkpointMemory: CheckpointMemory?
 
     public init(
         source: Source, slots: Int, targetGB: Double?,
@@ -128,7 +129,8 @@ public struct MemoryPlan {
         maxContextTokens: Int = ContextPolicy.defaultTokens,
         notes: [String], simulated: Bool = false,
         runtimeAllocationPolicy: RuntimeAllocationPolicy? = nil,
-        maxPrefillWaitMinutes: Double = 30, contextQualification: Bool = false
+        maxPrefillWaitMinutes: Double = 30, contextQualification: Bool = false,
+        checkpointMemory: CheckpointMemory? = nil
     ) {
         self.source = source
         self.slots = slots
@@ -149,13 +151,15 @@ public struct MemoryPlan {
         self.runtimeAllocationPolicy = runtimeAllocationPolicy
         self.maxPrefillWaitMinutes = maxPrefillWaitMinutes
         self.contextQualification = contextQualification
+        self.checkpointMemory = checkpointMemory
     }
 
     public var expertsPerLayerCached: Double { Geometry.perLayer(slots) }
-    public var poolGB: Double { Geometry.gb(slots) }
+    public var poolGB: Double { Double(slots) * Double(checkpointMemory?.recordBytes ?? Int(Geometry.recordBytes)) / 1e9 }
     public var memoryLedger: ContextMemoryLedger {
         ContextMemoryLedger(slots: slots, context: maxContextTokens, chunk: prefillChunk,
-            retentionTokens: prefixCacheTokens, mtp: mtpEnabled, visionResident: visionResidentReserved)
+            retentionTokens: prefixCacheTokens, mtp: mtpEnabled, visionResident: visionResidentReserved,
+            checkpoint: checkpointMemory)
     }
     public var expectedPeakGB: Double { Double(memoryLedger.expectedPeakBytes) / 1e9 }
 
@@ -170,18 +174,25 @@ public struct MemoryPlan {
             maxContextTokens: maxContextTokens, notes: notes, simulated: simulated,
             runtimeAllocationPolicy: runtimeAllocationPolicy,
             maxPrefillWaitMinutes: configuration.maxPrefillWaitMinutes,
-            contextQualification: configuration.qualification)
+            contextQualification: configuration.qualification, checkpointMemory: checkpointMemory)
     }
     /// Seconds a prompt filling the whole context takes before its first
     /// token, priced through the prefill schedule this plan runs.
     public var estPrefillSecondsAtMaxContext: Double {
-        PrefillSchedule.estSeconds(tokens: maxContextTokens, maxChunk: prefillChunk)
+        checkpointMemory == nil ? PrefillSchedule.estSeconds(tokens: maxContextTokens, maxChunk: prefillChunk) : .nan
     }
-    public var estWarmTokS: Double { Planner.estWarmTokS(expertsPerLayer: expertsPerLayerCached) }
+    public var estWarmTokS: Double { checkpointMemory == nil ? Planner.estWarmTokS(expertsPerLayer: expertsPerLayerCached) : .nan }
     public var fullyResident: Bool { slots >= Geometry.totalRecords }
 
     /// The startup announce: device, decision, expectation, override hint.
     public func banner() -> String {
+        if let checkpointMemory {
+            return "slotstream \(checkpointMemory.format.modelName) memory plan\n"
+                + String(format: "  target: %.1f GB; budgeted peak: %.1f GB; cache: %d slots (%.1f GB)\n",
+                         targetGB ?? expectedPeakGB, expectedPeakGB, slots, poolGB)
+                + "  prefill: \(prefillChunk) tokens; context: \(maxContextTokens); throughput: unmeasured\n"
+                + notes.map { "  note: " + $0 }.joined(separator: "\n")
+        }
         var l: [String] = []
         l.append("slotstream memory plan (\(source.rawValue))")
         if let a = availableGB, a.isFinite {
@@ -292,8 +303,8 @@ public struct MemoryPlan {
             // and a caller comparing two plans across a rounding boundary sees
             // a step that is not there. Anything asserting on the plan should
             // read these, not the printed line.
-            "est_warm_tok_s": estWarmTokS,
-            "est_prefill_tok_s": Planner.estPrefillTokS(chunk: prefillChunk),
+            "est_warm_tok_s": estWarmTokS.isFinite ? estWarmTokS as Any : NSNull(),
+            "est_prefill_tok_s": checkpointMemory == nil ? Planner.estPrefillTokS(chunk: prefillChunk) as Any : NSNull(),
         ]
         if let a = availableGB, a.isFinite { d["device_available_gb"] = tenth(a) }
         if let t = targetGB { d["target_gb"] = tenth(t) }
@@ -302,6 +313,7 @@ public struct MemoryPlan {
             if let chunk = policy.prefillChunkOverride { d["runtime_prefill_override"] = chunk }
         }
         if !notes.isEmpty { d["notes"] = notes }
+        if let checkpointMemory { d["checkpoint_format"] = checkpointMemory.format.rawValue }
         return d
     }
 }
@@ -986,6 +998,7 @@ public enum Planner {
     /// Resolve the first image against the existing policy, before allocating
     /// its tower. The source and target remain the user's original decision.
     public static func loadingVision(_ p: MemoryPlan) throws -> MemoryPlan {
+        guard p.checkpointMemory == nil else { throw PlanError("JANG vision is not qualified in this runtime") }
         guard p.visionEnabled else { throw PlanError("vision is disabled") }
         if p.visionResidentReserved { return p }
         var sized: MemoryPlan

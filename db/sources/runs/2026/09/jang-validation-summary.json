@@ -1,0 +1,15 @@
+{
+  "base_commit": "f60e9a83037fea576bf210a3650d6f29e164f183",
+  "binary_sha256": "0014844a367f513aa3dac20906f592e1af1b77df4ae8dfa3c48e2c18370c067b",
+  "compiled_source_files": 156,
+  "whole_model_loaded": false,
+  "full_model_downloaded": false,
+  "mtp_qualified": false,
+  "vision_qualified": false,
+  "catalogue": "46 passed, 0 failed, 0 skipped (27484 assertions)",
+  "static_pass": true,
+  "streaming_pass": {
+    "4M": true,
+    "6S": true
+  }
+}

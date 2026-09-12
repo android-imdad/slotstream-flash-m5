@@ -18,7 +18,8 @@ import tempfile
 ROOT = Path(__file__).resolve().parent.parent
 SOURCES = [f'Sources/Slotstream/{name}.swift' for name in (
     'Plan', 'Machine', 'Context', 'ContextMemory', 'ContextFeasibility',
-    'RequestControl', 'ToolCallSplitter', 'PinnedModel', 'Version')]
+    'RequestControl', 'ToolCallSplitter', 'PinnedModel', 'Version',
+    'CheckpointFormat', 'JANGPlanning')]
 SECTIONS = [
     ('Checkpoint.swift', 'public struct ModelError:', '// MARK: - Safetensors header parsing'),
     ('Governor.swift', 'public enum GovernorPolicy {', 'public final class MemoryGovernor:'),

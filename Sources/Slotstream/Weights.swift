@@ -24,9 +24,13 @@ public struct QLinear {
 
     public func callAsFunction(_ x: MLXArray) -> MLXArray {
         if let s = scales {
-            return quantizedMM(
+            let result = quantizedMM(
                 x, w, scales: s, biases: biases, transpose: true,
                 groupSize: groupSize, bits: bits)
+            // Keep the model's established BF16 activation/cache contract.
+            // FP16 scale values are accumulated through MLX's FP32 promotion,
+            // then the projection output returns to the input precision.
+            return x.dtype == .bfloat16 && s.dtype == .float16 ? result.asType(.bfloat16) : result
         }
         return matmul(x, w.transposed())
     }
@@ -72,7 +76,8 @@ extension TensorSource {
         let b = optionalTensor(base + ".biases")
         return QLinear(
             w: w, scales: s, biases: b,
-            groupSize: groupSize ?? config.qGroup, bits: bits ?? config.qBits)
+            groupSize: groupSize ?? config.quantization(for: base).groupSize,
+            bits: bits ?? config.quantization(for: base).bits)
     }
 }
 
@@ -117,8 +122,7 @@ public final class ResidentWeights: TensorSource {
         for f in files.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
             let all = try loadArrays(url: f)
             for (rawKey, arr) in all {
-                var key = rawKey
-                if key.hasPrefix("language_model.") { key.removeFirst("language_model.".count) }
+                let key = CheckpointNames.canonical(rawKey, format: config.format)
                 if key.hasPrefix("mtp.") || key.hasPrefix("vision_tower.") || key.hasPrefix("model.visual.") {
                     continue
                 }
@@ -128,7 +132,10 @@ public final class ResidentWeights: TensorSource {
                     let isWanted = includeLayerExperts.contains { key.contains("model.layers.\($0).mlp.switch_mlp.") }
                     if !isWanted { continue }
                 }
-                kept[key] = arr
+                // JANG stores its depthwise PLE kernel as [channels, taps].
+                // Slotstream/MLX conv1d consumes [channels, taps, 1].
+                kept[key] = config.format.isJANG && key.hasSuffix(".ple.conv1d.weight") && arr.ndim == 2
+                    ? arr.expandedDimensions(axis: -1) : arr
             }
         }
         var packed: [Int: PackedProjectionPair] = [:]
@@ -136,7 +143,8 @@ public final class ResidentWeights: TensorSource {
             func projection(_ base: String) -> QLinear? {
                 guard let weight = kept[base + ".weight"] else { return nil }
                 return QLinear(w: weight, scales: kept[base + ".scales"], biases: kept[base + ".biases"],
-                    groupSize: index.config.qGroup, bits: index.config.qBits)
+                    groupSize: index.config.quantization(for: base).groupSize,
+                    bits: index.config.quantization(for: base).bits)
             }
             for layer in config.layerTypes.indices where config.layerTypes[layer] == "linear_attention" {
                 let base = "model.layers.\(layer).linear_attn"
@@ -193,7 +201,9 @@ public final class ResidentWeights: TensorSource {
         let rs = take(s, ids, axis: 0)
         let rb = b.map { take($0, ids, axis: 0) }
         return dequantized(
-            rows, scales: rs, biases: rb, groupSize: config.qGroup, bits: config.qBits)
+            rows, scales: rs, biases: rb,
+            groupSize: config.quantization(for: "model.embed_tokens").groupSize,
+            bits: config.quantization(for: "model.embed_tokens").bits)
     }
 
     /// Main and draft callers already own CPU token IDs. Avoid uploading them
@@ -216,7 +226,7 @@ public final class ResidentWeights: TensorSource {
             count = next.partialValue
         }
         guard count == values.count else { throw ModelError("embedding lookup shape does not match IDs") }
-        if values.isEmpty { return MLXArray.zeros(shape + [config.hiddenSize], dtype: .bfloat16) }
+        if values.isEmpty { return MLXArray.zeros(shape + [config.hiddenSize], dtype: config.format.isJANG ? .float16 : .bfloat16) }
         if values.count <= 4096 { return try rows.gather(values, shape: shape) }
         var parts: [MLXArray] = []
         for lo in stride(from: 0, to: values.count, by: 4096) {

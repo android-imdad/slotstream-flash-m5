@@ -1,0 +1,435 @@
+........................
+----------------------------------------------------------------------
+Ran 24 tests in 20.448s
+
+OK
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 9.484s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 7.231s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 11.015s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 8.782s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 9.475s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 1.212s
+
+OK
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 44.810s
+
+OK
+coverage ratchet checks pass
+..{"phase": "starting", "prompt_tokens": 16, "reclaimable_gb": 20.0}
+{"prompt_tokens": 16, "passed": false, "error": "ValueError: capacity rung was incomplete, aborted or over its plan"}
+.......
+----------------------------------------------------------------------
+Ran 9 tests in 0.029s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 3.127s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.861s
+
+OK
+.....{"phase": "waiting for build reservation", "seconds": 0.0}
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.006s
+
+OK
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 1.967s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+OK
+..................................................
+----------------------------------------------------------------------
+Ran 50 tests in 0.019s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.040s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.006s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.012s
+
+OK
+..............................
+----------------------------------------------------------------------
+Ran 30 tests in 2.882s
+
+OK
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.090s
+
+OK
+{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+{"starting": "paired/unique-prose"}
+.{"starting": "native/combined-plain"}
+..{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+{"starting": "paired/unique-prose"}
+{"starting": "paired/sampled-short"}
+{"starting": "paired/mtp-resource"}
+{"starting": "paired/distinct-tail"}
+{"starting": "paired/complete-repeat"}
+{"starting": "paired/unique-with-retention"}
+{"starting": "paired/actual-default-one-token"}
+{"starting": "soak/off"}
+{"starting": "soak/on"}
+....{"starting": "native/combined-plain"}
+.{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+.{"starting": "native/combined-plain"}
+..{"starting": "native/combined-plain"}
+..
+----------------------------------------------------------------------
+Ran 13 tests in 1.360s
+
+OK
+..........{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+.
+----------------------------------------------------------------------
+Ran 11 tests in 0.114s
+
+OK
+llms-full.txt is current
+warning LOG_UNKNOWN_KIND log.md:124 — log entry kind `change` is not recognized
+    hint: use one of: ingest, create, update, delete, rename, link, validate, index-rebuild, contradiction
+warning LOG_OUT_OF_ORDER log.md:883 — log entry is older than the entry above it (possible rewrite)
+    hint: append corrective entries; never reorder past ones
+2 issue(s): 0 error(s), 2 warning(s), 0 info
+MEASUREMENTS.md is current
+PLAN.md is current
+claims gate: 135 needle checks, 0 failures
+BRAIN GATES PASS
+dequant_row.txt: OK
+layer_0.bin: OK
+layer_1.bin: OK
+layer_2.bin: OK
+layer_3.bin: OK
+ngram_ids.txt: OK
+tokens.txt: OK
+PASS  request VM counters are monotonic
+PASS  request VM reclaimable bytes are available
+PASS  process physical footprint is readable
+PASS  process compatibility high-water is readable
+PASS  lifetime RSS is separately readable
+PASS  kernel lifetime footprint includes current allocation
+PASS  statistics publish current and lifetime observations
+PASS  statistics predating the lifetime footprint field still decode
+PASS  monotonic duration is nonnegative
+PASS  footprint sampler includes endpoints
+PASS  automatic platform-qualified optimization defaults
+PASS  qualified platform keeps the complete joint candidate
+PASS  unqualified platform 0 keeps portable work and original rotation
+PASS  unqualified platform 1 keeps portable work and original rotation
+PASS  unqualified platform 2 keeps portable work and original rotation
+PASS  unqualified platform 3 keeps portable work and original rotation
+PASS  unqualified platform 4 keeps portable work and original rotation
+PASS  unqualified platform 5 keeps portable work and original rotation
+PASS  unqualified platform 6 keeps portable work and original rotation
+PASS  unqualified platform 7 keeps portable work and original rotation
+PASS  unqualified platform 8 keeps portable work and original rotation
+PASS  unqualified platform 9 keeps portable work and original rotation
+PASS  unqualified platform 10 keeps portable work and original rotation
+PASS  unqualified platform 11 keeps portable work and original rotation
+PASS  unqualified platform 12 keeps portable work and original rotation
+PASS  platform selection is deterministic
+PASS  explicit kernel qualification remains available
+PASS  explicit kernel fallback remains available
+PASS  reference control encoding omits unset automatic policy
+PASS  old control JSON remains decodable
+PASS  automatic policy survives saved control round trip
+PASS  absent overrides preserve an inherited automatic policy
+PASS  explicit automatic zero restores the chronological policy
+PASS  explicit automatic one enables only that policy
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_READ_SCOPE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_LAYER_WORKSPACE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_INDEXER_TILES
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_PLE_TILES
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_WORKSPACE_TILE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_SCOPE_FRONTIER
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_WORKSPACE_PIECES
+PASS  malformed automatic policy refuses/true
+PASS  malformed automatic policy refuses/-1
+PASS  malformed automatic policy refuses/2
+PASS  malformed automatic policy refuses/
+PASS  absent vision overrides retain inherited tiling
+PASS  explicit zero padding leaves inherited tiling enabled
+PASS  explicit zero query tile selects original vision attention
+PASS  explicit padding overrides inherited tiling/80
+PASS  explicit tiling overrides inherited padding/80
+PASS  explicit query zero retains inherited padding/80
+PASS  explicit padding with query zero remains valid/80
+PASS  explicit query tile with padding zero remains valid/80
+PASS  two explicit vision alternatives refuse/80
+PASS  two explicit vision alternatives refuse/80
+PASS  two explicit vision alternatives refuse/80
+PASS  explicit padding overrides inherited tiling/128
+PASS  explicit tiling overrides inherited padding/128
+PASS  explicit query zero retains inherited padding/128
+PASS  explicit padding with query zero remains valid/128
+PASS  explicit query tile with padding zero remains valid/128
+PASS  two explicit vision alternatives refuse/128
+PASS  two explicit vision alternatives refuse/128
+PASS  two explicit vision alternatives refuse/128
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_PADDING/bad
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_PADDING/256
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_QUERY_TILE/bad
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_QUERY_TILE/128
+PASS  combined candidate preserves the original MTP verification shape
+PASS  absent overrides retain the selected default family
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPACT_STATE
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPACT_STATE
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPACT_MTP
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPACT_MTP
+PASS  explicit zero disables only SLOTSTREAM_OPT_NGRAM_ROWS
+PASS  explicit one restores only SLOTSTREAM_OPT_NGRAM_ROWS
+PASS  explicit zero disables only SLOTSTREAM_OPT_FINAL_FORWARD
+PASS  explicit one restores only SLOTSTREAM_OPT_FINAL_FORWARD
+PASS  explicit zero disables only SLOTSTREAM_OPT_SAMPLER_THRESHOLD
+PASS  explicit one restores only SLOTSTREAM_OPT_SAMPLER_THRESHOLD
+PASS  explicit zero disables only SLOTSTREAM_OPT_SAMPLER_DRAW
+PASS  explicit one restores only SLOTSTREAM_OPT_SAMPLER_DRAW
+PASS  explicit zero disables only SLOTSTREAM_OPT_OUTPUT_QUEUE
+PASS  explicit one restores only SLOTSTREAM_OPT_OUTPUT_QUEUE
+PASS  explicit zero disables only SLOTSTREAM_OPT_RESPONSIVE_GOVERNOR
+PASS  explicit one restores only SLOTSTREAM_OPT_RESPONSIVE_GOVERNOR
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPLETE_PROMPT
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPLETE_PROMPT
+PASS  explicit zero disables only SLOTSTREAM_OPT_SHARED_ROPE
+PASS  explicit one restores only SLOTSTREAM_OPT_SHARED_ROPE
+PASS  explicit zero disables only SLOTSTREAM_OPT_FUSED_ROPE
+PASS  explicit one restores only SLOTSTREAM_OPT_FUSED_ROPE
+PASS  explicit zeros restore the complete reference inference family
+PASS  explicit numeric zero disables inherited prefix retention
+PASS  non-optimization environment leaves the family intact
+PASS  selected defaults still reject invalid override ["SLOTSTREAM_OPT_COMPLETE_PROMPT": "false"]
+PASS  selected defaults still reject invalid override ["SLOTSTREAM_OPT_TYPO": "0"]
+PASS  valid inherited read scope retains its prerequisites
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_COMPACT_STATE
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_COMPACT_MTP
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_LAYER_WORKSPACE
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_INDEXER_TILES
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_PLE_TILES
+PASS  scope can be disabled while retaining its other independent work
+PASS  public environment function value keeps its signature and automatic default
+PASS  typed override enables compaction
+PASS  malformed override refused
+PASS  unknown optimization refused
+PASS  invalid read scope -1 refused
+PASS  invalid read scope 1 refused
+PASS  invalid read scope 16384 refused
+PASS  invalid read scope bad refused
+PASS  unbounded read scope refused
+PASS  explicit workspace tile is recorded
+PASS  unbounded workspace tile refused
+PASS  terminal output needs no speculative draft
+PASS  draft count fits remaining output
+PASS  public depth cannot exceed recording cap
+PASS  negative remaining output cannot underflow
+PASS  prefix cache reaches its four-entry bound
+PASS  an identical history replaces instead of duplicating an entry
+PASS  a miss evicts before allocating a fifth state
+PASS  a smaller live token ceiling evicts immediately
+PASS  held GB includes fixed recurrent state
+PASS  growing hit still reuses its state
+PASS  growing hit reserves future state before allocation
+PASS  huge reservation safely misses
+PASS  huge reservation releases held state
+PASS  capacity reservation still hits
+PASS  capacity growth reserves bytes before reuse
+PASS  saturated byte reservation evicts safely
+PASS  identical bytes hash alike
+PASS  different bytes do not
+PASS  the same image at the same offset matches
+PASS  a swapped image does not
+PASS  an entry ending inside a run still matches that run
+PASS  a text-only entry rejects a prompt with an image inside its range
+PASS  an image beyond the entry's range is irrelevant to the match
+PASS  a vision conversation is held, not discarded
+PASS  the same ids with a different picture miss
+PASS  the text-only splice never sees a vision entry
+PASS  prefix splice chooses the longest retained extension
+PASS  prefix splice is strict, not an identical-history match
+PASS  prefix splice lookup does not consume the retained state
+PASS  a disabled prefix cache offers no splice
+PASS  shard listing works through a symlinked model dir
+PASS  8.1 GB plan stays inside its target
+PASS  10.0 GB plan stays inside its target
+PASS  16.0 GB plan stays inside its target
+PASS  30.0 GB plan stays inside its target
+RUNTIME CHECK PASS
+{
+  "device": "Apple M5 Max",
+  "exit_code": 0,
+  "failures": [],
+  "maximum_live_gpu_buffer_bytes": 201326592,
+  "model_loaded": false,
+  "observations": [
+    {
+      "lifetime_rss_peak_bytes": 13090816,
+      "phase": "baseline",
+      "physical_footprint_bytes": 4276728,
+      "reported_peak_bytes": 13074432,
+      "sampled_peak_bytes": 4276728
+    },
+    {
+      "lifetime_rss_peak_bytes": 15024128,
+      "phase": "transient_128_mib",
+      "physical_footprint_bytes": 257540696,
+      "reported_peak_bytes": 257540696,
+      "sampled_peak_bytes": 257540696
+    },
+    {
+      "lifetime_rss_peak_bytes": 15024128,
+      "phase": "transient_freed",
+      "physical_footprint_bytes": 123322968,
+      "reported_peak_bytes": 257540696,
+      "sampled_peak_bytes": 257540696
+    },
+    {
+      "lifetime_rss_peak_bytes": 15040512,
+      "phase": "persistent_64_mib",
+      "physical_footprint_bytes": 190448216,
+      "reported_peak_bytes": 257540696,
+      "sampled_peak_bytes": 257540696
+    },
+    {
+      "lifetime_rss_peak_bytes": 15040512,
+      "phase": "persistent_plus_transient",
+      "physical_footprint_bytes": 324665944,
+      "reported_peak_bytes": 324665944,
+      "sampled_peak_bytes": 324665944
+    },
+    {
+      "lifetime_rss_peak_bytes": 15056896,
+      "phase": "persistent_after_transient_freed",
+      "physical_footprint_bytes": 190464600,
+      "reported_peak_bytes": 324682328,
+      "sampled_peak_bytes": 324665944
+    },
+    {
+      "lifetime_rss_peak_bytes": 15056896,
+      "phase": "all_gpu_buffers_freed",
+      "physical_footprint_bytes": 123355736,
+      "reported_peak_bytes": 324682328,
+      "sampled_peak_bytes": 324665944
+    },
+    {
+      "lifetime_rss_peak_bytes": 23445504,
+      "phase": "cpu_allocation_after_gpu_peak",
+      "physical_footprint_bytes": 131744344,
+      "reported_peak_bytes": 324682328,
+      "sampled_peak_bytes": 324665944
+    },
+    {
+      "lifetime_rss_peak_bytes": 23445504,
+      "phase": "after_concurrent_reads",
+      "physical_footprint_bytes": 123388504,
+      "reported_peak_bytes": 324682328,
+      "sampled_peak_bytes": 324665944
+    }
+  ],
+  "passed": true,
+  "source_sha256": {
+    "Sources/Slotstream/Checkpoint.swift": "1b9ce8b0ce27cc174b05648358fd09ec857f5e950a8cbf7cdd43fc1e75d54534",
+    "Sources/Slotstream/Observation.swift": "fcb7557541a5a0ce885737449d6b2b88009a8521a7c743cded5d120867529e10",
+    "Sources/Slotstream/ProcessMemory.swift": "37e2ac7fb149f2a9e46f142bc89ae36835bef2bd0bd9d0975a278a334f8c63e0",
+    "Tools/process_memory_check.swift": "17c4ee5dfdff19b1bc467ad896047f6cc8c35d27850d1a62b88f39ea59ff704b",
+    "Tools/process_memory_gate.py": "4eb64b24a9fe7d25ac6c970da91688751303a5cc7dd6d2fc340486220b3fdb58"
+  }
+}
+PASS  matching file is accepted
+PASS  same-size corruption is rejected
+PASS  exact Content-Range is accepted
+PASS  wrong range start is rejected
+PASS  wrong range total is rejected
+PASS  unknown range total is rejected
+PASS  every pinned file has a digest
+PASS  the draft head is pinned as the one optional file
+PASS  an absent optional file is not a repair; an absent required one is
+PASS  an empty directory reads as missing
+PASS  missing needs the required model
+PASS  status carries free disk
+PASS  bytesToFetch agrees with required files
+PASS  a missing copy is not ready
+PULL CHECK PASS
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.010s
+
+OK
+{"bf16_predictions":16711680,"centers":1000000,"roundtrips":60,"malformed_inputs":39583,"pass":true}
+Traceback (most recent call last):
+  File "<CHECKOUT>/Tools/slotpack/checks.py", line 33, in <module>
+    if __name__ == '__main__': main()
+  File "<CHECKOUT>/Tools/slotpack/checks.py", line 23, in main
+    run = subprocess.run([str(binary)], check=True, capture_output=True, text=True)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['<CHECKOUT>/.build/transport-v1/build-e33c0ab2f922401c95a7ae0355cf2650/download-harness']' died with <Signals.SIGTRAP: 5>.

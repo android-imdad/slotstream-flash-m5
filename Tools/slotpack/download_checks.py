@@ -27,7 +27,7 @@ def compile_harness(entrypoint='DownloadHarness.swift'):
     # mapped Mach-O in place can invalidate its signature and kill a long pull.
     build=OUT/('build-'+uuid.uuid4().hex)
     build.mkdir(parents=True)
-    names=['Errors','PinnedModel','WeightStore','WeightDownload','DownloadHTTP','SlotpackManifest','SlotpackDownload','DownloadConcurrency']
+    names=['Errors','PinnedModel','WeightStore','WeightDownload','DownloadHTTP','SlotpackManifest','SlotpackDownload','DownloadConcurrency','CheckpointFormat','JANGModels','JANGManifests']
     paths=[ROOT/'Sources/Slotstream'/f'{n}.swift' for n in names]
     paths+=list((ROOT/'Sources/Slotstream').glob('PinnedTransport*.swift'))
     paths+=[ROOT/'Sources/CSlotpack/slotpack.c',ROOT/'Sources/CSlotpack/include/slotpack.h',ROOT/'Tools/slotpack'/entrypoint]

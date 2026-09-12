@@ -1,5 +1,14 @@
 # Changelog
 
+## Local unreleased: JANG checkpoint support
+
+- Add pinned JANG_4M and JANG_6S downloads and text-mode expert streaming.
+- Preserve per-module precision, FP16 scales and mixed n-gram packing.
+- Price checkpoint-specific resident weights and cache records; keep JANG
+  cache plans fixed and omit unmeasured speed estimates.
+- Add real weight-row numerical fixtures and configuration checks. Full-model
+  generation and performance qualification remain pending. See [JANG](docs/JANG.md).
+
 What each release changed, newest first. `curl | sh` installs the latest
 release; anything under **Unreleased** is on `main` only.
 

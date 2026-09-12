@@ -1,0 +1,131 @@
+PASS  4M: correct profile
+PASS  4M: original ten-expert routing
+PASS  4M: resident and expert precision independent
+PASS  4M: expert pool width
+PASS  4M: embedding override
+PASS  4M: n-gram override canonicalized
+PASS  4M: down precision
+PASS  4M: safety margin stays outside peak
+PASS  4M: actual slot bytes priced
+PASS  4M: measured legacy speed not reused
+PASS  4M: no unqualified MTP/vision
+PASS  4M: simulation remains non-loadable
+PASS  4M: JSON contains no NaN
+PASS  4M: request settings preserve layout
+PASS  4M: reject target 0.0
+PASS  4M: reject target -1.0
+PASS  4M: reject target 8.0
+PASS  4M: reject target 35.0
+PASS  4M: reject target nan
+PASS  4M: reject target inf
+PASS  oversized explicit pool
+PASS  native routing change refused
+PASS  unknown norm convention refused
+PASS  6S: correct profile
+PASS  6S: original ten-expert routing
+PASS  6S: resident and expert precision independent
+PASS  6S: expert pool width
+PASS  6S: embedding override
+PASS  6S: n-gram override canonicalized
+PASS  6S: down precision
+PASS  6S: safety margin stays outside peak
+PASS  6S: actual slot bytes priced
+PASS  6S: measured legacy speed not reused
+PASS  6S: no unqualified MTP/vision
+PASS  6S: simulation remains non-loadable
+PASS  6S: JSON contains no NaN
+PASS  6S: request settings preserve layout
+PASS  6S: reject target 0.0
+PASS  6S: reject target -1.0
+PASS  6S: reject target 8.0
+PASS  6S: reject target 35.0
+PASS  6S: reject target nan
+PASS  6S: reject target inf
+PASS  oversized explicit pool
+PASS  native routing change refused
+PASS  unknown norm convention refused
+PASS  path language_model.layers.1.ple.layer_multipliers
+PASS  path visual.blocks.0.attn.proj.weight
+PASS  path lm_head.weight
+PASS  path language_model.layers.1.ple.conv1d_weight
+PASS  path language_model.layers.1.ple.ngram_embedding.shards.127.scales
+PASS  path mtp.fc_hidden.weight
+PASS  legacy namespace unchanged
+PASS  jang4M: every download pinned
+PASS  jang4M: alias
+PASS  jang4M: path
+PASS  jang4M: library prices selected download
+PASS  jang4M: library alias preserves selection
+PASS  jang6S: every download pinned
+PASS  jang6S: alias
+PASS  jang6S: path
+PASS  jang6S: library prices selected download
+PASS  jang6S: library alias preserves selection
+PASS  unknown model has no download
+JANG FORMAT CHECK PASS
+PASS  language_model.layers.1.ple.ngram_embedding.shards.0: activation precision stays BF16
+PASS  language_model.layers.1.ple.ngram_embedding.shards.0: projection follows explicit BF16 output contract
+PASS  language_model.layers.1.ple.ngram_embedding.shards.0: compact cache preserves FP16
+PASS  language_model.layers.1.ple.ngram_embedding.shards.0: CPU decoding matches native MLX
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: activation precision stays BF16
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: projection follows explicit BF16 output contract
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: compact cache preserves FP16
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: CPU decoding matches native MLX
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: widening changes no represented weight
+PASS  language_model.layers.1.ple.ngram_embedding.shards.2: native QMM agrees within FP32 reduction tolerance
+PASS  language_model.layers.0.mlp.switch_mlp.down_proj: activation precision stays BF16
+PASS  language_model.layers.0.mlp.switch_mlp.down_proj: projection follows explicit BF16 output contract
+PASS  language_model.layers.0.mlp.switch_mlp.down_proj: compact cache preserves FP16
+PASS  language_model.layers.0.mlp.switch_mlp.down_proj: compact cache preserves FP16
+PASS  language_model.layers.0.mlp.switch_mlp.down_proj: CPU decoding matches native MLX
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: activation precision stays BF16
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: projection follows explicit BF16 output contract
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: compact cache preserves FP16
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: compact cache preserves FP16
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: CPU decoding matches native MLX
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: widening changes no represented weight
+PASS  language_model.layers.0.mlp.switch_mlp.gate_proj: native QMM agrees within FP32 reduction tolerance
+PASS  truncated row refused
+JANG NUMERICAL CHECK PASS
+PASS  run/batch piece 0
+PASS  run/batch piece 1
+PASS  run/batch piece 2
+PASS  run/batch piece 3
+PASS  run/batch piece 4
+PASS  run/batch piece 5
+PASS  run/batch piece 6
+PASS  run/batch piece 7
+PASS  run/batch piece 8
+PASS  native source values 0/0/gate_proj
+PASS  native source values 0/0/up_proj
+PASS  native source values 0/0/down_proj
+PASS  native source values 0/1/gate_proj
+PASS  native source values 0/1/up_proj
+PASS  native source values 0/1/down_proj
+PASS  native source values 1/0/gate_proj
+PASS  native source values 1/0/up_proj
+PASS  native source values 1/0/down_proj
+PASS  read statistics count source bytes
+PASS  cache expansion is not disk traffic
+PASS  inserted piece 0
+PASS  inserted piece 1
+PASS  inserted piece 2
+PASS  inserted piece 3
+PASS  inserted piece 4
+PASS  inserted piece 5
+PASS  inserted piece 6
+PASS  inserted piece 7
+PASS  inserted piece 8
+PASS  cache hits perform no new reads
+PASS  growth preserves cached records
+PASS  shrink/refill piece 0
+PASS  shrink/refill piece 1
+PASS  shrink/refill piece 2
+PASS  shrink/refill piece 3
+PASS  shrink/refill piece 4
+PASS  shrink/refill piece 5
+PASS  shrink/refill piece 6
+PASS  shrink/refill piece 7
+PASS  shrink/refill piece 8
+PASS  pool allocation matches priced record width
+JANG STREAMING CHECK PASS

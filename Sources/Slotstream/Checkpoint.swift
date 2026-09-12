@@ -69,6 +69,13 @@ public struct ModelConfig {
     public var qBits = 4
     public var qGroup = 64
     public var ngramQGroup = 32
+    public var format: CheckpointFormat = .pipe4
+    public var quantizationOverrides: [String: AffineQuantization] = [:]
+    public var expertBits: Int { format.expertBits }
+
+    public func quantization(for base: String) -> AffineQuantization {
+        quantizationOverrides[base] ?? AffineQuantization(bits: qBits, groupSize: qGroup)
+    }
 
     public var rotaryDim: Int { Int(Float(headDim) * partialRotaryFactor) }
     public var pleLayerIndices: [Int] { pleLayerIds.map { $0 - 1 } }
@@ -151,6 +158,29 @@ public struct ModelConfig {
         if let q = root["quantization"] as? [String: Any] {
             c.qBits = (q["bits"] as? Int) ?? c.qBits
             c.qGroup = (q["group_size"] as? Int) ?? c.qGroup
+            if let jang = root["jang_config"] as? [String: Any] {
+                guard jang["format"] as? String == "jang_v2",
+                      jang["family"] as? String == "qwen4_exp",
+                      jang["norm_convention"] as? String == "runtime_plus1_applied" else {
+                    throw ModelError("unsupported JANG encoding or normalization convention")
+                }
+                let expertBits = q.filter { $0.key.contains(".switch_mlp.") }.compactMap { ($0.value as? [String: Any])?["bits"] as? Int }
+                guard expertBits.count == c.numLayers * 3, expertBits.allSatisfy({ $0 == 4 || $0 == 6 }) else {
+                    throw ModelError("JANG support requires explicit four/six-bit expert projection overrides")
+                }
+                c.format = expertBits.contains(6) ? .jang6S : .jang4M
+            }
+            for (name, value) in q {
+                guard let entry = value as? [String: Any] else { continue }
+                guard let bits = entry["bits"] as? Int, let group = entry["group_size"] as? Int,
+                      [2, 3, 4, 5, 6, 8].contains(bits), [32, 64, 128].contains(group),
+                      (entry["mode"] as? String ?? "affine") == "affine" else {
+                    throw ModelError("unsupported quantization override for \(name)")
+                }
+                let key = CheckpointNames.canonical(name, format: c.format)
+                guard c.quantizationOverrides[key] == nil else { throw ModelError("duplicate quantization override \(key)") }
+                c.quantizationOverrides[key] = AffineQuantization(bits: bits, groupSize: group)
+            }
             // ngram shard override (all identical per M0)
             for (k, v) in q {
                 if k.contains("ngram_embedding"), let d = v as? [String: Any],
@@ -186,7 +216,7 @@ public struct ModelConfig {
             ngramSize == 3, headsPerNgram == 8, ngramVocabBase == 20_000_000,
             ngramDivisibleBy == 128, splitNgramParts == 128,
             pleEmbedDim == 2560, pleLayerIds == [2], pleConvKernel == 4,
-            qBits == 4, qGroup == 64, ngramQGroup == 32
+            qBits == (format.isJANG ? 8 : 4), qGroup == 64, ngramQGroup == 32
         else {
             try bad("checkpoint geometry does not match Qwen3.8-Flash-Next-MLX-4bit")
         }
@@ -387,8 +417,7 @@ public final class CheckpointIndex {
             guard !byteOverflow, offs[1] - offs[0] == expected else {
                 throw corrupt("byte count does not match dtype × shape for \(key)")
             }
-            var name = key
-            if name.hasPrefix("language_model.") { name.removeFirst("language_model.".count) }
+            let name = CheckpointNames.canonical(key, format: config.format)
             guard tensors[name] == nil, !parsed.contains(where: { $0.name == name }) else {
                 throw corrupt("duplicate tensor name \(name)")
             }
@@ -498,6 +527,21 @@ public final class CheckpointIndex {
                 "\(dir.path) does not look like a \(PinnedModelName.display) checkpoint "
                     + "(no tensor `\(missing)`; found \(tensors.count) tensors) — check --model")
         }
+        // Every shard may have its own precision. Validate before the CPU
+        // decoder can index packed words or interpret FP16 as BF16.
+        if config.format.isJANG {
+            let prefix = "model.layers.1.ple.ple_embedding.ngram_embedding.shard_"
+            for shard in 0 ..< config.splitNgramParts {
+                let base = prefix + String(shard)
+                let quant = config.quantization(for: base)
+                guard let w = tensors[base + ".weight"], let s = tensors[base + ".scales"],
+                      let b = tensors[base + ".biases"], [3, 4].contains(quant.bits), quant.groupSize == 32,
+                      w.dtype == "U32", w.shape == [2_500_012, 160 * quant.bits / 32],
+                      s.dtype == "F16", b.dtype == "F16", s.shape == [2_500_012, 5], b.shape == s.shape else {
+                    throw ModelError("unsupported JANG n-gram shard layout: \(base)")
+                }
+            }
+        }
     }
 
     public func ref(_ name: String) -> TensorRef {
@@ -548,4 +592,20 @@ public final class CheckpointIndex {
                 return ExactRead.Outcome(count: got, error: got < 0 ? errno : 0)
             }
     }
+}
+
+// Header-derived resident accounting stays outside the pure config section.
+extension CheckpointMemory {
+    public init(index: CheckpointIndex) throws {
+        guard index.config.format.isJANG else { throw ModelError("JANG planning requires a JANG checkpoint") }
+        var bytes = 0
+        for (name, ref) in index.tensors {
+            if name.contains(".switch_mlp.") || name.contains("ngram_embedding.shard_")
+                || name.hasPrefix("mtp.") || name.hasPrefix("vision_tower.") || name.hasPrefix("model.visual.") { continue }
+            bytes = ContextBytes.sum(bytes, ref.byteCount)
+        }
+        guard bytes > 0, bytes < 32_000_000_000 else { throw ModelError("unsupported JANG resident footprint") }
+        self.init(format: index.config.format, residentBytes: bytes)
+    }
+
 }

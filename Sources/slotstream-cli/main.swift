@@ -12,7 +12,7 @@ struct Slotstream: ParsableCommand {
         abstract: "Qwen3.8-Flash-Next on Apple Silicon via SSD-streamed experts + cache slots.",
         version: SlotstreamBuild.version,
         subcommands: [
-            Run.self, Serve.self, Pull.self, Doctor.self, Parity.self, ElasticCheck.self,
+            Run.self, Serve.self, Pull.self, Doctor.self, Parity.self, ElasticCheck.self, JANGCheck.self,
             NgramGolden.self, DequantGolden.self, TemplateCheck.self, SamplerGolden.self, GovernorCheck.self,
             PrefixCheck.self, ElasticDrill.self, RuntimeCheck.self, PullCheck.self,
             MTPParity.self, MTPAccept.self, MTPCheck.self, MTPFixtureInputs.self, MTPBench.self, MTPPassCost.self,
@@ -32,6 +32,19 @@ struct RuntimeCheck: ParsableCommand {
 
     func run() throws {
         try CheckRendering.emit(Diagnostics.runtime(), banner: "RUNTIME CHECK PASS")
+    }
+}
+
+struct JANGCheck: ParsableCommand {
+    static let configuration = CommandConfiguration(commandName: "jang-check",
+        abstract: "Check JANG format, memory planning and real weight-row fixtures against MLX")
+    @Option(help: "Also test bounded expert streaming from a checkpoint directory") var model: String?
+    func run() throws {
+        try CheckRendering.emit(Diagnostics.jangFormats(), banner: "JANG FORMAT CHECK PASS")
+        try CheckRendering.emit(Diagnostics.jangNumerics(), banner: "JANG NUMERICAL CHECK PASS")
+        if let model {
+            try CheckRendering.emit(Diagnostics.jangExpertStreaming(modelDir: ModelLocator.resolve(model)), banner: "JANG STREAMING CHECK PASS")
+        }
     }
 }
 
@@ -158,6 +171,18 @@ struct ModelOptions: ParsableArguments {
             throw PlanError("this diagnostic requires the MTP draft head; --mtp off is incompatible")
         }
         try ensureWeights()
+        let checkpoint = try CheckpointIndex(dir: modelURL)
+        if checkpoint.config.format.isJANG {
+            guard !requireMTP, requestedMTP != .on, try visionMode() != .on else {
+                throw PlanError("JANG support currently covers text inference; MTP and vision are not qualified")
+            }
+            let plan = try CheckpointMemory(index: checkpoint).plan(memoryGB: memoryGB,
+                expertsPerLayer: expertsPerLayer, poolGB: poolGB, maxContext: maxContext,
+                ramPercent: maxRAMPercent ?? 70, policy: policy)
+                .withRequestPolicy(configuration)
+            FileHandle.standardError.write((plan.banner() + "\n").data(using: .utf8)!)
+            return plan
+        }
         let base = try Planner.plan(
             expertsPerLayer: expertsPerLayer, poolGB: poolGB, memoryGB: memoryGB,
             ramPercent: maxRAMPercent,
@@ -193,6 +218,16 @@ struct ModelOptions: ParsableArguments {
     func ensureWeights() throws {
         let url = modelURL
         let fm = FileManager.default
+        if let jang = JANGModels.named(model) {
+            let missing = jang.files.first { file in
+                let size = (try? fm.attributesOfItem(atPath: url.appendingPathComponent(file.path).path))?[.size] as? Int64
+                return size != file.size
+            }
+            if let missing {
+                throw PlanError("missing or incomplete \(missing.path); run slotstream pull \(model)")
+            }
+            return
+        }
         guard model == PinnedModel.name || model == PinnedModel.dirName else {
             // explicit path: all we can check cheaply is that a model is there
             guard fm.fileExists(atPath: url.appendingPathComponent("config.json").path) else {
@@ -502,6 +537,7 @@ struct Serve: ParsableCommand {
             FileHandle.standardError.write("[\(stamp)] \(line)\n".data(using: .utf8)!)
         }
         progress.tailAware = engine.model.optimizations.tailAwarePrefill
+        progress.referenceEstimateEnabled = plan.checkpointMemory == nil
         engine.generator.onPrefillProgressAbsolute = { done, total, elapsed, base in
             progress.maxChunk = engine.generator.prefillChunk
             progress.report(done: done, total: total, elapsed: elapsed, base: base)
@@ -514,7 +550,7 @@ struct Serve: ParsableCommand {
                     .data(using: .utf8)!)
         }
         var governor: MemoryGovernor?
-        if plan.source == .auto, !noElastic {
+        if plan.source == .auto, plan.checkpointMemory == nil, !noElastic {
             governor = MemoryGovernor(engine: engine)
             governor?.start()
         } else if plan.source != .auto, !noElastic {
@@ -524,7 +560,7 @@ struct Serve: ParsableCommand {
         }
         defer { governor?.stop() }
         let server = Server(
-            engine: engine, port: port, weightsBytes: Int(PinnedModel.totalBytes),
+            engine: engine, port: port, weightsBytes: JANGModels.all.first(where: { $0.format == engine.model.cfg.format }).map { Int($0.totalBytes) } ?? Int(PinnedModel.totalBytes),
             listenFD: listenFD)
         try server.run()
     }
@@ -660,6 +696,32 @@ struct Doctor: ParsableCommand {
 
     func run() throws {
         let configuration = try ContextConfiguration(maxContextTokens: maxContext, maxPrefillWaitMinutes: maxPrefillWait)
+        let jang = JANGModels.named(model.model)
+        let configOnDisk = try? ModelConfig.load(from: model.modelURL)
+        if jang != nil || configOnDisk?.format.isJANG == true {
+            guard simRAM == nil, simWorkingSet == nil, simAvailable == nil else {
+                throw PlanError("JANG doctor currently requires real device observations")
+            }
+            guard configOnDisk != nil else {
+                let message = "JANG weights are not installed; run slotstream pull \(model.model). Memory sizing requires checkpoint headers."
+                if asJSON {
+                    print(String(decoding: try JSONSerialization.data(withJSONObject: ["status": "download_required", "message": message,
+                        "download_bytes": jang?.totalBytes ?? 0], options: [.sortedKeys]), as: UTF8.self))
+                } else { print(message) }
+                return
+            }
+            guard try model.mtpMode() != .on, try model.visionMode() != .on else {
+                throw PlanError("JANG support currently covers text inference; MTP and vision are not qualified")
+            }
+            let index = try CheckpointIndex(dir: model.modelURL)
+            let plan = try CheckpointMemory(index: index).plan(memoryGB: model.memoryGB,
+                expertsPerLayer: model.expertsPerLayer, poolGB: model.poolGB, maxContext: maxContext,
+                ramPercent: model.maxRAMPercent ?? 70,
+                policy: model.runtimePolicy()).withRequestPolicy(configuration)
+            if asJSON { print(String(decoding: try JSONSerialization.data(withJSONObject: plan.json(), options: [.prettyPrinted, .sortedKeys]), as: UTF8.self)) }
+            else { print(plan.banner()) }
+            return
+        }
         // --json is for machines: emit the plan and nothing else.
         let quiet = asJSON
         let info = MLX.GPU.deviceInfo()

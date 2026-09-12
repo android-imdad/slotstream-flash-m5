@@ -6,14 +6,20 @@ import MLX
 package final class RouterProjection {
     package var minimumRows = 0
     private let original: MLXArray
+    private var quantized: QLinear?
     private var promoted: MLXArray?
     private var enabled = false
     package private(set) var materializations = 0
     package var cachedBytes: Int { promoted?.nbytes ?? 0 }
 
     package init(_ weight: MLXArray) { original = weight }
+    package init(_ projection: QLinear) {
+        original = projection.w
+        quantized = projection.isQuantized ? projection : nil
+    }
 
     package func configure(cached: Bool) {
+        guard quantized == nil else { return }
         guard cached != enabled else { return }
         enabled = cached
         if cached, original.dtype != .float32 {
@@ -25,6 +31,7 @@ package final class RouterProjection {
     }
 
     package func callAsFunction(_ x: MLXArray) -> MLXArray {
+        if let quantized { return quantized(x.asType(.float32), minimumRows: minimumRows) }
         let rows = x.size / x.dim(-1)
         if rows > 0, rows < minimumRows {
             let flat = x.reshaped([rows, x.dim(-1)])

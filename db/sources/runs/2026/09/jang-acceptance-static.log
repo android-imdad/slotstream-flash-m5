@@ -1,0 +1,554 @@
+........................
+----------------------------------------------------------------------
+Ran 24 tests in 27.480s
+
+OK
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 12.285s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 14.566s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 13.551s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 8.749s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 11.933s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 1.835s
+
+OK
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 52.365s
+
+OK
+coverage ratchet checks pass
+..{"phase": "starting", "prompt_tokens": 16, "reclaimable_gb": 20.0}
+{"prompt_tokens": 16, "passed": false, "error": "ValueError: capacity rung was incomplete, aborted or over its plan"}
+.......
+----------------------------------------------------------------------
+Ran 9 tests in 0.027s
+
+OK
+...
+----------------------------------------------------------------------
+Ran 3 tests in 3.114s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.841s
+
+OK
+.....{"phase": "waiting for build reservation", "seconds": 0.0}
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.005s
+
+OK
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 1.469s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK
+..................................................
+----------------------------------------------------------------------
+Ran 50 tests in 0.016s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.022s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.004s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+OK
+..............................
+----------------------------------------------------------------------
+Ran 30 tests in 2.412s
+
+OK
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.078s
+
+OK
+{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+{"starting": "paired/unique-prose"}
+.{"starting": "native/combined-plain"}
+..{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+{"starting": "paired/unique-prose"}
+{"starting": "paired/sampled-short"}
+{"starting": "paired/mtp-resource"}
+{"starting": "paired/distinct-tail"}
+{"starting": "paired/complete-repeat"}
+{"starting": "paired/unique-with-retention"}
+{"starting": "paired/actual-default-one-token"}
+{"starting": "soak/off"}
+{"starting": "soak/on"}
+....{"starting": "native/combined-plain"}
+.{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+.{"starting": "native/combined-plain"}
+..{"starting": "native/combined-plain"}
+..
+----------------------------------------------------------------------
+Ran 13 tests in 1.090s
+
+OK
+..........{"starting": "native/combined-plain"}
+{"starting": "native/combined-mtp"}
+{"starting": "native/read-failure-serving"}
+{"starting": "paired/short-one"}
+.
+----------------------------------------------------------------------
+Ran 11 tests in 0.083s
+
+OK
+llms-full.txt is current
+warning LOG_UNKNOWN_KIND log.md:124 — log entry kind `change` is not recognized
+    hint: use one of: ingest, create, update, delete, rename, link, validate, index-rebuild, contradiction
+warning LOG_OUT_OF_ORDER log.md:883 — log entry is older than the entry above it (possible rewrite)
+    hint: append corrective entries; never reorder past ones
+2 issue(s): 0 error(s), 2 warning(s), 0 info
+MEASUREMENTS.md is current
+PLAN.md is current
+claims gate: 135 needle checks, 0 failures
+BRAIN GATES PASS
+dequant_row.txt: OK
+layer_0.bin: OK
+layer_1.bin: OK
+layer_2.bin: OK
+layer_3.bin: OK
+ngram_ids.txt: OK
+tokens.txt: OK
+PASS  request VM counters are monotonic
+PASS  request VM reclaimable bytes are available
+PASS  process physical footprint is readable
+PASS  process compatibility high-water is readable
+PASS  lifetime RSS is separately readable
+PASS  kernel lifetime footprint includes current allocation
+PASS  statistics publish current and lifetime observations
+PASS  statistics predating the lifetime footprint field still decode
+PASS  monotonic duration is nonnegative
+PASS  footprint sampler includes endpoints
+PASS  automatic platform-qualified optimization defaults
+PASS  qualified platform keeps the complete joint candidate
+PASS  unqualified platform 0 keeps portable work and original rotation
+PASS  unqualified platform 1 keeps portable work and original rotation
+PASS  unqualified platform 2 keeps portable work and original rotation
+PASS  unqualified platform 3 keeps portable work and original rotation
+PASS  unqualified platform 4 keeps portable work and original rotation
+PASS  unqualified platform 5 keeps portable work and original rotation
+PASS  unqualified platform 6 keeps portable work and original rotation
+PASS  unqualified platform 7 keeps portable work and original rotation
+PASS  unqualified platform 8 keeps portable work and original rotation
+PASS  unqualified platform 9 keeps portable work and original rotation
+PASS  unqualified platform 10 keeps portable work and original rotation
+PASS  unqualified platform 11 keeps portable work and original rotation
+PASS  unqualified platform 12 keeps portable work and original rotation
+PASS  platform selection is deterministic
+PASS  explicit kernel qualification remains available
+PASS  explicit kernel fallback remains available
+PASS  reference control encoding omits unset automatic policy
+PASS  old control JSON remains decodable
+PASS  automatic policy survives saved control round trip
+PASS  absent overrides preserve an inherited automatic policy
+PASS  explicit automatic zero restores the chronological policy
+PASS  explicit automatic one enables only that policy
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_READ_SCOPE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_LAYER_WORKSPACE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_INDEXER_TILES
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_PLE_TILES
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_WORKSPACE_TILE
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_SCOPE_FRONTIER
+PASS  manual scope control suppresses inherited automatic policy/SLOTSTREAM_OPT_WORKSPACE_PIECES
+PASS  malformed automatic policy refuses/true
+PASS  malformed automatic policy refuses/-1
+PASS  malformed automatic policy refuses/2
+PASS  malformed automatic policy refuses/
+PASS  absent vision overrides retain inherited tiling
+PASS  explicit zero padding leaves inherited tiling enabled
+PASS  explicit zero query tile selects original vision attention
+PASS  explicit padding overrides inherited tiling/80
+PASS  explicit tiling overrides inherited padding/80
+PASS  explicit query zero retains inherited padding/80
+PASS  explicit padding with query zero remains valid/80
+PASS  explicit query tile with padding zero remains valid/80
+PASS  two explicit vision alternatives refuse/80
+PASS  two explicit vision alternatives refuse/80
+PASS  two explicit vision alternatives refuse/80
+PASS  explicit padding overrides inherited tiling/128
+PASS  explicit tiling overrides inherited padding/128
+PASS  explicit query zero retains inherited padding/128
+PASS  explicit padding with query zero remains valid/128
+PASS  explicit query tile with padding zero remains valid/128
+PASS  two explicit vision alternatives refuse/128
+PASS  two explicit vision alternatives refuse/128
+PASS  two explicit vision alternatives refuse/128
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_PADDING/bad
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_PADDING/256
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_QUERY_TILE/bad
+PASS  inherited vision defaults still reject malformed override/SLOTSTREAM_OPT_VISION_QUERY_TILE/128
+PASS  combined candidate preserves the original MTP verification shape
+PASS  absent overrides retain the selected default family
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPACT_STATE
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPACT_STATE
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPACT_MTP
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPACT_MTP
+PASS  explicit zero disables only SLOTSTREAM_OPT_NGRAM_ROWS
+PASS  explicit one restores only SLOTSTREAM_OPT_NGRAM_ROWS
+PASS  explicit zero disables only SLOTSTREAM_OPT_FINAL_FORWARD
+PASS  explicit one restores only SLOTSTREAM_OPT_FINAL_FORWARD
+PASS  explicit zero disables only SLOTSTREAM_OPT_SAMPLER_THRESHOLD
+PASS  explicit one restores only SLOTSTREAM_OPT_SAMPLER_THRESHOLD
+PASS  explicit zero disables only SLOTSTREAM_OPT_SAMPLER_DRAW
+PASS  explicit one restores only SLOTSTREAM_OPT_SAMPLER_DRAW
+PASS  explicit zero disables only SLOTSTREAM_OPT_OUTPUT_QUEUE
+PASS  explicit one restores only SLOTSTREAM_OPT_OUTPUT_QUEUE
+PASS  explicit zero disables only SLOTSTREAM_OPT_RESPONSIVE_GOVERNOR
+PASS  explicit one restores only SLOTSTREAM_OPT_RESPONSIVE_GOVERNOR
+PASS  explicit zero disables only SLOTSTREAM_OPT_COMPLETE_PROMPT
+PASS  explicit one restores only SLOTSTREAM_OPT_COMPLETE_PROMPT
+PASS  explicit zero disables only SLOTSTREAM_OPT_SHARED_ROPE
+PASS  explicit one restores only SLOTSTREAM_OPT_SHARED_ROPE
+PASS  explicit zero disables only SLOTSTREAM_OPT_FUSED_ROPE
+PASS  explicit one restores only SLOTSTREAM_OPT_FUSED_ROPE
+PASS  explicit zeros restore the complete reference inference family
+PASS  explicit numeric zero disables inherited prefix retention
+PASS  non-optimization environment leaves the family intact
+PASS  selected defaults still reject invalid override ["SLOTSTREAM_OPT_COMPLETE_PROMPT": "false"]
+PASS  selected defaults still reject invalid override ["SLOTSTREAM_OPT_TYPO": "0"]
+PASS  valid inherited read scope retains its prerequisites
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_COMPACT_STATE
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_COMPACT_MTP
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_LAYER_WORKSPACE
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_INDEXER_TILES
+PASS  inherited scope rejects disabled prerequisite SLOTSTREAM_OPT_PLE_TILES
+PASS  scope can be disabled while retaining its other independent work
+PASS  public environment function value keeps its signature and automatic default
+PASS  typed override enables compaction
+PASS  malformed override refused
+PASS  unknown optimization refused
+PASS  invalid read scope -1 refused
+PASS  invalid read scope 1 refused
+PASS  invalid read scope 16384 refused
+PASS  invalid read scope bad refused
+PASS  unbounded read scope refused
+PASS  explicit workspace tile is recorded
+PASS  unbounded workspace tile refused
+PASS  terminal output needs no speculative draft
+PASS  draft count fits remaining output
+PASS  public depth cannot exceed recording cap
+PASS  negative remaining output cannot underflow
+PASS  prefix cache reaches its four-entry bound
+PASS  an identical history replaces instead of duplicating an entry
+PASS  a miss evicts before allocating a fifth state
+PASS  a smaller live token ceiling evicts immediately
+PASS  held GB includes fixed recurrent state
+PASS  growing hit still reuses its state
+PASS  growing hit reserves future state before allocation
+PASS  huge reservation safely misses
+PASS  huge reservation releases held state
+PASS  capacity reservation still hits
+PASS  capacity growth reserves bytes before reuse
+PASS  saturated byte reservation evicts safely
+PASS  identical bytes hash alike
+PASS  different bytes do not
+PASS  the same image at the same offset matches
+PASS  a swapped image does not
+PASS  an entry ending inside a run still matches that run
+PASS  a text-only entry rejects a prompt with an image inside its range
+PASS  an image beyond the entry's range is irrelevant to the match
+PASS  a vision conversation is held, not discarded
+PASS  the same ids with a different picture miss
+PASS  the text-only splice never sees a vision entry
+PASS  prefix splice chooses the longest retained extension
+PASS  prefix splice is strict, not an identical-history match
+PASS  prefix splice lookup does not consume the retained state
+PASS  a disabled prefix cache offers no splice
+PASS  shard listing works through a symlinked model dir
+PASS  8.1 GB plan stays inside its target
+PASS  10.0 GB plan stays inside its target
+PASS  16.0 GB plan stays inside its target
+PASS  30.0 GB plan stays inside its target
+RUNTIME CHECK PASS
+{
+  "device": "Apple M5 Max",
+  "exit_code": 0,
+  "failures": [],
+  "maximum_live_gpu_buffer_bytes": 201326592,
+  "model_loaded": false,
+  "observations": [
+    {
+      "lifetime_rss_peak_bytes": 13123584,
+      "phase": "baseline",
+      "physical_footprint_bytes": 4309496,
+      "reported_peak_bytes": 13107200,
+      "sampled_peak_bytes": 4309496
+    },
+    {
+      "lifetime_rss_peak_bytes": 14958592,
+      "phase": "transient_128_mib",
+      "physical_footprint_bytes": 257507928,
+      "reported_peak_bytes": 257507928,
+      "sampled_peak_bytes": 257507928
+    },
+    {
+      "lifetime_rss_peak_bytes": 14958592,
+      "phase": "transient_freed",
+      "physical_footprint_bytes": 123290200,
+      "reported_peak_bytes": 257507928,
+      "sampled_peak_bytes": 257507928
+    },
+    {
+      "lifetime_rss_peak_bytes": 15056896,
+      "phase": "persistent_64_mib",
+      "physical_footprint_bytes": 190497368,
+      "reported_peak_bytes": 257507928,
+      "sampled_peak_bytes": 257507928
+    },
+    {
+      "lifetime_rss_peak_bytes": 15056896,
+      "phase": "persistent_plus_transient",
+      "physical_footprint_bytes": 324715096,
+      "reported_peak_bytes": 324715096,
+      "sampled_peak_bytes": 324715096
+    },
+    {
+      "lifetime_rss_peak_bytes": 15073280,
+      "phase": "persistent_after_transient_freed",
+      "physical_footprint_bytes": 190513752,
+      "reported_peak_bytes": 324731480,
+      "sampled_peak_bytes": 324715096
+    },
+    {
+      "lifetime_rss_peak_bytes": 15073280,
+      "phase": "all_gpu_buffers_freed",
+      "physical_footprint_bytes": 123404888,
+      "reported_peak_bytes": 324731480,
+      "sampled_peak_bytes": 324715096
+    },
+    {
+      "lifetime_rss_peak_bytes": 23461888,
+      "phase": "cpu_allocation_after_gpu_peak",
+      "physical_footprint_bytes": 131793496,
+      "reported_peak_bytes": 324731480,
+      "sampled_peak_bytes": 324715096
+    },
+    {
+      "lifetime_rss_peak_bytes": 23461888,
+      "phase": "after_concurrent_reads",
+      "physical_footprint_bytes": 123519600,
+      "reported_peak_bytes": 324731480,
+      "sampled_peak_bytes": 324715096
+    }
+  ],
+  "passed": true,
+  "source_sha256": {
+    "Sources/Slotstream/Checkpoint.swift": "1b9ce8b0ce27cc174b05648358fd09ec857f5e950a8cbf7cdd43fc1e75d54534",
+    "Sources/Slotstream/Observation.swift": "fcb7557541a5a0ce885737449d6b2b88009a8521a7c743cded5d120867529e10",
+    "Sources/Slotstream/ProcessMemory.swift": "37e2ac7fb149f2a9e46f142bc89ae36835bef2bd0bd9d0975a278a334f8c63e0",
+    "Tools/process_memory_check.swift": "17c4ee5dfdff19b1bc467ad896047f6cc8c35d27850d1a62b88f39ea59ff704b",
+    "Tools/process_memory_gate.py": "4eb64b24a9fe7d25ac6c970da91688751303a5cc7dd6d2fc340486220b3fdb58"
+  }
+}
+PASS  matching file is accepted
+PASS  same-size corruption is rejected
+PASS  exact Content-Range is accepted
+PASS  wrong range start is rejected
+PASS  wrong range total is rejected
+PASS  unknown range total is rejected
+PASS  every pinned file has a digest
+PASS  the draft head is pinned as the one optional file
+PASS  an absent optional file is not a repair; an absent required one is
+PASS  an empty directory reads as missing
+PASS  missing needs the required model
+PASS  status carries free disk
+PASS  bytesToFetch agrees with required files
+PASS  a missing copy is not ready
+PULL CHECK PASS
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.010s
+
+OK
+{"bf16_predictions":16711680,"centers":1000000,"roundtrips":60,"malformed_inputs":39583,"pass":true}
+MANIFEST CHECKS PASS
+{"name": "normal", "pass_": true, "seconds": 0.497, "returncode": 0}
+{"name": "cache-miss-reporting", "pass_": true, "seconds": 0.037, "returncode": 0}
+{"name": "redirect", "pass_": true, "seconds": 0.033, "returncode": 0}
+{"name": "bad-object-fallback", "pass_": true, "seconds": 0.032, "returncode": 0}
+{"name": "missing-object-raw-fallback", "pass_": true, "seconds": 0.035, "returncode": 0}
+{"name": "raw-wrong-range-fails", "pass_": true, "seconds": 0.016, "returncode": 1}
+{"name": "raw-ignored-range-fails", "pass_": true, "seconds": 0.015, "returncode": 1}
+{"name": "optional-absent", "pass_": true, "seconds": 0.029, "returncode": 0}
+{"name": "optional-corrupt-and-unavailable", "pass_": true, "seconds": 0.029, "returncode": 0}
+{"name": "bad-object-fails", "pass_": true, "seconds": 0.015, "returncode": 1}
+{"name": "retry-after", "pass_": true, "seconds": 0.033, "returncode": 0}
+{"name": "hugging-face-rate-limit", "pass_": true, "seconds": 5.409, "returncode": 0}
+{"name": "cancel-during-hugging-face-rate-limit", "pass_": true, "seconds": 0.515, "returncode": 1}
+{"name": "transient-retry", "pass_": true, "seconds": 5.274, "returncode": 0}
+{"name": "wrong-length-fallback", "pass_": true, "seconds": 11.264, "returncode": 0}
+{"name": "short-body-fallback", "pass_": true, "seconds": 35.885, "returncode": 0}
+{"name": "content-encoding-fallback", "pass_": true, "seconds": 35.608, "returncode": 0}
+{"name": "cancel-preserves-progress", "pass_": true, "seconds": 1.407, "returncode": 1}
+{"name": "damaged-resumed-chunk-rejected", "pass_": true, "seconds": 0.036, "returncode": 1}
+{"name": "damaged-resumed-chunk-repair", "pass_": true, "seconds": 0.033, "returncode": 0}
+{"name": "resume", "pass_": true, "seconds": 0.03, "returncode": 0}
+{"name": "already-installed", "pass_": true, "seconds": 0.016, "returncode": 0}
+{"name": "valid-symlinks-reused", "pass_": true, "seconds": 0.016, "returncode": 0}
+{"name": "corruption-seed", "pass_": true, "seconds": 0.03, "returncode": 0}
+{"name": "same-size-final-repair", "pass_": true, "seconds": 0.02, "returncode": 0}
+{"name": "invalid-resume-map", "pass_": true, "seconds": 0.03, "returncode": 0}
+{"name": "forged-complete-map-without-parts", "pass_": true, "seconds": 0.03, "returncode": 0}
+{"name": "oversized-map-is-discarded", "pass_": true, "seconds": 0.03, "returncode": 0}
+{"name": "part-symlink-rejected", "pass_": true, "seconds": 0.006, "returncode": 1}
+{"name": "part-hardlink-rejected", "pass_": true, "seconds": 0.006, "returncode": 1}
+{"name": "part-fifo-rejected", "pass_": true, "seconds": 0.006, "returncode": 1}
+{"name": "concurrent-writer-rejected", "pass_": true, "seconds": 0.007, "returncode": 1}
+ALL HTTP CHECKS PASS
+{"name": "raw-multichunk", "pass_": true, "seconds": 1.081, "returncode": 0}
+{"name": "raw-installed-no-http", "pass_": true, "seconds": 0.271, "returncode": 0}
+{"name": "raw-source-fallback-missing", "pass_": true, "seconds": 0.352, "returncode": 0}
+{"name": "raw-source-fallback-wrong-range", "pass_": true, "seconds": 0.352, "returncode": 0}
+{"name": "raw-source-fallback-encoding", "pass_": true, "seconds": 40.933, "returncode": 0}
+{"name": "raw-source-fallback-ignore-range", "pass_": true, "seconds": 0.356, "returncode": 0}
+{"name": "raw-wrong-range-fails", "pass_": true, "seconds": 0.029, "returncode": 1}
+{"name": "raw-corrupt-final-rejected", "pass_": true, "seconds": 0.177, "returncode": 1}
+{"name": "raw-optional-inflight-writers", "pass_": true, "seconds": 0.22, "returncode": 0}
+{"name": "raw-cancel", "pass_": true, "seconds": 3.323, "returncode": 1}
+{"name": "raw-resume", "pass_": true, "seconds": 0.341, "returncode": 0}
+{"name": "raw-same-size-repair", "pass_": true, "seconds": 0.487, "returncode": 0}
+ALL RAW HTTP CHECKS PASS
+SUSTAINED MEMORY PASS 306905088 bytes peak RSS
+SLOTPACK GATES PASS
+PASS  48GB pristine: 33.0 GB target and starts quiet
+PASS  48GB busy: clamped to 15.4 GB, sized-down note
+PASS  16GB pristine: 9.8 GB target, no notes
+PASS  16GB busy: refuses an unphysical minimum allocation
+PASS  8GB Mac: refuses an unphysical minimum allocation
+PASS  128GB auto stops at the knee, not at 70% of RAM
+PASS  128GB explains the measured basis for its default
+PASS  128GB: --memory-gb still reaches full residency
+PASS  --sim-ram alone plans instead of erroring
+PASS  --max-ram-percent lowers the auto target
+PASS  --max-ram-percent cannot exceed the knee
+PASS  --max-ram-percent 0 refused
+PASS  --max-ram-percent 150 refused
+PASS  --max-ram-percent noted when outranked
+PASS  more memory never plans slower (7-90 GB sweep)
+PASS  explicit total target cannot authorize unavailable memory
+PASS  --experts-per-layer 0 refused
+PASS  --pool-gb 0 refused
+PASS  --memory-gb below minimum refused
+PASS  --memory-gb inf is a clean error
+PASS  --pool-gb inf is a clean error
+PASS  --pool-gb 1e300 saturates safely instead of trapping
+PASS  --memory-gb 1e300 refuses physical overcommit without trapping
+PASS  huge finite memory plan remains valid JSON
+PASS  --sim-ram inf is a clean error
+PASS  --sim-working-set inf is a clean error
+PASS  --sim-available inf is a clean error
+PASS  tiny pool raised to the floor, consistently
+PASS  knob precedence noted, never silent
+PASS  --model with no safetensors: clean error
+PASS  --model with no safetensors: names the fix
+PASS  MTP auto on a big quiet machine: knee + head = 34.6
+PASS  MTP auto stays off on a 16GB machine
+PASS  MTP auto on at --memory-gb 30 (137/layer after the charge)
+PASS  MTP auto off at --memory-gb 20 (below the 120/layer floor)
+PASS  --mtp on forces the head onto a small machine
+PASS  --mtp off suppresses it everywhere
+PASS  --mtp on without mtp.safetensors is a clean error
+PASS  --mtp on cannot squeeze under the minimum target
+PASS  --mtp gibberish refused
+PASS  MTP charge visible in json peak
+PASS  --model with unparseable config: clean error
+PASS  invalid config arithmetic is rejected before it traps
+PASS  --model with a corrupt safetensors header
+PASS  safetensors dtype/shape byte mismatch rejected
+PASS  safetensors header over 100MB rejected before allocation
+PASS  --model with a different model's tensors
+PASS  serve --max-context 0 refused before load
+PASS  plan announces the context cap and the wait
+PASS  doctor --json carries max_context_tokens + wait
+PASS  serve --max-context above the ceiling names the ceiling, not a knob
+PASS  doctor --max-context above the ceiling is the same clean error
+PASS  a lower --max-context caps the reuse ceiling too
+PASS  prefill-schedule: full model window obeys the product without exemptions
+PASS  prefill-schedule agrees with the doctor wait for the same pass
+PASS  prefill-schedule: a prefix hit reads only what is new
+PASS  prefill-schedule --chunk 0 refused
+PASS  context-check --tokens 4 refused before load
+PASS  parity rejects an invalid layer count before model load
+PASS  parity rejects malformed token ids without trapping
+PASS  n-gram golden rejects malformed token ids without trapping
+PASS  dequant golden rejects a negative row before model load
+PASS  sampler golden rejects an empty vocabulary without trapping
+PASS  sampler golden rejects a negative draw count without trapping
+planner: passed 64, failed 0
+{
+  "passed": true,
+  "model_loaded": false,
+  "hardware_qualified": false,
+  "binary_sha256": "0014844a367f513aa3dac20906f592e1af1b77df4ae8dfa3c48e2c18370c067b",
+  "cases": 304,
+  "failures": []
+}
+######################################################################## 100.0%
+######################################################################## 100.0%
+######################################################################## 100.0%
+INSTALLER GATES PASS
+STATIC GATES PASS

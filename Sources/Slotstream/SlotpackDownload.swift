@@ -34,6 +34,7 @@ final class SlotpackDownload: @unchecked Sendable {
     let cancellation: PullCancellation
     let log: WeightStore.Log
     let timeout: Double
+    private let availableDiskBytes: @Sendable () -> Int64
     private let lock = NSLock()
     private var parts: [Int: Part] = [:]
     private var completeFiles = Set<Int>()
@@ -55,11 +56,13 @@ final class SlotpackDownload: @unchecked Sendable {
 
     init(manifest: SlotpackManifest, digest: String, dest: URL, bases: [String], rawBases: [String],
          connections: Int, cancellation: PullCancellation, adaptive: Bool = false, timeout: Double = 60,
+         availableDiskBytes: (@Sendable () -> Int64)? = nil,
          log: @escaping WeightStore.Log) {
         self.manifest = manifest; self.manifestDigest = digest; self.dest = dest
         self.bases = bases; self.rawBases = rawBases; self.connections = max(1, min(32, connections))
         self.activeConnections = max(1, min(32, connections)); self.adaptive = adaptive
         self.cancellation = cancellation; self.timeout = timeout; self.log = log
+        self.availableDiskBytes = availableDiskBytes ?? { WeightStore.freeDiskBytes(near: dest) }
         self.resume = Resume(manifest: digest, done: Array(repeating: 0, count: manifest.objects.count))
     }
 
@@ -248,7 +251,7 @@ final class SlotpackDownload: @unchecked Sendable {
             neededDisk += max(0, file.size - allocated)
         }
         let margin: Int64 = 2_000_000_000
-        let free = WeightStore.freeDiskBytes(near: dest)
+        let free = availableDiskBytes()
         guard neededDisk == 0 || free >= neededDisk + margin else {
             throw SlotstreamError.pull(String(format: "not enough disk: %.1f GB required for reconstructed files plus 2 GB margin; %.1f GB free", Double(neededDisk)/1e9, Double(free)/1e9))
         }

@@ -202,9 +202,11 @@ It isn't available in the current Slotstream engine.
 
 ### Can I use a different model?
 
-Not with Slotstream today. Its loader and memory planner are built for this
-model. See [related projects](docs/ENGINEERING.md#related-projects) for runtimes
-with different model and hardware support.
+This local source checkout adds experimental support for the JANG_4M and
+JANG_6S quants of the same Qwen3.8-Flash-Next model. See the
+[JANG guide](docs/JANG.md) for pinned downloads, component checks and the
+remaining full-model qualification. The original checkpoint remains the default.
+For other architectures, see [related projects](docs/ENGINEERING.md#related-projects).
 
 ## Why this exists
 

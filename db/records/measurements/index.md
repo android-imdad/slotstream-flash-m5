@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: records/measurements
-updated: 2026-09-11T18:51:26.465461Z
+updated: 2026-09-12T09:19:41.267528Z
 ---
 
 # records/measurements
 
+- [[records/measurements/jang-support-validation-2026-09-12]] — JANG component, source-policy and transport validation passed; complete-model inference, KL, memory and throughput remain unqualified.
 - [[records/measurements/release-0-2-15-published-2026-09-11]] — v0.2.15 published, installed and accepted: 25 of 25 model gates on the exact CI artifact and 31 of 31 installed-release checks
 - [[records/measurements/release-0-2-15-open-apps-testing-2026-09-11]] — v0.2.15 testing with apps open: API passes, strict MTP resource gate remains unqualified
 - [[records/measurements/release-0-2-15-prepublication-2026-09-11]] — v0.2.15 prepared, not published: CI passed and 24 of 25 model gates qualify; final paging gate and app restoration pending
