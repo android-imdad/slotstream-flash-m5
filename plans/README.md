@@ -14,7 +14,11 @@ A second fresh-context review checked executor readiness against the source. The
 | [005](005-diagnostic-reference.md) | Establish bounded logits, state and activation reference | P1 | L | 002,003 and006 | DONE — bounded reference accepted; full natural corpus remains in parent001 |
 | [006](006-terminal-memory-sampling.md) | Preserve final Darwin lifetime peak before child reaping | P1 | M | Reproduced lifecycle evidence | DONE — reviewed `7f63f0b`,115 tests and real terminal-peak proof |
 | [007](007-natural-tokenized-capture.md) | Freeze natural text into tokenized capture shards | P1 | M | 002,005,006 | DONE — reviewed `0b032fa`, exact reference/chat parity |
-| [008](008-corpus-quality-metrics.md) | Freeze corpus and validate full-vocabulary quality metrics | P1 | L | 007 tokenizer/capture bridge | IN PROGRESS — source/data/environment reconciled |
+| [008](008-corpus-quality-metrics.md) | Freeze corpus and validate full-vocabulary quality metrics | P1 | L | 007,010,012 | DONE — reviewed `aa9b771`;896-position real cohort/metrics |
+| [009](009-neuron-block-oracle.md) | Measure neuron-block oracle quality and possible byte savings | P1 | L | 008 corpus and metrics | TODO — reconcile exact interfaces before dispatch |
+| [010](010-prompt-tokenizer.md) | Freeze complete task prompts without inference | P1 | M | 007 tokenizer facade | DONE — reviewed `bc185df`, exact tokenizer overlap |
+| [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — next direct speed experiment before009 |
+| [012](012-archived-evidence-validation.md) | Verify archived harness bytes and immutable receipt joins | P1 | S | 008 uncommitted host implementation | DONE — reviewed in `aa9b771`; archive mutations rejected |
 
 Execution checkout: `../slotstream-flash-m5`, branch `advisor/001-flash-m5`, starting at `93fb512`. The executor owns implementation there; the reviewer maintains this index and reviews each bounded stage. The original checkout holds the completed, verified download. Model weights are reused read-only; mutable build artifacts are separate. No merge, push, default activation or completed qualification is implied.
 
