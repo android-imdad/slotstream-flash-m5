@@ -305,7 +305,7 @@ private final class RejectingCaptureSink: FlashObservationSink {
 
 struct FlashCapture: ParsableCommand {
     static let configuration = CommandConfiguration(commandName: "flash-capture",
-        abstract: "Capture a bounded exact diagnostic reference; never enables approximate inference")
+        abstract: "Capture a bounded reference or explicit diagnostic neuron oracle")
     @Option var model: String
     @Option var manifest: String
     @Option var split: String
@@ -317,14 +317,24 @@ struct FlashCapture: ParsableCommand {
     @Option(name: .customLong("activation-quota-gb")) var activationQuotaGB = 32
     @Option(name: .customLong("logits-quota-gb")) var logitsQuotaGB = 8
     @Option(name: .customLong("position-limit")) var positionLimit = 64
+    @Option(name: .customLong("expert-widening")) var expertWidening = AffineWideningPolicy.scalar.rawValue
+    @Option(name: .customLong("oracle-config")) var oracleConfig: String?
     @Flag(name: .customLong("require-resident-split")) var requireResidentSplit = false
     private func digest(_ url:URL) throws -> String {
         SHA256.hash(data:try Data(contentsOf:url,options:.mappedIfSafe)).map{String(format:"%02x",$0)}.joined()
     }
 
     func run() throws {
-        guard mode == "reference-off" || mode == "reference-on" else {
-            throw ValidationError("--mode must be reference-off or reference-on; approximate modes are refused")
+        guard ["reference-off", "reference-on", "oracle"].contains(mode),
+              (mode == "oracle") == (oracleConfig != nil) else {
+            throw ValidationError("--mode must be reference-off, reference-on, or oracle with --oracle-config")
+        }
+        guard let wideningPolicy = AffineWideningPolicy(rawValue: expertWidening) else {
+            throw ValidationError("--expert-widening must be scalar or packed4-to6")
+        }
+        guard mode != "oracle" || (split == "development" && liveLimitMB == 64
+            && wideningPolicy == .scalar && !requireResidentSplit) else {
+            throw ValidationError("oracle requires development, 64 MiB live allowance, scalar widening and no resident split")
         }
         guard ["training", "development", "qualification"].contains(split), maxContext == 2048, memoryGB == 14, (32...64).contains(liveLimitMB),
               (1...32).contains(activationQuotaGB), (1...8).contains(logitsQuotaGB),
@@ -481,16 +491,28 @@ struct FlashCapture: ParsableCommand {
             }
             let modelURL = ModelLocator.resolve(model).resolvingSymlinksInPath()
             let index = try CheckpointIndex(dir: modelURL)
+            let oracleConfiguration = try oracleConfig.map { try OracleConfiguration.load($0,
+                manifestHash: SHA256.hash(data: manifestData).map { String(format: "%02x", $0) }.joined()) }
+            guard oracleConfiguration == nil || index.config.format == .jang6S else {
+                throw PlanError("oracle requires JANG_6S")
+            }
             let reservation = liveLimitMB << 20
             let policy = try RuntimeAllocationPolicy(prefixCacheEnabled: false,
-                diagnosticReservedBytes: reservation * 2)
+                diagnosticReservedBytes: reservation * 2 + (oracleConfiguration == nil ? 0 : OracleConfiguration.extraReservation))
             let plan = try CheckpointMemory(index: index).plan(memoryGB: memoryGB,
                 maxContext: maxContext, policy: policy)
             let sem = DispatchSemaphore(value: 0)
             var result: Result<Void, Error> = .success(())
             Task {
                 do {
-                    let engine = try await Engine(modelDir: modelURL, plan: plan)
+                    // The charged plan exists before allocating the sole norm table.
+                    let oracle = try oracleConfiguration.map { try NativeNeuronOracle(configuration: $0,
+                        configurationPath: oracleConfig!, model: modelURL, destination: destination) }
+                    let engine = try await Engine(modelDir: modelURL, plan: plan,
+                        expertWidening: wideningPolicy)
+                    guard engine.effectiveWideningPolicy == wideningPolicy else {
+                        throw PlanError("effective expert widening does not match the capture request")
+                    }
                     guard engine.model.optimizations.overlapResidentExperts == requireResidentSplit else {
                         throw PlanError("effective resident-overlap control does not match the capture request")
                     }
@@ -499,8 +521,12 @@ struct FlashCapture: ParsableCommand {
                         logitsQuota: Int64(logitsQuotaGB) * 1_000_000_000)
                     let previousSIGINT = Darwin.signal(SIGINT, SIG_IGN)
                     let cancellation=DispatchSource.makeSignalSource(signal:SIGINT,queue:.global())
-                    cancellation.setEventHandler { sink.cancel() }; cancellation.resume()
-                    defer { cancellation.cancel(); Darwin.signal(SIGINT, previousSIGINT) }
+                    cancellation.setEventHandler { sink.cancel(); oracle?.cancel() }; cancellation.resume()
+                    defer {
+                        engine.model.flashHiddenTransform = nil
+                        engine.model.flashObservationSink = nil
+                        cancellation.cancel(); Darwin.signal(SIGINT, previousSIGINT)
+                    }
                     let invalidState = engine.model.makeState()
                     let rejectingSink = RejectingCaptureSink()
                     engine.model.flashObservationSink = rejectingSink
@@ -513,8 +539,22 @@ struct FlashCapture: ParsableCommand {
                     do { _ = try engine.model.lastLogitsChecked([1], state: invalidState) }
                     catch { reuseRefused = String(describing:error).contains("incomplete forward") }
                     guard reuseRefused else { throw PlanError("partially advanced state was reusable after sink failure") }
+                    var maskReuseRefused = false
+                    if oracle != nil {
+                        let maskState = engine.model.makeState()
+                        engine.model.flashHiddenTransform = RejectingOracleTransform()
+                        do {
+                            _ = try engine.model.lastLogitsChecked([1], state: maskState)
+                            throw PlanError("injected oracle failure did not propagate")
+                        } catch let error where String(describing: error).contains("injected oracle mask failure") {}
+                        engine.model.flashHiddenTransform = nil
+                        do { _ = try engine.model.lastLogitsChecked([1], state: maskState) }
+                        catch { maskReuseRefused = String(describing: error).contains("incomplete forward") }
+                        guard maskReuseRefused else { throw PlanError("oracle failure left reusable state") }
+                    }
                     var documents: [[String: Any]] = []
                     for document in captureDocuments where document.split == split {
+                        engine.model.flashHiddenTransform = nil
                         let state = engine.model.makeState()
                         if !document.warmupIDs.isEmpty {
                             let warm = try engine.model.lastLogitsChecked(document.warmupIDs, state: state); eval(warm)
@@ -527,10 +567,13 @@ struct FlashCapture: ParsableCommand {
                             }
                             var routes: [[String: Any]] = []
                             engine.model.routerObserver = { layer, ids in routes.append(["layer": layer, "ids": ids]) }
-                            engine.model.flashObservationSink = mode == "reference-on" ? sink : nil
+                            engine.model.flashObservationSink = mode == "reference-off" ? nil : sink
                             sink.begin(documentID:document.id,tokenPosition:position.position,inputID:position.inputID)
+                            try oracle?.begin(document: document.id, position: position.position)
+                            engine.model.flashHiddenTransform = oracle
                             let logits = try engine.model.lastLogitsChecked([position.inputID], state: state)
                             eval(logits)
+                            try oracle?.finish()
                             try sink.writeLogits(logits, name: "logits-\(document.id)-\(position.position).bin")
                             let stateIdentity=try state.flashStateIdentity(maxCopyBytes:reservation)
                             let stateEncoder=JSONEncoder();stateEncoder.outputFormatting=[.sortedKeys]
@@ -542,10 +585,13 @@ struct FlashCapture: ParsableCommand {
                                 "state":try JSONSerialization.jsonObject(with:stateData),
                                 "continuation_id": argMax(logits).item(Int.self)])
                             engine.model.flashObservationSink = nil
+                            engine.model.flashHiddenTransform = nil
                         }
                         documents.append(["id": document.id, "positions": positions])
                     }
-                    var payload: [String: Any] = ["format": "slotstream-flash-capture-output-v1",
+                    let packedWidening = wideningPolicy == .packed4To6
+                    var payload: [String: Any] = ["format": oracle != nil ? "slotstream-flash-oracle-output-v1" : packedWidening
+                            ? "slotstream-flash-widening-output-v1" : "slotstream-flash-capture-output-v1",
                         "schema_version": 1, "qualification": false, "mode": mode,
                         "manifest_sha256": SHA256.hash(data: manifestData).map { String(format: "%02x", $0) }.joined(),
                         "binary": CommandLine.arguments[0], "model": modelURL.path,
@@ -564,6 +610,10 @@ struct FlashCapture: ParsableCommand {
                         "resident_split_evidence":["required":requireResidentSplit,
                             "split_layers":sink.splitLayerKeys],
                         "files": sink.files, "activation_bytes": sink.activationBytes, "logits_bytes": sink.logitsBytes]
+                    if packedWidening {
+                        payload["effective_expert_widening"] = engine.effectiveWideningPolicy.rawValue
+                    }
+                    if let oracle { payload["oracle"] = oracle.evidence(maskFailureRefused: maskReuseRefused) }
                     if let tokenizedMetadata { payload["tokenized_corpus"] = tokenizedMetadata }
                     guard !requireResidentSplit || !sink.splitLayerKeys.isEmpty else {
                         throw PlanError("resident-overlap control did not execute both resident and miss branches")
@@ -572,7 +622,8 @@ struct FlashCapture: ParsableCommand {
                     guard report.count<=reservation else { throw PlanError("capture report exceeds live-buffer limit") }
                     try report.write(to: destination.appendingPathComponent("report.json"), options: .atomic)
                     let hash = SHA256.hash(data: report).map { String(format: "%02x", $0) }.joined()
-                    try JSONSerialization.data(withJSONObject: ["format": "slotstream-flash-capture-completion-v1",
+                    try JSONSerialization.data(withJSONObject: ["format": oracle != nil ? "slotstream-flash-oracle-completion-v1" : packedWidening
+                            ? "slotstream-flash-widening-completion-v1" : "slotstream-flash-capture-completion-v1",
                         "report_sha256": hash, "qualification": false], options: [.prettyPrinted, .sortedKeys])
                         .write(to: destination.appendingPathComponent("completion.json"), options: .atomic)
                 } catch { result = .failure(error) }

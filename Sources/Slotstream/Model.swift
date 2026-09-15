@@ -107,6 +107,7 @@ public final class Qwen4ExpModel {
     /// Diagnostic observer; called on the serialized model thread with router-rank IDs.
     public var routerObserver: ((Int, [Int32]) -> Void)?
     public var flashObservationSink: (any FlashObservationSink)?
+    package var flashHiddenTransform: (any FlashHiddenTransform)?
     package var contextNumericsObserver: ((Int, String, MLXArray) -> Void)?
     package var gdnPhaseProfile: GDNPhaseProfile? {
         didSet { for layer in gdn.values { layer.phaseProfile = gdnPhaseProfile } }
@@ -154,11 +155,14 @@ public final class Qwen4ExpModel {
         public init() {}
     }
 
-    public convenience init(index: CheckpointIndex, poolSlots: Int, runLayers: Int? = nil) throws {
-        try self.init(index: index, poolSlots: poolSlots, runLayers: runLayers, embeddingRowCache: nil)
+    public convenience init(index: CheckpointIndex, poolSlots: Int, runLayers: Int? = nil,
+                            expertWidening: AffineWideningPolicy = .scalar) throws {
+        try self.init(index: index, poolSlots: poolSlots, runLayers: runLayers,
+            embeddingRowCache: nil, expertWidening: expertWidening)
     }
 
     package init(index: CheckpointIndex, poolSlots: Int, runLayers: Int? = nil, embeddingRowCache: Bool?,
+                 expertWidening: AffineWideningPolicy = .scalar,
                  packGDNProjections: Bool? = nil) throws {
         self.optimizations = try InferenceOptimizations.environment()
         try ModelProcessGuard.acquire()
@@ -173,13 +177,16 @@ public final class Qwen4ExpModel {
                 "expert-pool slot count must be between 1 and \(Geometry.totalRecords), got \(poolSlots)")
         }
         self.runLayers = selectedLayers
-        let store = try ExpertStore(index: index)
+        let store = try ExpertStore(index: index, wideningPolicy: expertWidening)
         // Reject a wrong/custom checkpoint before allocating the 3.8 GB
         // resident trunk or the expert pool.
         try Geometry.check(against: index.config, recordBytes: store.recordBytes)
         // Explicit experimental startup path: full-file verification precedes
         // resident/pool allocation. Default construction needs no repack.
         if let path = ProcessInfo.processInfo.environment["SLOTSTREAM_EXPERT_LAYOUT"] {
+            guard expertWidening == .scalar else {
+                throw ModelError("packed4-to6 widening cannot be combined with SLOTSTREAM_EXPERT_LAYOUT")
+            }
             guard !path.isEmpty else { throw ModelError("SLOTSTREAM_EXPERT_LAYOUT must name a packed artifact directory") }
             let report = try store.loadPackedLayout(at:URL(fileURLWithPath:path,isDirectory:true))
             fputs("[expert-layout] verified \(report.bytes) bytes in \(report.seconds) s\n",stderr)
@@ -401,6 +408,10 @@ public final class Qwen4ExpModel {
         let optimizations = executionOptions ?? self.optimizations
         try validateForward(ids, state: state)
         try flashObservationSink?.validateForward(tokens: ids.count)
+        try flashHiddenTransform?.validateForward(tokens: ids.count)
+        if flashHiddenTransform != nil && (optimizations.overlapResidentExperts || optimizations.layerExpertWorkspace) {
+            throw PlanError("neuron oracle cannot combine resident overlap or expert workspace")
+        }
         state.recordedTokenIds = state.recordingEnabled ? ids : nil
         state.recordingBaseTokenCount = state.recordingEnabled ? state.tokenCount : nil
         state.committedBoundaryValid = false
@@ -625,6 +636,7 @@ public final class Qwen4ExpModel {
             MemTrace.mark("hc2", x2)
             moe[l]!.routerObserver = routerObserver
             moe[l]!.flashObservationSink = flashObservationSink
+            moe[l]!.flashHiddenTransform = flashHiddenTransform
             moe[l]!.useLayerWorkspace = optimizations.layerExpertWorkspace
             moe[l]!.disjointOutput = optimizations.disjointSweepOutput
             moe[l]!.boundedRows = optimizations.boundedSweepRows

@@ -33,6 +33,26 @@ class PromptCorpusTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
+    def test_executable_directory_alias_preserves_identity_but_other_file_fails(self):
+        directory = self.root / "moved"
+        directory.mkdir()
+        binary = directory / "slotstream"
+        binary.write_bytes(b"fixture")
+        alias = self.root / "original"
+        alias.symlink_to(directory, target_is_directory=True)
+        index = {"executable_identity": {"path": str(alias / "slotstream"),
+            "binary_sha256": "a", "metallib_sha256": "b", "build_identity_sha256": "c",
+            "source_archive_sha256": "d", "historical": False}}
+        build = {"binary_sha256": "a", "metallib_sha256": "b"}
+        with mock.patch.object(prompt_tool, "validate_build_identity", return_value=(build, {
+                "identity": "identity", "source_archive": "archive"})), \
+                mock.patch.object(prompt_tool, "sha256", side_effect=lambda path: {"identity": "c", "archive": "d"}[path]):
+            prompt_tool._validate_executable(index, binary)
+            other = self.root / "another-binary"
+            other.write_bytes(b"fixture")
+            with self.assertRaisesRegex(EvidenceError, "identity path"):
+                prompt_tool._validate_executable(index, other)
+
     def write_source(self, documents: list[dict], name: str = "source.json") -> Path:
         source = {
             "format": "slotstream-prompt-source-v1",

@@ -197,7 +197,10 @@ def _validate_executable(index: dict[str, Any], binary: Path) -> None:
     } | ({"archive_receipt_path", "archive_receipt_sha256"}
          if index["executable_identity"].get("historical") is True else set()),
         "executable identity")
-    if type(executable["historical"]) is not bool or Path(executable["path"]) != binary:
+    # A moved checkout may retain its original location as a directory alias.
+    # Require the same actual file; all byte/archive checks below remain intact.
+    if (type(executable["historical"]) is not bool
+            or Path(executable["path"]).resolve(strict=True) != binary.resolve(strict=True)):
         raise EvidenceError("executable identity path or historical flag differs")
     build, paths = validate_build_identity(binary, historical=executable["historical"])
     if (executable["binary_sha256"] != build["binary_sha256"]

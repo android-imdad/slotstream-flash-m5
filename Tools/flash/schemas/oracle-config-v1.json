@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "schema_version",
+    "algorithm",
+    "retained_blocks",
+    "split",
+    "norm_manifest",
+    "norm_manifest_sha256",
+    "study",
+    "study_sha256",
+    "suite",
+    "suite_sha256",
+    "capture_manifest_sha256",
+    "diagnostic_reserved_bytes"
+  ],
+  "properties": {
+    "format": {
+      "const": "slotstream-oracle-config-v1"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "algorithm": {
+      "const": "fp32-values-fp64-sequential-column-l2-block64-v1"
+    },
+    "retained_blocks": {
+      "enum": [
+        10,
+        8,
+        6,
+        4,
+        2
+      ]
+    },
+    "split": {
+      "const": "development"
+    },
+    "norm_manifest": {
+      "type": "string"
+    },
+    "norm_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "study": {
+      "type": "string"
+    },
+    "study_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "suite": {
+      "type": "string"
+    },
+    "suite_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capture_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic_reserved_bytes": {
+      "const": 218103808
+    }
+  }
+}

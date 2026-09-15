@@ -152,7 +152,7 @@ class CaptureTests(unittest.TestCase):
         self.assertEqual(dry_run(self.source, 'heldout', output), 1)
         self.assertFalse((output / 'completion.json').exists())
 
-    def native_fixture(self, mode='reference-off', suffix='case'):
+    def native_fixture(self, mode='reference-off', suffix='case', widening_policy='scalar'):
         base = self.root / suffix
         base.mkdir()
         binary_dir = base / 'bin'
@@ -195,9 +195,11 @@ class CaptureTests(unittest.TestCase):
         state = {'fields': state_fields, 'indexerBases': {}, 'allocatedSequenceBytes': 0}
         state_hash = __import__('hashlib').sha256(json.dumps(state, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
         source = {'binary_sha256': sha256(binary), 'metallib_sha256': sha256(binary_dir / 'mlx.metallib'), 'build_identity_sha256': sha256(binary_dir / 'build-identity.json'), 'source_archive_sha256': sha256(binary_dir / 'build-source.tar.gz'), 'model_config_sha256': sha256(model / 'config.json'), 'model_index_sha256': sha256(model / 'model.safetensors.index.json')}
-        report = {'format': 'slotstream-flash-capture-output-v1', 'schema_version': 1, 'qualification': False, 'mode': mode, 'manifest_sha256': sha256(manifest), 'binary': str(binary), 'model': str(model), 'source_identity': source, 'plan': {'target_gb': 14}, 'memory_ledger': {'diagnostic_reserved_bytes': 128 << 20}, 'documents': [{'id': 'doc', 'positions': [{'position': 0, 'input_id': 1, 'next_token_id': 2, 'routes': routes, 'state': state, 'state_sha256': state_hash, 'continuation_id': 3}]}], 'files': files, 'invalid_state_reuse_refused': True, 'optimizations': {'overlapResidentExperts': False}, 'numerical_environment': {'mlx_enable_tf32_raw': None, 'effective_tf32': True}, 'resident_split_evidence': {'required': False, 'split_layers': []}, 'activation_bytes': sum((f['bytes'] for f in files if f['category'] != 'logits')), 'logits_bytes': sum((f['bytes'] for f in files if f['category'] == 'logits'))}
+        report = {'format': 'slotstream-flash-capture-output-v1' if widening_policy == 'scalar' else 'slotstream-flash-widening-output-v1', 'schema_version': 1, 'qualification': False, 'mode': mode, 'manifest_sha256': sha256(manifest), 'binary': str(binary), 'model': str(model), 'source_identity': source, 'plan': {'target_gb': 14}, 'memory_ledger': {'diagnostic_reserved_bytes': 128 << 20}, 'documents': [{'id': 'doc', 'positions': [{'position': 0, 'input_id': 1, 'next_token_id': 2, 'routes': routes, 'state': state, 'state_sha256': state_hash, 'continuation_id': 3}]}], 'files': files, 'invalid_state_reuse_refused': True, 'optimizations': {'overlapResidentExperts': False}, 'numerical_environment': {'mlx_enable_tf32_raw': None, 'effective_tf32': True}, 'resident_split_evidence': {'required': False, 'split_layers': []}, 'activation_bytes': sum((f['bytes'] for f in files if f['category'] != 'logits')), 'logits_bytes': sum((f['bytes'] for f in files if f['category'] == 'logits'))}
+        if widening_policy == 'packed4-to6':
+            report['effective_expert_widening'] = widening_policy
         atomic_json(native / 'report.json', report)
-        atomic_json(native / 'completion.json', {'format': 'slotstream-flash-capture-completion-v1', 'report_sha256': sha256(native / 'report.json'), 'qualification': False})
+        atomic_json(native / 'completion.json', {'format': 'slotstream-flash-capture-completion-v1' if widening_policy == 'scalar' else 'slotstream-flash-widening-completion-v1', 'report_sha256': sha256(native / 'report.json'), 'qualification': False})
         return (native, manifest, binary, model, request)
 
     def rewrite_report(self, native, report):
@@ -209,6 +211,23 @@ class CaptureTests(unittest.TestCase):
         validate_native_output(native, manifest, 'reference-off', binary, model, request)
         (native, manifest, binary, model, request) = self.native_fixture('reference-on', 'on')
         validate_native_output(native, manifest, 'reference-on', binary, model, request)
+
+    def test_native_output_admits_only_explicit_packed_widening_schema(self):
+        fixture = self.native_fixture(suffix='packed', widening_policy='packed4-to6')
+        (native, manifest, binary, model, request) = fixture
+        validate_native_output(native, manifest, 'reference-off', binary, model, request,
+                               widening_policy='packed4-to6')
+        with self.assertRaisesRegex(EvidenceError, 'native'):
+            validate_native_output(native, manifest, 'reference-off', binary, model, request)
+        report = read_json(native / 'report.json')
+        report['effective_expert_widening'] = 'scalar'
+        atomic_json(native / 'report.json', report)
+        atomic_json(native / 'completion.json', {
+            'format': 'slotstream-flash-widening-completion-v1',
+            'report_sha256': sha256(native / 'report.json'), 'qualification': False})
+        with self.assertRaisesRegex(EvidenceError, 'native'):
+            validate_native_output(native, manifest, 'reference-off', binary, model, request,
+                                   widening_policy='packed4-to6')
 
     def test_native_output_rejects_missing_extra_wrong_dtype_foreign_and_partial(self):
         (native, manifest, binary, model, request) = self.native_fixture(suffix='missing')

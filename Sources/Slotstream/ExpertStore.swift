@@ -11,6 +11,12 @@ public struct PackedLayoutReport: Codable {
     public let modelIdentity: String
 }
 
+public struct ExpertReadControlResult: Codable, Sendable {
+    public let path: String
+    public let noCacheReturnCode: Int32
+    public let readAheadReturnCode: Int32
+}
+
 public struct ExpertKey: Hashable {
     public let layer: Int
     public let expert: Int
@@ -34,6 +40,8 @@ public enum SlotPoolError: Error, CustomStringConvertible {
 
 public final class ExpertStore {
     public let index: CheckpointIndex
+    public let effectiveWideningPolicy: AffineWideningPolicy
+    package var balancedReadScheduling = false
     private let cfg: ModelConfig
     // per (layer, piece) tensor refs; pieces ordered gw,gs,gb,uw,us,ub,dw,ds,db
     static let pieces = [
@@ -54,6 +62,9 @@ public final class ExpertStore {
     /// payload before changing the active reader. Failed loads preserve it.
     @discardableResult
     public func loadPackedLayout(at directory: URL) throws -> PackedLayoutReport {
+        guard effectiveWideningPolicy == .scalar else {
+            throw ModelError("packed4-to6 widening cannot be combined with a packed expert layout")
+        }
         try ModelProcessGuard.acquire()
         let identity = try packedModelIdentity()
         let candidate = try PackedExpertLayout(directory:directory,identity:identity,
@@ -115,6 +126,22 @@ public final class ExpertStore {
         let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
         return PackedExpertLayout.hex(try encoder.encode(Identity(config:PackedExpertLayout.hex(config),tensors:sources)))
     }
+    package func wideningSourceIdentity() throws -> String { try packedModelIdentity() }
+
+    /// Reapply and record the descriptor controls used by the original-reader
+    /// component check. The index already requests these settings on open; the
+    /// return codes here are the observed syscall results rather than inferred
+    /// configuration.
+    package func configureWideningReadControls() -> [ExpertReadControlResult] {
+        var seen = Set<URL>()
+        return refs.flatMap { $0 }.compactMap { ref in
+            guard seen.insert(ref.file).inserted else { return nil }
+            let descriptor = index.fd(for: ref.file)
+            return ExpertReadControlResult(path: ref.file.path,
+                noCacheReturnCode: fcntl(descriptor, F_NOCACHE, 1),
+                readAheadReturnCode: fcntl(descriptor, F_RDAHEAD, 0))
+        }
+    }
     private var readHandles: [[TensorReadHandle]]?
     package var readHandleCount: Int { readHandles?.reduce(0) { $0 + $1.count } ?? 0 }
     package func configureReadHandles(_ enabled: Bool) {
@@ -129,6 +156,11 @@ public final class ExpertStore {
     }
     public private(set) var pieceRowBytes: [Int] = []  // bytes per expert per piece
     package func sourceRecordBytes(layer: Int) -> Int { refs[layer].reduce(0) { $0 + $1.rowBytes } }
+    package func wideningProjectionCount(layer: Int) -> Int {
+        [0, 3, 6].reduce(0) { count, piece in
+            count + (refs[layer][piece].rowBytes == pieceRowBytes[piece] ? 0 : 1)
+        }
+    }
     private var pieceShapes: [[Int]] = []
     private var scaleDType: DType { cfg.format.isJANG ? .float32 : .bfloat16 }
 
@@ -167,7 +199,8 @@ public final class ExpertStore {
                          offset: (first + row) * sourceBytes, count: sourceBytes)
                 try AffineCodes.widen(UnsafeRawBufferPointer(bytes),
                     to: UnsafeMutableRawBufferPointer(start: dst + row * targetBytes, count: targetBytes),
-                    count: cfg.hiddenSize * cfg.moeIntermediate, from: bits, to: cfg.expertBits)
+                    count: cfg.hiddenSize * cfg.moeIntermediate, from: bits, to: cfg.expertBits,
+                    policy: effectiveWideningPolicy)
             }
         }
     }
@@ -181,9 +214,13 @@ public final class ExpertStore {
         return total
     }
 
-    public init(index: CheckpointIndex) throws {
+    public init(index: CheckpointIndex, wideningPolicy: AffineWideningPolicy = .scalar) throws {
         self.index = index
         self.cfg = index.config
+        guard wideningPolicy == .scalar || index.config.format == .jang6S else {
+            throw ModelError("packed4-to6 expert widening requires a JANG_6S checkpoint")
+        }
+        self.effectiveWideningPolicy = wideningPolicy
         let h = cfg.hiddenSize
         let ff = cfg.moeIntermediate
         let g = cfg.qGroup
@@ -294,15 +331,20 @@ public final class ExpertStore {
         // 9n reads, spread across worker lanes
         let jobs: [(piece: Int, slot: Int)] = (0 ..< n).flatMap { s in (0 ..< 9).map { (piece: $0, slot: s) } }
         let lanes = min(max(queueDepth, 1), jobs.count)
+        let assignment = balancedReadScheduling ? ExpertReadSchedule.balanced(
+            costs: jobs.map { refs[keys[$0.slot].layer][$0.piece].rowBytes + pieceRowBytes[$0.piece] },
+            lanes: lanes) : nil
         DispatchQueue.concurrentPerform(iterations: lanes) { lane in
-            var j = lane
-            while j < jobs.count {
+            // Default keeps its original strided order. Experimental lanes
+            // balance source plus destination bytes, including expansion work.
+            let count = assignment?[lane].count ?? ((jobs.count - lane + lanes - 1) / lanes)
+            for index in 0 ..< count {
+                let j = assignment?[lane][index] ?? (lane + index * lanes)
                 let (p, s) = jobs[j]
                 let key = keys[s]
                 let pb = pieceRowBytes[p]
                 do { try readRows(into: buffers[p] + s * pb, layer: key.layer, piece: p, first: key.expert, count: 1) }
                 catch { failure.record(error) }
-                j += lanes
             }
         }
 
@@ -518,6 +560,7 @@ public final class SlotPool {
     public var poolBytes: Int { pools.reduce(0) { $0 + $1.nbytes } }
     /// Bytes per cache record, including any lossless JANG expansion.
     public var recordBytes: Int { store.recordBytes }
+    public var effectiveWideningPolicy: AffineWideningPolicy { store.effectiveWideningPolicy }
     /// The cache size in the per-layer unit of intuition (the pool itself is
     /// global and shared -- hot layers borrow from cold ones).
     public var slotsPerLayer: Double { Double(slots) / Double(cfg.numLayers) }

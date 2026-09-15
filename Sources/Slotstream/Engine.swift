@@ -113,6 +113,7 @@ public final class Engine {
     public let tokenizer: any Tokenizers.Tokenizer
     public let eosIds: Set<Int>
     public let modelName: String
+    public var effectiveWideningPolicy: AffineWideningPolicy { model.pool.effectiveWideningPolicy }
     /// Lazily-loaded vision tower (VLM). Loaded on the first request that
     /// carries an image and then cached; see `ensureVisionTower`.
     public private(set) var visionTower: VisionTower?
@@ -287,11 +288,14 @@ public final class Engine {
         poolSnapshotLock.unlock()
     }
 
-    public convenience init(modelDir: URL, plan: MemoryPlan) async throws {
-        try await self.init(modelDir: modelDir, poolSlots: plan.slots, plan: plan)
+    public convenience init(modelDir: URL, plan: MemoryPlan,
+                            expertWidening: AffineWideningPolicy = .scalar) async throws {
+        try await self.init(modelDir: modelDir, poolSlots: plan.slots, plan: plan,
+            expertWidening: expertWidening)
     }
 
-    public init(modelDir: URL, poolSlots: Int, plan: MemoryPlan? = nil) async throws {
+    public init(modelDir: URL, poolSlots: Int, plan: MemoryPlan? = nil,
+                expertWidening: AffineWideningPolicy = .scalar) async throws {
         // A plan made for a simulated machine may be printed and compared,
         // never loaded. Simulating memory the machine does not have still
         // allocates for real: on 2026-08-30 a simulated 60 GB drove a 25.4 GB
@@ -299,6 +303,13 @@ public final class Engine {
         // cannot be forgotten at a call site.
         if plan?.simulated == true { throw SlotstreamError.simulatedDeviceCannotLoad }
         let index = try CheckpointIndex(dir: modelDir)
+        guard expertWidening == .scalar || index.config.format == .jang6S else {
+            throw ModelError("packed4-to6 expert widening requires a JANG_6S checkpoint")
+        }
+        if expertWidening != .scalar,
+           ProcessInfo.processInfo.environment["SLOTSTREAM_EXPERT_LAYOUT"] != nil {
+            throw ModelError("packed4-to6 widening cannot be combined with SLOTSTREAM_EXPERT_LAYOUT")
+        }
         let layout = index.config.format.isJANG ? try CheckpointMemory(index: index) : nil
         guard plan == nil || plan?.checkpointMemory == layout else {
             throw SlotstreamError.invalidPlan("memory plan belongs to a different checkpoint layout")
@@ -341,7 +352,8 @@ public final class Engine {
         MLX.Memory.cacheLimit = 2 << 30
         self.modelName = index.config.format.modelName
         let t0 = Date()
-        self.model = try Qwen4ExpModel(index: index, poolSlots: poolSlots)
+        self.model = try Qwen4ExpModel(index: index, poolSlots: poolSlots,
+            expertWidening: expertWidening)
         self.responsiveGovernor = layout == nil && model.optimizations.responsiveGovernor
         try model.validate()
         // Read from the index that is already open — no tensor is touched, and

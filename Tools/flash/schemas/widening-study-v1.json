@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slotstream.dev/schemas/widening-study-v1.json",
+  "title": "Slotstream exact widening study evidence",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["format", "schema_version", "mode", "qualification", "binary_sha256", "report_sha256", "receipt_sha256", "terminal_before_reap", "peak_bytes", "memory_limit_bytes", "harness_hashes"],
+      "properties": {
+        "format": {"const": "slotstream-widening-component-evidence-v1"},
+        "schema_version": {"const": 1},
+        "mode": {"enum": ["synthetic", "model"]},
+        "qualification": {"const": false},
+        "binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "terminal_before_reap": {"const": true},
+        "peak_bytes": {"type": "integer", "minimum": 1, "maximum": 512000000},
+        "memory_limit_bytes": {"const": 512000000},
+        "harness_hashes": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["format", "schema_version", "qualification", "exact_capture_parity", "ordinary_cli_id_parity", "reference_binary_sha256", "candidate", "model", "corpus", "captures", "ordinary", "harness_hashes"],
+      "properties": {
+        "format": {"const": "slotstream-widening-parity-v1"},
+        "schema_version": {"const": 1},
+        "qualification": {"const": false},
+        "exact_capture_parity": {"const": true},
+        "ordinary_cli_id_parity": {"const": true},
+        "reference_binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate": {"type": "object"},
+        "model": {"type": "object"},
+        "corpus": {"type": "object"},
+        "captures": {"type": "array", "minItems": 1},
+        "ordinary": {"type": "array", "minItems": 1},
+        "harness_hashes": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["format", "schema_version", "qualification", "scope", "fixture_sha256", "model_verification", "parity_evidence_path", "parity_evidence_sha256", "candidate_archive_receipt_sha256", "candidate_binary_sha256", "pairs_per_prompt", "rows", "decision", "harness_hashes"],
+      "properties": {
+        "format": {"const": "slotstream-widening-screen-v1"},
+        "schema_version": {"const": 1},
+        "qualification": {"const": false},
+        "scope": {"type": "string"},
+        "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "model_verification": {"type": "object"},
+        "parity_evidence_path": {"type": "string"},
+        "parity_evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_archive_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pairs_per_prompt": {"const": 1},
+        "rows": {"type": "array", "minItems": 3, "maxItems": 3},
+        "decision": {"type": "object"},
+        "harness_hashes": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["format", "schema_version", "qualification", "scope", "fixture_sha256", "model_verification", "parity_evidence_path", "parity_evidence_sha256", "candidate_archive_receipt_sha256", "candidate_binary_sha256", "pairs_per_prompt", "rows", "decision", "harness_hashes"],
+      "properties": {
+        "format": {"const": "slotstream-widening-qualify-v1"},
+        "schema_version": {"const": 1},
+        "qualification": {"type": "boolean"},
+        "scope": {"type": "string"},
+        "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "model_verification": {"type": "object"},
+        "parity_evidence_path": {"type": "string"},
+        "parity_evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_archive_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pairs_per_prompt": {"const": 10},
+        "rows": {"type": "array", "minItems": 30, "maxItems": 30},
+        "decision": {"type": "object"},
+        "harness_hashes": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
+  ]
+}

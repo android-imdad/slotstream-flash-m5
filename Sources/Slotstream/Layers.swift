@@ -1051,6 +1051,7 @@ final class MoELayer {
     private(set) var residentJoinSeconds = 0.0
     var routerObserver: ((Int, [Int32]) -> Void)?
     weak var flashObservationSink: (any FlashObservationSink)?
+    weak var flashHiddenTransform: (any FlashHiddenTransform)?
     var useLayerWorkspace = false
     var workspaceTokenTile = 256
     var workspaceComputeRanges: [Range<Int>] = []
@@ -1259,9 +1260,17 @@ final class MoELayer {
             let u = gatherQuantizedMM(
                 xe, pool.pools[3], scales: pool.pools[4], biases: pool.pools[5],
                 rhsIndices: slotIdx, transpose: true, groupSize: cfg.qGroup, bits: cfg.expertBits)
-            let hidden = MLXNN.silu(g) * u
+            var hidden = MLXNN.silu(g) * u
             if let sink = flashObservationSink, let ranks, observationError == nil {
                 do { try sink.observeHidden(layer: layer, routerRanks: ranks,
+                    expertIDs: ranks.map { expertIds[$0] }, value: hidden) }
+                catch { observationError = error }
+            }
+            // Observe the unmodified SwiGLU output before a diagnostic mask.
+            // A thrown transform aborts this checked forward; its retained
+            // state remains invalid and cannot be reused.
+            if let transform = flashHiddenTransform, let ranks, observationError == nil {
+                do { hidden = try transform.transformHidden(layer: layer, routerRanks: ranks,
                     expertIDs: ranks.map { expertIds[$0] }, value: hidden) }
                 catch { observationError = error }
             }
@@ -1296,7 +1305,7 @@ final class MoELayer {
         let slotIds = expertIds.map { Int32(slotOf[seen[ExpertKey(layer, Int($0))]!]) }
         guard let ready else {
             let result = project(slotIds,
-                ranks: flashObservationSink == nil ? nil : Array(expertIds.indices))
+                ranks: flashObservationSink == nil && flashHiddenTransform == nil ? nil : Array(expertIds.indices))
             if let observationError { throw observationError }
             return result
         }

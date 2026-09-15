@@ -154,12 +154,35 @@ def _expected_state_fields(model: Path) -> list[str]:
             raise EvidenceError('unsupported pinned model layer type')
     return sorted(names)
 
-def validate_native_report(report, root, manifest, mode, binary, model, request, *, require_split=False):
+def validate_native_report(report, root, manifest, mode, binary, model, request, *,
+                           require_split=False, widening_policy='scalar'):
+    if mode not in ('reference-off', 'reference-on'):
+        raise EvidenceError('reference validator does not accept oracle captures')
+    return _validate_native_report(report, root, manifest, mode, binary, model, request,
+                                   require_split=require_split, widening_policy=widening_policy)
+
+def _validate_native_report(report, root, manifest, mode, binary, model, request, *,
+                            require_split=False, widening_policy='scalar', oracle=False):
+    if widening_policy not in ('scalar', 'packed4-to6'):
+        raise EvidenceError('unsupported expert widening policy')
     report_keys = {'format', 'schema_version', 'qualification', 'mode', 'manifest_sha256', 'binary', 'model', 'source_identity', 'plan', 'memory_ledger', 'documents', 'files', 'activation_bytes', 'logits_bytes', 'invalid_state_reuse_refused', 'optimizations', 'numerical_environment', 'resident_split_evidence'}
+    expected_format = 'slotstream-flash-capture-output-v1'
+    if oracle:
+        if mode != 'oracle' or widening_policy != 'scalar' or require_split:
+            raise EvidenceError('unsupported oracle capture combination')
+        report_keys.add('oracle')
+        expected_format = 'slotstream-flash-oracle-output-v1'
+    if widening_policy == 'packed4-to6':
+        report_keys.add('effective_expert_widening')
+        expected_format = 'slotstream-flash-widening-output-v1'
     v2 = request.get('format', 'slotstream-flash-capture-v1') == 'slotstream-tokenized-capture-shard-v2'
     if v2:
         report_keys.add('tokenized_corpus')
-    if set(report) != report_keys or report.get('format') != 'slotstream-flash-capture-output-v1' or report.get('schema_version') != 1 or (report.get('mode') != mode) or (report.get('qualification') is not False):
+    if (set(report) != report_keys or report.get('format') != expected_format
+            or report.get('schema_version') != 1 or (report.get('mode') != mode)
+            or (report.get('qualification') is not False)
+            or (widening_policy == 'packed4-to6'
+                and report.get('effective_expert_widening') != 'packed4-to6')):
         raise EvidenceError('invalid native capture report')
     if report.get('manifest_sha256') != sha256(manifest) or report.get('invalid_state_reuse_refused') is not True:
         raise EvidenceError('native manifest or failed-state evidence mismatch')
@@ -183,7 +206,7 @@ def validate_native_report(report, root, manifest, mode, binary, model, request,
             path = model / item['path']
             if not path.is_file() or path.stat().st_size != item['bytes'] or sha256(path) != item['sha256']:
                 raise EvidenceError('tokenized shard tokenizer file changed')
-    if report.get('memory_ledger', {}).get('diagnostic_reserved_bytes') != 128 << 20 or report.get('plan', {}).get('target_gb') != 14:
+    if report.get('memory_ledger', {}).get('diagnostic_reserved_bytes') != (208 if oracle else 128) << 20 or report.get('plan', {}).get('target_gb') != 14:
         raise EvidenceError('native diagnostic reservation or plan mismatch')
     files = report.get('files', [])
     if len({f.get('name') for f in files}) != len(files):
@@ -256,7 +279,7 @@ def validate_native_report(report, root, manifest, mode, binary, model, request,
                 raise EvidenceError('activation input identity mismatch')
             if len([f for f in selected if f['category'] == 'logits']) != 1:
                 raise EvidenceError('logits coverage failed')
-            if mode == 'reference-on':
+            if mode in ('reference-on', 'oracle'):
                 inputs = [f for f in selected if f['category'] == 'input']
                 hidden = [f for f in selected if f['category'] == 'hidden']
                 if sorted((f['layer'] for f in inputs)) != list(range(LAYERS)):
@@ -294,18 +317,28 @@ def validate_native_report(report, root, manifest, mode, binary, model, request,
     if not isinstance(split_evidence, dict) or split_evidence.get('required') is not require_split or split_evidence.get('split_layers') != split_layers or (require_split and (not split_layers)):
         raise EvidenceError('resident/miss production split evidence mismatch')
 
-def validate_native_output(root, manifest, mode, binary, model, request, *, require_split=False):
+def validate_native_output(root, manifest, mode, binary, model, request, *,
+                           require_split=False, widening_policy='scalar'):
     report_path = root / 'report.json'
     completion_path = root / 'completion.json'
     report = read_json(report_path)
     completion = read_json(completion_path)
-    if set(completion) != {'format', 'report_sha256', 'qualification'} or completion.get('format') != 'slotstream-flash-capture-completion-v1' or completion.get('report_sha256') != sha256(report_path) or (completion.get('qualification') is not False):
+    completion_format = ('slotstream-flash-widening-completion-v1'
+                         if widening_policy == 'packed4-to6'
+                         else 'slotstream-flash-capture-completion-v1')
+    if set(completion) != {'format', 'report_sha256', 'qualification'} or completion.get('format') != completion_format or completion.get('report_sha256') != sha256(report_path) or (completion.get('qualification') is not False):
         raise EvidenceError('native completion does not bind the report')
-    validate_native_report(report, root, manifest, mode, binary, model, request, require_split=require_split)
+    validate_native_report(report, root, manifest, mode, binary, model, request,
+                           require_split=require_split, widening_policy=widening_policy)
     return report
 
-def _native(binary, model, manifest, split, mode, out, *, require_split=False):
+def _native(binary, model, manifest, split, mode, out, *, require_split=False,
+            widening_policy='scalar'):
+    if widening_policy not in ('scalar', 'packed4-to6'):
+        raise EvidenceError('unsupported expert widening policy')
     cmd = [str(binary), 'flash-capture', '--model', str(model), '--manifest', str(manifest), '--split', split, '--mode', mode, '--memory-gb', '14', '--max-context', '2048', '--output', str(out / 'native'), '--live-limit-mb', '64', '--activation-quota-gb', '32', '--logits-quota-gb', '8']
+    if widening_policy != 'scalar':
+        cmd.extend(['--expert-widening', widening_policy])
     if require_split:
         cmd.append('--require-resident-split')
     settle = benchmark.settle_before_model_launch()
@@ -325,7 +358,9 @@ def _native(binary, model, manifest, split, mode, out, *, require_split=False):
     if code or not receipt['result']['functional_success']:
         raise EvidenceError(f'native {mode} capture failed')
     request = validate_manifest(manifest)
-    report = validate_native_output(out / 'native', manifest, mode, binary.resolve(), model.resolve(), request, require_split=require_split)
+    report = validate_native_output(out / 'native', manifest, mode, binary.resolve(),
+                                    model.resolve(), request, require_split=require_split,
+                                    widening_policy=widening_policy)
     return (report, receipt, settle)
 
 def _ordinary(binary, model, out):

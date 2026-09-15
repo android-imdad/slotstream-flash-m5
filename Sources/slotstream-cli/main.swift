@@ -13,6 +13,9 @@ struct Slotstream: ParsableCommand {
         version: SlotstreamBuild.version,
         subcommands: [
             Run.self, Serve.self, Pull.self, Doctor.self, Parity.self, ElasticCheck.self, JANGCheck.self, M5Check.self,
+            WideningCheck.self,
+            ReadSchedulingCheck.self,
+            FlashColumnNorms.self,
             FlashCapture.self, FlashTokenize.self, FlashTokenizePrompts.self,
             NgramGolden.self, DequantGolden.self, TemplateCheck.self, SamplerGolden.self, GovernorCheck.self,
             PrefixCheck.self, ElasticDrill.self, RuntimeCheck.self, PullCheck.self,
@@ -314,6 +317,9 @@ struct Run: ParsableCommand {
     @Option(help: "Read the exact UTF-8 prompt from a file") var promptFile: String?
     @Option(help: "Write exact tokens, effective configuration and generation measurements as JSON")
     var statsJson: String?
+    @Option(name: .customLong("expert-widening"),
+            help: "Exact expert-code widening: scalar | packed4-to6 (default scalar)")
+    var expertWidening = AffineWideningPolicy.scalar.rawValue
     @Option(help: "Deterministic sampling seed") var seed: UInt64?
     @Flag(help: "Sample physical footprint during generation (diagnostic overhead)")
     var sampleFootprint = false
@@ -336,6 +342,9 @@ struct Run: ParsableCommand {
         if raw, !images.isEmpty {
             throw PlanError("--raw has no chat template to place an image in; drop one of them")
         }
+        guard let wideningPolicy = AffineWideningPolicy(rawValue: expertWidening) else {
+            throw ValidationError("--expert-widening must be scalar or packed4-to6")
+        }
         _ = try ContextConfiguration(maxContextTokens: maxContext, maxPrefillWaitMinutes: maxPrefillWait)
         let launchStart = RuntimeClock.now()
         let sem = DispatchSemaphore(value: 0)
@@ -343,7 +352,8 @@ struct Run: ParsableCommand {
         let plan = try model.announcedPlan(maxContext: maxContext, maxPrefillWait: maxPrefillWait)
         Task {
             do {
-                let engine = try await Engine(modelDir: model.modelURL, plan: plan)
+                let engine = try await Engine(modelDir: model.modelURL, plan: plan,
+                    expertWidening: wideningPolicy)
                 let loadSeconds = RuntimeClock.seconds(since: launchStart)
                 engine.generator.footprintSampling = sampleFootprint
                 let control = try engine.beginRequest()
@@ -435,6 +445,7 @@ struct Run: ParsableCommand {
                         "prompt_ids": ids, "output_ids": outputIds, "text": text,
                         "plan": plan.json(), "effective_prefill_chunk": engine.generator.prefillChunk,
                         "effective_pool_slots": engine.model.pool.slots,
+                        "effective_expert_widening": engine.effectiveWideningPolicy.rawValue,
                         "effective_prefill_cost_gb": Planner.prefillCostGB(engine.generator.prefillChunk),
                         "effective_expected_peak_gb": plan.expectedPeakGB + Planner.prefillCostGB(engine.generator.prefillChunk) - Planner.prefillCostGB(plan.prefillChunk) + workspaceGB + scopeGB + routerGB,
                         "extra_expert_workspace_gb": workspaceGB,
@@ -443,6 +454,11 @@ struct Run: ParsableCommand {
                         "experimental_memory_family": workspaceGB > 0 || scopeGB > 0 || routerGB > 0,
                         "optimizations": try JSONSerialization.jsonObject(with: JSONEncoder().encode(engine.model.optimizations)),
                         "effective_mtp": engine.model.mtpHead != nil && engine.generator.speculationEnabled,
+                        "effective_vision": engine.visionAllowed,
+                        "numerical_environment": [
+                            "mlx_enable_tf32_raw": ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] as Any? ?? NSNull(),
+                            "effective_tf32": ProcessInfo.processInfo.environment["MLX_ENABLE_TF32"] != "0",
+                        ],
                         "load_seconds": loadSeconds, "encode_seconds": encodeSeconds,
                         "launch_seconds": RuntimeClock.seconds(since: launchStart),
                         "sampling": ["greedy": greedy, "seed": seed.map(String.init) ?? "default",
