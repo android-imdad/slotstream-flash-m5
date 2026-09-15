@@ -1,0 +1,1980 @@
+{
+  "cooled_failure_sha256": "fc512fc8abe7ad4cac441774a98f13d249aeb9b8cb80b8f898445bf2d27b7def",
+  "cpu_sample": {
+    "complete": true,
+    "exact_output_and_work_vs_untraced": true,
+    "failure": null,
+    "limits": "CPU thread stack samples from an early short-prompt request interval under the recorded nominal or fair regime; not GPU kernel durations, utilization, or whole-request CPU percentages. Instrumented timings cannot support performance claims.",
+    "operating_conditions_before": {
+      "conditions": {
+        "lowPowerModeEnabled": false,
+        "thermalState": "fair"
+      },
+      "observed_at_utc": "2026-09-15T16:47:42.316204+00:00",
+      "provider": "Foundation NSProcessInfo",
+      "ready": false,
+      "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+    },
+    "report_sha256": "610fd06c0fcafa93653f255c5287a48749dee351150fb4e32f2e9fe5770cd35c",
+    "sample_sha256": "1a210eba27c818dbe42769146d876fac9baa4a9d4cf1e663d3913d24e47a8913"
+  },
+  "decision": {
+    "cohort_complete": false,
+    "complete_workloads": {
+      "python-deduplicate": {
+        "decode": {
+          "estimate": 0.5150186228808616,
+          "lower_95": 0.49446633882062496,
+          "pairs": 10,
+          "resamples": 10000,
+          "seed": 17,
+          "statistic": "median paired decode-time improvement fraction",
+          "upper_95": 0.561762243112562
+        },
+        "median_first_token_regression_fraction": -0.5053871883547543,
+        "pairs": 10,
+        "performance_thresholds_met": true
+      },
+      "sky-blue": {
+        "decode": {
+          "estimate": 0.5283407667479172,
+          "lower_95": 0.5210847450199982,
+          "pairs": 10,
+          "resamples": 10000,
+          "seed": 17,
+          "statistic": "median paired decode-time improvement fraction",
+          "upper_95": 0.5376787110417732
+        },
+        "median_first_token_regression_fraction": -0.4995057617232049,
+        "pairs": 10,
+        "performance_thresholds_met": true
+      }
+    },
+    "completed_pairs": 22,
+    "disposition": "thermally-inconclusive",
+    "eligible_complete_pairs": 21,
+    "failure": {
+      "error": "EvidenceError: timing is ineligible: non-nominal or unknown operating conditions",
+      "format": "slotstream-widening-study-failure-v1"
+    },
+    "qualified": false,
+    "required_pairs": 30
+  },
+  "exporter_sha256": "026faf2223063820987a8aa18113eed10939cca433014e1ccf6fe62d1453fd92",
+  "fixture_sha256": "ab767c3c09a6e76f3e1ee7a943054695a73da6242fa9bb296c3bc8cfc9be941b",
+  "format": "slotstream-jang-widening-qualification-session-v1",
+  "hardware": {
+    "chip": "Apple M5 Max",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.1\nBuildVersion:\t\t25F80\n",
+    "physical_memory_bytes": 51539607552
+  },
+  "harness_hashes": {
+    "Tools/flash/__init__.py": "08ccb41bc8876c38e53d5883f9331586108795fd9683a2d09d0c57471a1442da",
+    "Tools/flash/benchmark.py": "3378872a9962703028022ffdbb49f403a4778aef901097fed7d6aa5da974c1f2",
+    "Tools/flash/cache_study.py": "f73c1741913fc2a47edd376017b07d4cfbcc203a48c3245b1f18665a6d0d5fee",
+    "Tools/flash/calibrate.py": "76ea4f1ef9e6bcdbd7abb1e5621c4e93a0b953cbd5b86ace28de770bbd489ac0",
+    "Tools/flash/capture.py": "ae321076d1b1549181c8e91d8ddeb248c3c7c18b64a957c2d546c95a5486388d",
+    "Tools/flash/common.py": "7ce36413d88855505e300f8c424efa0158078af94665c6fedf25a76583ec487a",
+    "Tools/flash/corpus.py": "1e181f212a6116c86ce9537f49f1529dc5ecad8ae72ad4d867f3226a30ab7e32",
+    "Tools/flash/engine_bench.py": "0068b83eb40f866de0f48fcac3f54d61b7eb5667245ab0a5022b5ed0efd62378",
+    "Tools/flash/eval_env.py": "dd0ab043e87d0685e242af668b6f5c5f41f0b08464cf5d3a22572e32895650ca",
+    "Tools/flash/eval_gate.py": "a8a86824b974862c50e7b2bffce340ef71932027c521633c89b233a89051fc1f",
+    "Tools/flash/evaluate.py": "f0dad5fc13e74ccc1326d120cc021c2b37f5106d28ce32b9770bbc57ce30fb58",
+    "Tools/flash/export_findings.py": "4560c20b6de7a69f41ce56e260a175d935721d82ffdaeb0f67c632f2190a18e8",
+    "Tools/flash/gates.py": "7d309c2b8754741137ab17b19e9936ffc818f7dd740b68f9c88562ffee3e0e0d",
+    "Tools/flash/m5_probe.py": "1b75f071206afb1fb03a34d32cff5220336e92e8404706cc44963d6221999f03",
+    "Tools/flash/metrics.py": "61cc948531692b581ea1abaeda9b7c02d1b592f910e6c0723c90ba6573127f57",
+    "Tools/flash/mlx_dispatch_probe.py": "d52c2c5c8a7ab2d70f6a5fe64007737c2f494a93e245219a1a25b087ecfc806d",
+    "Tools/flash/observe.py": "fe1c3279863ae58b8184dc416a3ce220b8d8fc1cbb6f41669b05377e0c147ba4",
+    "Tools/flash/oracle.py": "a5c130215a98011f75799d1c92643db9e0453c0355fc690978097eb4c282511a",
+    "Tools/flash/prefetch_cost_study.py": "7ac785108518005e8651d2521937a1e90c30b2a75b66805a7e32648737284a65",
+    "Tools/flash/prefetch_study.py": "03b90deb47f7b24bd9459aee9e1f1d6484ada99660af40c31c65d842a7c6c2e9",
+    "Tools/flash/prompt_corpus.py": "f73d424190793495e146036d7a04dea78731e7b959582b4043c32ff6384549af",
+    "Tools/flash/read_schedule_study.py": "2a2a96c0aaed5336c412fc9fb895b6e9135378517725c3f065ed96f6d85ff29e",
+    "Tools/flash/readiness.py": "ec8227ac9920fef870a6b19c85e341ceec12add3d90752b68f5c782d6e406bf9",
+    "Tools/flash/receipts.py": "fbdacade52fb5376117765403e7aadbc85ff3ed6f0297f55b7b2a49ea0bd768b",
+    "Tools/flash/replay.py": "bb41f533633a74078a80f9f0356c1c70179f7a540df717d6d118b8cddc007d47",
+    "Tools/flash/requirements-eval.lock": "ab59904aeeacd07c7c7d748bc14620899987966fdf87126826e8168a16bf0574",
+    "Tools/flash/schemas/authored-corpus-v1.json": "84149ce99f6ac859ca929d46f344b7dacd03102e4f15a1d653fe59b0af264811",
+    "Tools/flash/schemas/capture-v1.json": "57fc5eaa9af704865195fde9a253082f6529e31f3313e1ce11450ca0268c77f6",
+    "Tools/flash/schemas/capture-v2.json": "738ed19122ff98dd755df459bf96cd9d010297c5b23066010532be4a9290ad35",
+    "Tools/flash/schemas/oracle-config-v1.json": "0175d5111ccafa3eff1159788b0f90765beb92a3842fcd75725add8a397e784b",
+    "Tools/flash/schemas/oracle-evidence-v1.json": "25b942eabafffaceb1298a678609efb657913678ddb4d1c834956bcbd2fd6218",
+    "Tools/flash/schemas/prompt-artifact-v1.json": "c38108b4178129d7052d8c3fcc5ed02585ca59e9179d9b1e943085a6d0810981",
+    "Tools/flash/schemas/prompt-corpus-v1.json": "a69b03e156fa97487743a16f5861501838dace55e224c80766e1d6d3f0c2cac1",
+    "Tools/flash/schemas/prompt-source-v1.json": "c0c0ef424effd45cd0ecc9c501bb231983bbe43622299172e039fccbaefffe53",
+    "Tools/flash/schemas/quality-cohort-v1.json": "48c67712c4a411db56b21a4795f29625c43272927256e31f5e021ba08e6ce294",
+    "Tools/flash/schemas/quality-metrics-v2.json": "e0ad30a1b7fd42886567ec2132fd6133a5d9a70a190260fd0404a34d4d27e495",
+    "Tools/flash/schemas/quality-prepared-suite-v2.json": "380c5c2db9837a2d156ba945727f39a9758d5f1648b5b34adc2454fd89c17886",
+    "Tools/flash/schemas/quality-suite-v2.json": "7cd2a67275c1eb9087e0af8f2819e325cac9729d554cf0c2417b50178eddf5d3",
+    "Tools/flash/schemas/receipt-v1.json": "28aa93bb27c3d1005e082f2d4da2466375aa3fcaa8308dad7ebbcfe766830fae",
+    "Tools/flash/schemas/selection-v1.json": "d21d2c4bf7f04f787f4b57d61b710e4c92178bf6051b551c6f2c000e37a6c197",
+    "Tools/flash/schemas/tokenized-corpus-v1.json": "2f8f8b2a47c8a5a1f2ab777498374dd66331c62f6227132f8f08865eb3bc0fd4",
+    "Tools/flash/schemas/widening-study-v1.json": "f8ee277bd1ac37e38b665935a0c825089c765154585ba2b33540cddf3bb78479",
+    "Tools/flash/test_cache_study.py": "954748ab474932047f17c4d2d6d4ae4b06ed0170671f941ad23dd37c3dfcab88",
+    "Tools/flash/test_calibrate.py": "6b56a54105ce5733fe2ad2597eeb11607f59f1488cfa7e1898315d7ba9b08ba5",
+    "Tools/flash/test_capture.py": "174cfdddf22f7b28a78ae7bf2358dae4c610159da6eb83fd6bac274f7354a0e7",
+    "Tools/flash/test_corpus.py": "304312eb636a08d29becd938826448a177510d2ee441f926ca2de23973176931",
+    "Tools/flash/test_engine_bench.py": "447bd4281dda29ef3b81383c0c57dd4835d629d0bc6873a68bc92b551eeecd1e",
+    "Tools/flash/test_eval_env.py": "42c1a1dea0852e9215ca580712d5f92c9184291c5baabb95df64aa005dfa25ce",
+    "Tools/flash/test_launcher.py": "1c3ff7d6b4c9f8ef3ea5c1f1d749d9db80b5ecf03bb1453da84f0103aa4fd301",
+    "Tools/flash/test_m5_probe.py": "08053eba6c83026a64eeb951f8df6651709b7e5d0dec18ef1156c14a6b66395b",
+    "Tools/flash/test_metrics.py": "67467bd4bf5cab507d1d0b55242eeed923ac6743ac861a51df259e15f95a6e99",
+    "Tools/flash/test_observe.py": "2b43cc86a51a66dd3e8df00611ce9a92bb7f21956456aba6f0e9e4c0f7319615",
+    "Tools/flash/test_oracle.py": "3e4575440c49003726dd562e03020eae4deec5fb383ff7d06299259799fc7912",
+    "Tools/flash/test_prefetch_cost_study.py": "8af872cda38e61615ba7dd297983af207e3198f56778a3e3b460128ece4aaa72",
+    "Tools/flash/test_prefetch_study.py": "20d0ab12de8b971d85ea033f2205e64b64bbb0d5ae194a51aabe04109eb6554b",
+    "Tools/flash/test_prompt_corpus.py": "e62e94b629562f8f7410b3782c607e07539510cbc8707b3ced62754a89c6547c",
+    "Tools/flash/test_read_schedule_study.py": "6ca6585d2f3a79cb7a2c1f831d03b8a0298759f487554f779d23dae8fa0ee625",
+    "Tools/flash/test_receipts.py": "4f7010c828768272f5976bedc1447dc00e2d14d6442ac01fbb481e3b03c64842",
+    "Tools/flash/test_replay.py": "22f0dce16c661b7308f4e5343dde881787a32db875f1978ce7c64986b85b9130",
+    "Tools/flash/test_tokenize.py": "4cf8b20a019c8ab2b9af6b9c354476317f98f0c9179347c2f1d9ff8e77f27b3e",
+    "Tools/flash/test_whole_expert_study.py": "b4087b813da785fbc0b7905d307950725464b10bfb8e5e9e4fea347a3fc66485",
+    "Tools/flash/test_widen_study.py": "17b22f7f5506db4ba968bbdfb41aab489ad36f770a95babc374e73ceb297d789",
+    "Tools/flash/tokenize_corpus.py": "90acc62287f535d430ba64e3063029a0fee1b905625acf1c5ebbfba7fe25f730",
+    "Tools/flash/whole_expert_study.py": "dbcf57eea519edd250b3b80c52a609df9e32b41c8e6657511a5e22387e9f650a",
+    "Tools/flash/widen_study.py": "185ba061851d4daa35ac504736728cd38e6ff7e2887d1b3873cb953b349f3817"
+  },
+  "host_tests": {
+    "log_sha256": "33a48a73bc38ccd3f4269b672ff8bfca0cd35612992dad531df2a3ee465a7815",
+    "passed": 228
+  },
+  "limits": "Fixed short-prompt widening qualification and separate raw-code diagnostic. No broad held-out quality, GPU utilization, new kernel speedup, default activation, serving exposure or upstream release.",
+  "medians": {
+    "python-deduplicate": {
+      "packed4-to6": {
+        "decode_seconds": 14.202754854,
+        "decode_tokens_per_second": 4.999049243658092,
+        "first_token_seconds": 1.928105854,
+        "load_seconds": 0.817399667,
+        "prefill_seconds": 1.9273843125,
+        "request_seconds": 16.166426125
+      },
+      "scalar": {
+        "decode_seconds": 29.4761321045,
+        "decode_tokens_per_second": 2.408885182357639,
+        "first_token_seconds": 3.8795631459999997,
+        "load_seconds": 0.8263273545,
+        "prefill_seconds": 3.878873521,
+        "request_seconds": 33.4284328335
+      }
+    },
+    "sky-blue": {
+      "packed4-to6": {
+        "decode_seconds": 5.8790060415,
+        "decode_tokens_per_second": 5.443181894303147,
+        "first_token_seconds": 1.8011409795,
+        "load_seconds": 0.8305437715,
+        "prefill_seconds": 1.8004328125,
+        "request_seconds": 7.7316768335
+      },
+      "scalar": {
+        "decode_seconds": 12.516578166999999,
+        "decode_tokens_per_second": 2.5566752241093855,
+        "first_token_seconds": 3.5738348330000003,
+        "load_seconds": 0.8129757915,
+        "prefill_seconds": 3.573128021,
+        "request_seconds": 16.0864775625
+      }
+    }
+  },
+  "native_binary_sha256": "f63dc19f1ad46595074447199c96148212ef970c153361cfcdb35f6094b4c286",
+  "native_checks": {
+    "failed": 0,
+    "passed": 54,
+    "skipped": 0
+  },
+  "pairs": [
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.02807154099719,
+          "first_text_seconds": 1.898596166,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10000192864,
+          "receipt_sha256": "b30875584c41d5e803d1ce130d6e06e6356c551840bb71a583fabc2b7ad7b5ab",
+          "settling_sha256": "ee1028608731cd247e389f8a2e858e49d302b65fd2b7fac7528df232ddd9f95d",
+          "stats_sha256": "352069a30b9a9de4ad74a5f4588f9e1144b0211aadd1d5c2a6d8e14e22be5303",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.855785042,
+            "decode_tokens_per_second": 5.464681468066772,
+            "first_token_seconds": 1.898514833,
+            "load_seconds": 0.8381215,
+            "prefill_seconds": 1.897772167,
+            "request_seconds": 7.762788875
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.01666641599877,
+          "first_text_seconds": 5.712287416,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10000373136,
+          "receipt_sha256": "26d818b9d747f0a2c5b7257eaeab7b3a478b3693b70ffd642671c904ba083bd3",
+          "settling_sha256": "1aa3b41be19e8ade1bb80708fcfdc361a7da402db3810c9cc2848a698a3172a9",
+          "stats_sha256": "4a8401cb1df647a6507b7df699086a015fdd92aae57d4d8363800ca0b189b5f7",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.751849708,
+            "decode_tokens_per_second": 2.5094398642358904,
+            "first_token_seconds": 5.712193125,
+            "load_seconds": 0.905927791,
+            "prefill_seconds": 5.711425666,
+            "request_seconds": 18.472031458
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 32,
+      "pair_index": 0,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.02633925000555,
+          "first_text_seconds": 1.774579708,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10005026120,
+          "receipt_sha256": "ff43def463df65fff3c5ac3a279b73f82c48c44b6cc4041099d5408107321156",
+          "settling_sha256": "1f66b6caa1169971e429f1cdc28cc99855955a5388124236073fb3bab2d0f90a",
+          "stats_sha256": "cdcf53502fd5f34cd26b6297be16987e27cbe5a2db4458dcf3625070f7b968f8",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.852732416,
+            "decode_tokens_per_second": 5.4675316972495605,
+            "first_token_seconds": 1.774483917,
+            "load_seconds": 0.87300025,
+            "prefill_seconds": 1.773750833,
+            "request_seconds": 7.636175041
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.02739720799582,
+          "first_text_seconds": 3.551012042,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012071264,
+          "receipt_sha256": "2785ff534acb572001a1cec6af03ea5749c2077b2c7b9edd2e8553b46e17dd57",
+          "settling_sha256": "bdec29c5ba5b088cf62c09b2ba56f1a5ad8db168d02d0f2a3777628000d94457",
+          "stats_sha256": "4d8cf18fd4d710b52520ae73d15e8044f5f8ca7f7b67783570adeccfdc91cd78",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.58014175,
+            "decode_tokens_per_second": 2.5436915287540383,
+            "first_token_seconds": 3.550923625,
+            "load_seconds": 0.797876541,
+            "prefill_seconds": 3.550203,
+            "request_seconds": 16.139949208
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 32,
+      "pair_index": 1,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.025268499994127,
+          "first_text_seconds": 1.826199417,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9992115456,
+          "receipt_sha256": "e629f163bd2ca1826dcb9d58ab59dca1c43fd43b45e2586c871f7a3aee3f1c72",
+          "settling_sha256": "3962406a226f295f36f66a176739c02adb6cd6d14616d2d89e8b35d0de9b7253",
+          "stats_sha256": "690561cb751b8992a75676f88895c9b39492425a7549ff2931c9b9ca3e0d0fcf",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.829511291,
+            "decode_tokens_per_second": 5.489310922067138,
+            "first_token_seconds": 1.8261135,
+            "load_seconds": 0.849429292,
+            "prefill_seconds": 1.825365542,
+            "request_seconds": 7.663909542
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.01682458400319,
+          "first_text_seconds": 3.530529667,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012071312,
+          "receipt_sha256": "797543d53472c42df6109877b9e901b1a37ee7ec3da9b7ab131df1c0140876f3",
+          "settling_sha256": "9970debf13eba585bec7ad8bdd45fc5b901eb36704cb82d5234f324373f418e9",
+          "stats_sha256": "da6c1c56e1c1af76c41b080ff2a070d92d6ca1fb25193b4a241aadf301c26f60",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.689215042,
+            "decode_tokens_per_second": 2.521826597948201,
+            "first_token_seconds": 3.53043675,
+            "load_seconds": 0.794484375,
+            "prefill_seconds": 3.529738375,
+            "request_seconds": 16.2277735
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 32,
+      "pair_index": 2,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.022814584001026,
+          "first_text_seconds": 1.870286583,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10004698464,
+          "receipt_sha256": "c93b1567f99bb4586511da5781d6ea9a178c7fe291a2821f8ae64cf01d16ce08",
+          "settling_sha256": "febe0d7d084adce249fb80fa266aaede597bb529ce1c4196152c55b81160c524",
+          "stats_sha256": "e9cbf69fe865f2f31f0ebca92aecdfeab5bbf4cc3f1f15034b09e814c85fe0c4",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.966248416,
+            "decode_tokens_per_second": 5.36350446189668,
+            "first_token_seconds": 1.870188625,
+            "load_seconds": 0.833018459,
+            "prefill_seconds": 1.869508041,
+            "request_seconds": 7.844746709
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.024072332998912,
+          "first_text_seconds": 3.576537583,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012251488,
+          "receipt_sha256": "c1f71077183e8c7b37414312ec1275e8ef18a727f7739c99bc005da4f21b9d12",
+          "settling_sha256": "76ce2c0edc452ceb07c54cbdd125edf80fcbd672d8ffe6fc0c8834b02d372e99",
+          "stats_sha256": "fac0fbd09869251810268358102c40ea0a9a3a225aef4e7272dd4a12bf08d4d3",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.601726292,
+            "decode_tokens_per_second": 2.5393346322967414,
+            "first_token_seconds": 3.576446375,
+            "load_seconds": 0.830071667,
+            "prefill_seconds": 3.575761042,
+            "request_seconds": 16.186474583
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 32,
+      "pair_index": 3,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.013853416996426,
+          "first_text_seconds": 1.763800167,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9986430232,
+          "receipt_sha256": "3eeed1c53bab62a5db91ccc1262ac5b7e064ce4a4214b14be71aa5d94821796c",
+          "settling_sha256": "61fceb3caebbe1214fce75c7315c77e145076281165c9f5388cd9a32460fa881",
+          "stats_sha256": "ceb7d20db45bc72c26280c5c98ded379b896fa0c8fc0d4b4e2c7fe10f0e0fce9",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.839127291,
+            "decode_tokens_per_second": 5.480271007162738,
+            "first_token_seconds": 1.763715208,
+            "load_seconds": 0.828032709,
+            "prefill_seconds": 1.762935333,
+            "request_seconds": 7.6110785
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.02233208299731,
+          "first_text_seconds": 3.61764975,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9996473648,
+          "receipt_sha256": "e944a06ec7d20d5289bb5fe9be1072491daed48427e7d9863449c3c24b363950",
+          "settling_sha256": "2d2a83eca2e4527e6a2851c9ef757f0285d47f04cdbfed402d600e8efda0b299",
+          "stats_sha256": "7e94e787dc6dc246554fa991839865df8c035fe944874faeba791313d41d37d6",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.291436667,
+            "decode_tokens_per_second": 2.60343854562693,
+            "first_token_seconds": 3.6175515,
+            "load_seconds": 0.823763958,
+            "prefill_seconds": 3.616775458,
+            "request_seconds": 15.916856125
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 32,
+      "pair_index": 4,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.024514666001778,
+          "first_text_seconds": 1.792532708,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10009908600,
+          "receipt_sha256": "e039ce44486e5c715a6f4ebc27eb23edd6965c835d1d6528ce28a6869f7e0a8a",
+          "settling_sha256": "df89de3fa0281e98fd42e979726b9df9ca0a53c03bc93f4a0c291b54238a96a1",
+          "stats_sha256": "218d8188827924fc7c576ffd770545f4de5d13d9bd33460fe5ecb464887b30e0",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 6.041414667,
+            "decode_tokens_per_second": 5.29677265405957,
+            "first_token_seconds": 1.792441542,
+            "load_seconds": 0.828069084,
+            "prefill_seconds": 1.791729375,
+            "request_seconds": 7.842297833
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.01816187499935,
+          "first_text_seconds": 3.6286755,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10017543448,
+          "receipt_sha256": "4a1471393dba71bff2d7a3e9a23c82d434678d85bc0548d060e9007cefe94c25",
+          "settling_sha256": "4aa97de542d4c8533d5560007c6fcfe58ed5b06038503cc711e1def637b5ddb3",
+          "stats_sha256": "6a0abb1e5459cb1708d22e692c7789e5a46f2e76f5c88448fec08bbe80dd8eaa",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.857587625,
+            "decode_tokens_per_second": 2.488802793595583,
+            "first_token_seconds": 3.628584584,
+            "load_seconds": 0.856726334,
+            "prefill_seconds": 3.62793075,
+            "request_seconds": 16.494930541
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 32,
+      "pair_index": 5,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.020760708001035,
+          "first_text_seconds": 1.834414792,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10000225632,
+          "receipt_sha256": "c8fddd12641e271259a43e36eec573d75e6f2da418fe6e28f5ecefa33bf99095",
+          "settling_sha256": "9a347159a3508ae7659a308072903353f1a21f89a86bf3e49738060faec470fb",
+          "stats_sha256": "93b897f933c2b1230d0dbcbd339cda9c6b86536b43883c86cec1486c6085c276",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.902227041,
+            "decode_tokens_per_second": 5.421682320539523,
+            "first_token_seconds": 1.83431825,
+            "load_seconds": 0.799298791,
+            "prefill_seconds": 1.833580459,
+            "request_seconds": 7.744613834
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.024894667003537,
+          "first_text_seconds": 3.571317833,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012644680,
+          "receipt_sha256": "8dcee9c8f6a5d0472deec0276161282f85ce2c4acfdc087defb8f1c7815493b7",
+          "settling_sha256": "adf359c97d6a3ec7424c31c16bfc29b8552f0ab11aa8e48a8721f8d230b00ce6",
+          "stats_sha256": "235f3ceedbdad81151ff887407b6b14251aa01b5d4367763cdaaf6306feb4648",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.453014584,
+            "decode_tokens_per_second": 2.569658919464733,
+            "first_token_seconds": 3.571223291,
+            "load_seconds": 0.807104709,
+            "prefill_seconds": 3.570495,
+            "request_seconds": 16.033005917
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 32,
+      "pair_index": 6,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.020368249999592,
+          "first_text_seconds": 1.809928959,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10013742432,
+          "receipt_sha256": "f7cbd0ee4b9e557f5113aff6e30c505ec37dcf1a3b9aecf91455cf07020cd381",
+          "settling_sha256": "6ac2b0b2eee7e50f889383facec000b6001539926d9546b3738ae29df89cd8a5",
+          "stats_sha256": "ad3cc5a0a6f22650f536527af97ff57bafcb5ba2f54ca750a2367709cd77d9dd",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 6.013508417,
+            "decode_tokens_per_second": 5.321352824507072,
+            "first_token_seconds": 1.809840417,
+            "load_seconds": 0.838314208,
+            "prefill_seconds": 1.80913625,
+            "request_seconds": 7.831468167
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.01995962500223,
+          "first_text_seconds": 3.636044208,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10011235680,
+          "receipt_sha256": "86c6dc163c93efb5e03f228c72fa67805716c8618b0a1915139160d8cedca43b",
+          "settling_sha256": "bfbcdd0da38a7ab317a2e3f8e7a83a5329f1ae61b1793d7670087608a7bb8aa7",
+          "stats_sha256": "30ebda4359ffec10b13930964ceb7b3f95235aa2a59aad9b6979ba96f46e9490",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.375528083,
+            "decode_tokens_per_second": 2.5857482432574104,
+            "first_token_seconds": 3.635960292,
+            "load_seconds": 0.809389,
+            "prefill_seconds": 3.635252708,
+            "request_seconds": 16.019681625
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 32,
+      "pair_index": 7,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.025819957998465,
+          "first_text_seconds": 1.780303542,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9989297456,
+          "receipt_sha256": "2f36af12b8286a841faf034856af45d4f2b69e11e9dc1ec9851c2f916fe5bf57",
+          "settling_sha256": "aa79b1131bf67444c461cb72d6102549a11fbf9b80432a2dffe24affbddd0120",
+          "stats_sha256": "9ed36eee8a963bca9e484f1ec6ba2635f0cef0a70db8298579674c1dc1b23e5c",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.71467175,
+            "decode_tokens_per_second": 5.599621710555816,
+            "first_token_seconds": 1.7802205,
+            "load_seconds": 0.803010958,
+            "prefill_seconds": 1.779529916,
+            "request_seconds": 7.503051709
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.024476834005327,
+          "first_text_seconds": 3.551555916,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10002912488,
+          "receipt_sha256": "bfd2f40e1fc9f7f121fa92e94582e5ff7139c3ae79ff3f0e8b85e76ad07f230e",
+          "settling_sha256": "ea4e6d17e35d01a8ce4398e5218b22673c45c023b3d07c81e87a787c81d63655",
+          "stats_sha256": "ecffd986c61b54245e6c3878f1422150e1fd6ac73a343a7d0ea4cdf633f7f2bd",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.324933166,
+            "decode_tokens_per_second": 2.5963629635149945,
+            "first_token_seconds": 3.551463834,
+            "load_seconds": 0.816562583,
+            "prefill_seconds": 3.550772583,
+            "request_seconds": 15.884913041
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 32,
+      "pair_index": 8,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.016454999997222,
+          "first_text_seconds": 1.771475083,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9990575384,
+          "receipt_sha256": "21d77b03ce8c7ddd54624e4d2bcefffdea6458ce9f1b78888604cf56224557d4",
+          "settling_sha256": "f6cdc5fc8f05518ae23a5cdd7cb30a95f80db3e51d96005a03fa79c65213d2d8",
+          "stats_sha256": "a11d8135d4a8e2091b8f0bb26492ba163e51d64224d59ecba036e7de9b501a75",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 5.939156667,
+            "decode_tokens_per_second": 5.387970345655811,
+            "first_token_seconds": 1.771377166,
+            "load_seconds": 0.807063167,
+            "prefill_seconds": 1.770718959,
+            "request_seconds": 7.718739833
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.028121499999543,
+          "first_text_seconds": 3.483279333,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 9990051072,
+          "receipt_sha256": "468f107ca7a9319f726bc3c8a78a32c99f2fd5b9801ee15c2eade907ad6b16cb",
+          "settling_sha256": "8c53206b67051d1b468b60e2b10bdd0391a7060d9e88aac7f8670b96f14c695b",
+          "stats_sha256": "b81984eaab089afef21e5071ea2f40c392e1e434b322c2e54c1abad603d091f3",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 12.274261083,
+            "decode_tokens_per_second": 2.6070815818249446,
+            "first_token_seconds": 3.483202125,
+            "load_seconds": 0.795482125,
+            "prefill_seconds": 3.482522958,
+            "request_seconds": 15.76556225
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 32,
+      "pair_index": 9,
+      "prompt_id": "sky-blue",
+      "prompt_tokens": 23
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.020805457999813,
+          "first_text_seconds": 1.867384083,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10054587744,
+          "receipt_sha256": "c03e4dd1776044ad00107f65b38a4209ca764c29bd857f1797c9c79e38bfe832",
+          "settling_sha256": "4464fa37c1a504751b7ba8be7362fe5e994e38f97bbd5424356954851f811caf",
+          "stats_sha256": "a1009409d6eb224fabb89878348bb4c3cf552eb4c287ea5080e1cb43eb2ee737",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 14.781006542,
+            "decode_tokens_per_second": 4.80346178037704,
+            "first_token_seconds": 1.86729975,
+            "load_seconds": 0.806638,
+            "prefill_seconds": 1.866657291,
+            "request_seconds": 16.65655475
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.016727750000427,
+          "first_text_seconds": 3.817512625,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10058405168,
+          "receipt_sha256": "ec463fd85a52047e62c1d2451f4b01f580432984b2c134c66c7b062d022b7c1f",
+          "settling_sha256": "6826801844b992543c1a141afbcc38dc157927f6bf9f95b2be2b67bebece5c07",
+          "stats_sha256": "0cc140b7cd0802e5e3ce5ae9a5671acaaea73e173f682776a1794d69cc629656",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 29.238422042,
+            "decode_tokens_per_second": 2.4283116201692043,
+            "first_token_seconds": 3.8174295,
+            "load_seconds": 0.818604958,
+            "prefill_seconds": 3.816714125,
+            "request_seconds": 33.064195959
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 71,
+      "pair_index": 0,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.033332207996864,
+          "first_text_seconds": 1.92177075,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10052900120,
+          "receipt_sha256": "60abf65375c54ddfe80a3f6841fe64a5ffabfcb8e181d6f3e51216f2065339a9",
+          "settling_sha256": "14dcf727844bac38f2a03888a0b01bbf4b67c39d0b95563571937630232238f1",
+          "stats_sha256": "fe2f6cae4195853ccf146d3cfd943d7360f3132d59e69ff61299539938e1e83b",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 14.175011708,
+            "decode_tokens_per_second": 5.008814205065487,
+            "first_token_seconds": 1.9216865,
+            "load_seconds": 0.833268959,
+            "prefill_seconds": 1.920926541,
+            "request_seconds": 16.105230375
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.021620624997013,
+          "first_text_seconds": 3.840808375,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10063910312,
+          "receipt_sha256": "e78b5c20aad9be90ac138fb2d59699a97df83f0ab81d5229f080e99954a8e83b",
+          "settling_sha256": "c2113f06209935e27b52ba8298d80a179f6a60b97b4b4bf8d3d386256860ae05",
+          "stats_sha256": "7d37a8933db5ade3b117ce6880cd5d8af6298e9495df236f804975c1b71b2d9f",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 29.135809459,
+            "decode_tokens_per_second": 2.4368638221605416,
+            "first_token_seconds": 3.840725083,
+            "load_seconds": 0.821144125,
+            "prefill_seconds": 3.840024958,
+            "request_seconds": 32.984723
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 71,
+      "pair_index": 1,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.025037542000064,
+          "first_text_seconds": 1.939343958,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10044085456,
+          "receipt_sha256": "93d296f7504399f3b06d60f169e76861c8005be44e0c0476c50eca3d33858c39",
+          "settling_sha256": "fbc5945ea5e7711775749d6243ee068bc28a493bc707749f65d5eac1762d5449",
+          "stats_sha256": "54bf16a2ac0f07deff7b6add335b51491aa4bb9c8e05ecb31ab2c269a73fa617",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 14.86516125,
+            "decode_tokens_per_second": 4.776268404084752,
+            "first_token_seconds": 1.939254958,
+            "load_seconds": 0.825473875,
+            "prefill_seconds": 1.938588375,
+            "request_seconds": 16.812861667
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.02366241600248,
+          "first_text_seconds": 5.216880542,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10087798232,
+          "receipt_sha256": "d293cf58f4a9076a19e2a468da8845506e181e677226884d1b4c0c495c781081",
+          "settling_sha256": "7e16f926d362b869a827cbebbd5302c9c1e033441a9f111b93164ae426f9a00d",
+          "stats_sha256": "e778e20be3c4283e8560b487c5b6aa17d553ee28418208e817bb9ca9ae8f9d90",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 41.146048459,
+            "decode_tokens_per_second": 1.7255605983828066,
+            "first_token_seconds": 5.216777416,
+            "load_seconds": 1.096418208,
+            "prefill_seconds": 5.214465875,
+            "request_seconds": 46.373241792
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 71,
+      "pair_index": 2,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.032014709002397,
+          "first_text_seconds": 1.948174458,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10060682640,
+          "receipt_sha256": "0a6dc63bfc71cbc9d8f626dcf34d9b8bed09e9685e1e43411ff97d54be082d70",
+          "settling_sha256": "41d9ca35c863959cb325d693cb8ef74d9a134d9fc3e5232bb7f990bda6419513",
+          "stats_sha256": "0e74c3c06c79f88e5c18f5582b7d7f0e5a81b52e919679f43623f9673d73e5f5",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 13.94386875,
+            "decode_tokens_per_second": 5.091843682191859,
+            "first_token_seconds": 1.948081958,
+            "load_seconds": 0.81488675,
+            "prefill_seconds": 1.947298208,
+            "request_seconds": 15.900014167
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.02811237500282,
+          "first_text_seconds": 5.42797775,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10082637200,
+          "receipt_sha256": "9e7dd35e57bc20ef7f8ff05aafd674242adb15188db2b82b55a3f65478b99db8",
+          "settling_sha256": "65f591a451bfa7eafaf67c3d013202d2b0db08e1d4af76a2b17a5b3dddb6261b",
+          "stats_sha256": "e25ff01b885d673faccca11fe82fb6afcf8afe1f525263a80b50b210cf5720d0",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 29.713842167,
+            "decode_tokens_per_second": 2.3894587445460735,
+            "first_token_seconds": 5.427878792,
+            "load_seconds": 1.306882208,
+            "prefill_seconds": 5.426663208,
+            "request_seconds": 35.154707625
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 71,
+      "pair_index": 3,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.029141040999093,
+          "first_text_seconds": 1.902427417,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10055144800,
+          "receipt_sha256": "1f76c00a88948a04279ade8d1ed6a6b04e7ff352cfea1b4fce2bfb4501b6b24b",
+          "settling_sha256": "d8ffb78e0696766cd24ec5f7c0f85a2129f8316f8d3d7473ccf13f6bc2022908",
+          "stats_sha256": "4496ad8e21e804f2554b06c70283bdea6ff1e4f2406f5ac30e507473c4558050",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 13.980786667,
+            "decode_tokens_per_second": 5.078398068084905,
+            "first_token_seconds": 1.902342167,
+            "load_seconds": 0.804323833,
+            "prefill_seconds": 1.901628917,
+            "request_seconds": 15.891116709
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.037947208998958,
+          "first_text_seconds": 3.759481625,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10064696744,
+          "receipt_sha256": "e09c2dd0ec8a8600ac5095faeb43eeb617001a0556d7c67824f2cbb110e30efa",
+          "settling_sha256": "6cbda55dfbbbb3917c77c6d25e2cd26446cd1795343fc05a09a9086319daaa05",
+          "stats_sha256": "94cf33a74612038946eb8efde0f6e6f079d86e58eed862bdf8c24ffa1e6ea399",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 28.918926375,
+            "decode_tokens_per_second": 2.4551395539143694,
+            "first_token_seconds": 3.759391833,
+            "load_seconds": 0.798900959,
+            "prefill_seconds": 3.758652458,
+            "request_seconds": 32.686568
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 71,
+      "pair_index": 4,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.04638066700136,
+          "first_text_seconds": 1.858054708,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10055914896,
+          "receipt_sha256": "37504e047ca28bdb1f9b16d1b099318ebed8be9449deb3108ba59d9881b424ab",
+          "settling_sha256": "1d5cecefec991aafed9caff5add0cbf2b14fd909c4e3e17ab9890cbe46ec1162",
+          "stats_sha256": "50a02e59dfc0e72353dcf8c8711a494d9d906936ab9fb46b00e97efc6bc33497",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 13.939093583,
+            "decode_tokens_per_second": 5.0935880139717975,
+            "first_token_seconds": 1.857970792,
+            "load_seconds": 0.795215792,
+            "prefill_seconds": 1.857306583,
+            "request_seconds": 15.805214208
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.033420457999455,
+          "first_text_seconds": 3.89812625,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10058683840,
+          "receipt_sha256": "15f1b471d008b7b5eaff96d00aa5e4aec40cfb69e3ddc1487b1e7d5b36f712cc",
+          "settling_sha256": "cee05f4ec06e4a124ec19eebe81a7e62ab226c44dab05916103b05e403313d46",
+          "stats_sha256": "b88cba7720b54352ff46bc8dbd9175c9f003606f24b5de2a24505e4ec710624d",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 28.861981083,
+            "decode_tokens_per_second": 2.4599835955758325,
+            "first_token_seconds": 3.898012792,
+            "load_seconds": 0.82564625,
+            "prefill_seconds": 3.897333417,
+            "request_seconds": 32.768573542
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 71,
+      "pair_index": 5,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.025522750001983,
+          "first_text_seconds": 1.925449583,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10058126688,
+          "receipt_sha256": "3f167b47b231252ea164cf2fa4c3a9494e161e3ae30c28164a9230cdd74118be",
+          "settling_sha256": "8bff699e92750a3893fca2f5e0a18bb3f76f14f3c04425c118fc9ae7f490bcd7",
+          "stats_sha256": "72d52421c59287948c8ed3b7e15874f2d586e839c5990db49ba0ee841df73c22",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 13.911074917,
+            "decode_tokens_per_second": 5.103847145071054,
+            "first_token_seconds": 1.925367125,
+            "load_seconds": 0.803480333,
+            "prefill_seconds": 1.924620917,
+            "request_seconds": 15.844614667
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.0512149999995,
+          "first_text_seconds": 4.556857333,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10078999928,
+          "receipt_sha256": "83716ad3c46a1fbd83f40f18eee3b92535a6968033a3d995c1736bc6301fc43a",
+          "settling_sha256": "c8123eb9beb6dd9996f102439e88e160558b005515bc19a63e04215fb1a16ca4",
+          "stats_sha256": "0f32270df081a778e71a7e6fee38362ab98aec37526581930a679fc0e8adabd2",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 35.350489792,
+            "decode_tokens_per_second": 2.008458734737748,
+            "first_token_seconds": 4.556756458,
+            "load_seconds": 0.827008459,
+            "prefill_seconds": 4.555533709,
+            "request_seconds": 39.915391834
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 71,
+      "pair_index": 6,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.01899516699632,
+          "first_text_seconds": 2.5961295,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10072151440,
+          "receipt_sha256": "2e67e44b30097e28b86f6c31e2f14eac3ee20ead962f0b6798b62eb002549db8",
+          "settling_sha256": "29f25f9b1b2286cdf7b52283e8e62bfd3fbab9355ac64dc8f0d184b3aff581b6",
+          "stats_sha256": "b62a4ba70bb187c42fe6b662c719384ea8a9e8b8896731de0304108762fee86a",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 19.068113375,
+            "decode_tokens_per_second": 3.7234936988096234,
+            "first_token_seconds": 2.596025875,
+            "load_seconds": 0.872224292,
+            "prefill_seconds": 2.595213042,
+            "request_seconds": 21.67257275
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.037501082995732,
+          "first_text_seconds": 4.522472958,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10069366184,
+          "receipt_sha256": "6ed65e4f93540154ab8db17c70d0f522162610ad7353ef7244dfed5f66d3cabc",
+          "settling_sha256": "66b4b40e753e1acb712465d0b4527b3492cb3afcbca88859513160bd9123c64b",
+          "stats_sha256": "208e9d30be4759a543a03e908aa51d0f5d968f3997398de6ef2de588fd380f0f",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 31.491204708,
+            "decode_tokens_per_second": 2.2545977728811124,
+            "first_token_seconds": 4.522386708,
+            "load_seconds": 1.1161345,
+            "prefill_seconds": 4.521715542,
+            "request_seconds": 36.022941875
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 71,
+      "pair_index": 7,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.016142749998835,
+          "first_text_seconds": 1.988714709,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10061845904,
+          "receipt_sha256": "92ad5b7cb65259e88a72b4cc81435046264f9a49c26d11a20292142725b3a49e",
+          "settling_sha256": "2405e54084d118bdd54ef7ea526657a12a2df5d285af2d401cfcdcb3441a3437",
+          "stats_sha256": "7cbd9bbd028e15f2800587cda516c1f4ad33d8a7f4ae07bf6662b8c62990d787",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 14.230498,
+            "decode_tokens_per_second": 4.989284282250698,
+            "first_token_seconds": 1.988624,
+            "load_seconds": 0.819912584,
+            "prefill_seconds": 1.987933042,
+            "request_seconds": 16.227621875
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.021880375003093,
+          "first_text_seconds": 3.83476125,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10056226216,
+          "receipt_sha256": "5a19b7a0b7d0a83fa088690776d182274c0bde02fe21062022095057eb86f9f8",
+          "settling_sha256": "40131e82e0bb9a243b46a48daeebe97626e95170dc4786cf2a27bd7a3aba84ca",
+          "stats_sha256": "c7714e577a4fa730c088128394fc524baf6bce4488632a98b6252c6c488010dd",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 29.148514417,
+            "decode_tokens_per_second": 2.435801666742624,
+            "first_token_seconds": 3.834678458,
+            "load_seconds": 0.8504665,
+            "prefill_seconds": 3.833986166,
+            "request_seconds": 32.991515291
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 71,
+      "pair_index": 8,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.017518417000247,
+          "first_text_seconds": 1.930955166,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10069595536,
+          "receipt_sha256": "5f188072d3795a129684cb99c24555349e77ca8e342aa64360da577fdae655da",
+          "settling_sha256": "b96ec4b642c019da2d1f075cfb19864be93917610713a2c97a97da0f7849656e",
+          "stats_sha256": "c6d0e888de19b37b939751c0bf1568363c197b9aed45608cf6ad3f03b3a0d555",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 15.351498625,
+            "decode_tokens_per_second": 4.624955630349738,
+            "first_token_seconds": 1.930844583,
+            "load_seconds": 0.831235708,
+            "prefill_seconds": 1.930147708,
+            "request_seconds": 17.290796875
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.029691875002754,
+          "first_text_seconds": 3.86120375,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10068055440,
+          "receipt_sha256": "c67338ad396e37ff5a6f51ea04b8c2706fef65402d4da2454abf7b09c0aedf3f",
+          "settling_sha256": "6300c861247967a62ee28da91fa0087b495cc884d0dcf208af898a2c53a7d968",
+          "stats_sha256": "aaf2867b15a9496937b46f62afdbf48348c1fb5e440ee95d005eb95837f3b856",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 29.923167333,
+            "decode_tokens_per_second": 2.3727434736395523,
+            "first_token_seconds": 3.8611135,
+            "load_seconds": 0.819985792,
+            "prefill_seconds": 3.860413625,
+            "request_seconds": 33.792669708
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 71,
+      "pair_index": 9,
+      "prompt_id": "python-deduplicate",
+      "prompt_tokens": 27
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.019845499999064,
+          "first_text_seconds": 1.801306667,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012890464,
+          "receipt_sha256": "cce8886b2c4db2ea8bdbc5c588c5ff23bf55255de3cda3e3d596ae97d48da3d9",
+          "settling_sha256": "f15bec216b2afcc962f1acd6aa9dea1543ce0d5e63a22fec40afa950d90096fa",
+          "stats_sha256": "fd7528257dadf4e182fafc7f75b0350e75d81df169ba26cfdea62904b801f400",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 24.680433125,
+            "decode_tokens_per_second": 5.186294719858163,
+            "first_token_seconds": 1.801203708,
+            "load_seconds": 0.815674209,
+            "prefill_seconds": 1.800347791,
+            "request_seconds": 26.489841875
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.027950957999565,
+          "first_text_seconds": 3.649280875,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10021819768,
+          "receipt_sha256": "c784db6e32a5434e18d0fcbd69e56814a2a4ea58cdd089bea56581f94a64f22a",
+          "settling_sha256": "8a324d6625506071f827e6dfa1f805360f440c8d2f3c14282ec26e630a2082aa",
+          "stats_sha256": "71c51bb3cbfc6ad36dcfd9c74ba58c3c992d55caf80433cd59b8ef4f949aaf28",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 50.839196875,
+            "decode_tokens_per_second": 2.517742369430379,
+            "first_token_seconds": 3.649191875,
+            "load_seconds": 0.814327417,
+            "prefill_seconds": 3.648483792,
+            "request_seconds": 54.496430458
+          }
+        }
+      },
+      "order": [
+        "scalar",
+        "packed4-to6"
+      ],
+      "output_tokens": 128,
+      "pair_index": 0,
+      "prompt_id": "multiply-37-by-42",
+      "prompt_tokens": 26
+    },
+    {
+      "arms": {
+        "packed4-to6": {
+          "cooldown_elapsed_seconds": 30.02140700000018,
+          "first_text_seconds": 1.832486667,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": null,
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10012988816,
+          "receipt_sha256": "d15c632a7d9ac80c080f340128bb50ba7c15070caca6a4a10675aea76684593d",
+          "settling_sha256": "9ee9d1be28e2255a8417820aac45e0ce14e2957c0f72484d6e8cf8795ddedfdf",
+          "stats_sha256": "c98aca4d0b89d06f372836aff1be13428f659967f1515380c2110b1a868eed9c",
+          "timing_eligible": true,
+          "timings": {
+            "decode_seconds": 24.261598,
+            "decode_tokens_per_second": 5.275827255896335,
+            "first_token_seconds": 1.832392875,
+            "load_seconds": 0.865774042,
+            "prefill_seconds": 1.831258833,
+            "request_seconds": 26.103982958
+          }
+        },
+        "scalar": {
+          "cooldown_elapsed_seconds": 30.025215125002433,
+          "first_text_seconds": 3.618223666,
+          "generator_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "generator_system_after": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "fair"
+          },
+          "generator_system_before": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "ineligible_reason": "timing is ineligible: non-nominal or unknown operating conditions",
+          "launcher_swap_delta": {
+            "swapins": 0,
+            "swapouts": 0
+          },
+          "peak_bytes": 10034517392,
+          "receipt_sha256": "6c94c18ffa069427aa4f2428a3ebb7da346e03a4b713ac21726b2f7c77000b66",
+          "settling_sha256": "f52cefa76acc9b99194562fea163e6f76a79b2d7cdbc3bcfc48d24656eafcac7",
+          "stats_sha256": "3bb8dbb4fcfca2640d65749a04e129fa0c027f8db7f9b36cd7dec4f073164549",
+          "timing_eligible": false,
+          "timings": {
+            "decode_seconds": 85.205143,
+            "decode_tokens_per_second": 1.5022567358404644,
+            "first_token_seconds": 3.618136917,
+            "load_seconds": 0.831955541,
+            "prefill_seconds": 3.617343791,
+            "request_seconds": 88.831446333
+          }
+        }
+      },
+      "order": [
+        "packed4-to6",
+        "scalar"
+      ],
+      "output_tokens": 128,
+      "pair_index": 1,
+      "prompt_id": "multiply-37-by-42",
+      "prompt_tokens": 26
+    }
+  ],
+  "parity_report_sha256": "9f489f439013f1c2275011a920078fd34a34705581c629362188a5dd382116dc",
+  "request_profile": {
+    "complete": false,
+    "evidence_sha256": "55ceee367ea257590c6ff86f3aeb0ec5de138326f26b02b0f9a48eb6855ef1e3",
+    "limits": "Nominal thermal conditions remained unavailable. Prelaunch waiter stopped before any model run; clean long-prompt timing profiles remain unrun.",
+    "median_stats": {},
+    "rows": [],
+    "scope": "Planned raw code-prefix timing profile, not run"
+  },
+  "scope": "Current-source fixed short-prompt qualification attempts, thermally inconclusive overall",
+  "stopped_attempt": {
+    "after": {
+      "lowPowerModeEnabled": false,
+      "thermalState": "fair"
+    },
+    "before": {
+      "lowPowerModeEnabled": false,
+      "thermalState": "nominal"
+    },
+    "completed_arms": 39,
+    "failed_timing_arm": "python-deduplicate/pair-09/scalar",
+    "failure": {
+      "error": "EvidenceError: timing is ineligible: non-nominal or unknown operating conditions",
+      "format": "slotstream-widening-study-failure-v1"
+    },
+    "failure_sha256": "fc512fc8abe7ad4cac441774a98f13d249aeb9b8cb80b8f898445bf2d27b7def",
+    "functional_success": true,
+    "memory_qualified": true,
+    "receipt_sha256": "4c2fefb01e29ce5e50c28c6f184bd5fb71591ed3c96a4febbec878f37f724f7c",
+    "stats_sha256": "181fb3ccd35ee35e298811aee0ae027a1584046fbd78fb2e8ce399a2d7c81026"
+  }
+}

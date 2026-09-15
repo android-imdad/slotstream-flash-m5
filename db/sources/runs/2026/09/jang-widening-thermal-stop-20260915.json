@@ -1,0 +1,24 @@
+{
+  "format": "jang-widening-thermal-stop-v1",
+  "failure": {
+    "error": "EvidenceError: timing is ineligible: non-nominal or unknown operating conditions",
+    "format": "slotstream-widening-study-failure-v1"
+  },
+  "failure_sha256": "fc512fc8abe7ad4cac441774a98f13d249aeb9b8cb80b8f898445bf2d27b7def",
+  "completed_arms": 39,
+  "failed_timing_arm": "python-deduplicate/pair-09/scalar",
+  "stats_sha256": "181fb3ccd35ee35e298811aee0ae027a1584046fbd78fb2e8ce399a2d7c81026",
+  "receipt_sha256": "4c2fefb01e29ce5e50c28c6f184bd5fb71591ed3c96a4febbec878f37f724f7c",
+  "before": {
+    "lowPowerModeEnabled": false,
+    "thermalState": "nominal"
+  },
+  "after": {
+    "lowPowerModeEnabled": false,
+    "thermalState": "fair"
+  },
+  "functional_success": true,
+  "memory_qualified": true,
+  "peak_bytes": 10070660544,
+  "binary_sha256": "f63dc19f1ad46595074447199c96148212ef970c153361cfcdb35f6094b4c286"
+}

@@ -1012,3 +1012,6 @@ Reconciled completed JANG_6S baseline, widening, oracle and loading/prefetch fin
 ## [2026-09-15 14:23] update | records/decisions/jang-flash-public-wip-repository.md
 User authorized a public WIP research repository. Added fork attribution, measured M5 Max results and verified JANG model links; preserve upstream origin and publish only to the new repository.
 
+## [2026-09-15 17:01] update | records/plan/jang-flash-qualification-status.md
+Recorded current widening prerequisites and completed workload subsets; preserved both thermal exclusions; added shared tested cooldown and separate CPU diagnostics. Formal qualification and clean longer-prompt profiles remain pending. Static and brain gates pass; owned model and profiling processes stopped.
+

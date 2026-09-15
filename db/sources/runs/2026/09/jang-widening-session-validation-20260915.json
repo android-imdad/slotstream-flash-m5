@@ -1,0 +1,25 @@
+{
+  "format": "jang-widening-session-validation-v1",
+  "static_gates": {
+    "passed": true,
+    "log_sha256": "26167a8044883d2ee31db95666f4c7300329f36eb314dd69f837ef8cd97ad6bd"
+  },
+  "host_tests": {
+    "passed": 228,
+    "log_sha256": "33a48a73bc38ccd3f4269b672ff8bfca0cd35612992dad531df2a3ee465a7815"
+  },
+  "native_checks": {
+    "passed": 54,
+    "failed": 0,
+    "skipped": 0,
+    "report_sha256": "db5d9469b8d9a1a465fb9ba3a81698e9e021118c79636b48826f286136a1bb00"
+  },
+  "brain_gates": {
+    "passed": true,
+    "preexisting_log_warnings": 2,
+    "log_sha256": "df3764aa1b6eaaa8d3484be486f8ee63c1ef8ceb76c4ee6eba242b2709bcadac"
+  },
+  "owned_model_or_profile_processes": [],
+  "qualification": false,
+  "qualification_disposition": "thermally-inconclusive"
+}

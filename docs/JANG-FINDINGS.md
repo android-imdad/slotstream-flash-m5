@@ -24,7 +24,7 @@ Protocol: three paired rounds per workload on the local M5 Max with 48 GB unifie
 
 All paired outputs and completed work matched exactly. The maximum observed packed-process footprint was 20.69 GB. First-text measurements exclude loading and cooldown. The configured context limit is not evidence of long-prompt quality.
 
-This is a measured development checkpoint. The original ten-pair qualification and the parent final run-set remain pending. The saved upstream target was not beaten; it uses another quantization and persistent HTTP serving with MTP/lookahead, so it is not the causal control for the speedup above.
+This is a measured development checkpoint. Formal qualification was subsequently attempted and remains thermally inconclusive; the parent final run-set remains pending. The saved upstream target was not beaten; it uses another quantization and persistent HTTP serving with MTP/lookahead, so it is not the causal control for the speedup above.
 
 [Canonical measurement](../db/records/measurements/jang-exact-widening-2026-09-15.md) · [Full benchmark method](../plans/009-oracle-execution.md#completed-24-gb-benchmark) · [Saved upstream target](../BASELINE.md)
 
@@ -81,11 +81,19 @@ The Apple Neural Engine is a separate device. The planned ANE work was limited t
 
 ## What remains
 
-- Complete the larger paired widening qualification; keep the current development result scoped to its actual workloads and budget.
+- Complete the paired widening qualification under suitable thermal conditions. Both attempts stopped at non-nominal endpoints; completed workload subsets cannot qualify the incomplete whole cohort. Keep the earlier development result scoped to its actual workloads and budget.
 - Implement the parent aggregate run-set and final qualification/reporting interfaces. Some commands in the original plan are still specifications, not existing tools.
 - Qualify broader tasks and long-context behavior before making broader claims. JANG_4M full-model evidence and publisher/BF16 reproduction remain separate gaps.
 - Treat CLI serving integration, default rollout and upstream integration/release as separate work. Existing scalar defaults remain.
 - Keep the original-checkpoint learned Expert Lookahead plan separate: JANG heuristic rejection does not evaluate that learned approach.
+
+The latest execution revalidated exact widening and added shared prelaunch
+cooldown handling. A separate CPU stack diagnostic observed SSD reads, packed
+expansion, staging and waits while preserving output/work equality. It ran under
+recorded fair conditions; its timings cannot support speed claims, and CPU
+stacks do not establish GPU utilization or kernel durations. Clean longer-prompt
+profiling remains open. [Current attempts, completed subsets and diagnostic
+limits](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md).
 
 [Current canonical plan](../db/records/plan/jang-flash-qualification-status.md) · [Detailed plan index](../plans/README.md) · [Admission decision](../db/records/decisions/jang-flash-admission-2026-09-15.md)
 

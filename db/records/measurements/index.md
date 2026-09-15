@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: records/measurements
-updated: 2026-09-15T13:45:14.567775Z
+updated: 2026-09-15T16:51:40.418693Z
 ---
 
 # records/measurements
 
+- [[records/measurements/jang-widening-qualification-attempts-2026-09-15]] — Current widening prerequisites pass; overall qualification remains thermally inconclusive
 - [[records/measurements/jang-support-validation-2026-09-12]] — JANG component, source-policy and transport validation passed; complete-model inference, KL, memory and throughput remain unqualified.
 - [[records/measurements/jang-prefetch-cost-screen-2026-09-15]] — JANG causal SSD-prefetch: empirical cost and overlap rejection
 - [[records/measurements/jang-loading-screens-2026-09-15]] — JANG exact-loading screens: rejected component candidates

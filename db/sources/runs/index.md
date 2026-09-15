@@ -2,11 +2,14 @@
 type: index
 scope: type-folder
 folder: sources/runs
-updated: 2026-09-15T14:07:37.952015Z
+updated: 2026-09-15T17:01:14.595777Z
 ---
 
 # sources/runs
 
+- [[sources/runs/2026/09/jang-widening-qualification-20260915]] — Current-source widening evidence, two thermal exclusions and a separate non-timing CPU sample
+- [[sources/runs/2026/09/jang-widening-cooled-stop-20260915]] — Cooled Plan011 cohort remains thermally inconclusive after its second scalar arithmetic run
+- [[sources/runs/2026/09/jang-widening-thermal-stop-20260915]] — Plan011 first current-source study excluded after a nominal-to-fair thermal endpoint
 - [[sources/runs/2026/09/jang-flash-findings-20260915]] — Portable JANG Flash findings from completed local experiments
 - [[sources/runs/2026/09/jang-support-validation]] — Passing source build, JANG numerical and streaming fixtures, regression catalogue and static transport gates; full-model inference untested.
 - [[sources/runs/2026/09/2026-09-11-release-0-2-15-published-and-installed]] — v0.2.15 CI-artifact acceptance 25/25, publication with verified attestation, installation and installed-release acceptance 31/31.
@@ -504,11 +507,8 @@ updated: 2026-09-15T14:07:37.952015Z
 - [[sources/runs/2026/09/2026-09-05-chronological-prefill-numerical-counterexample]] — Larger chronological pass fails full-state and greedy continuation gates despite fewer expert reads
 - [[sources/runs/2026/09/2026-09-05-optimization-corrected-mask-and-shared-overlap]] — Corrected indexer passes independent mask and full-state gates; shared prelaunch pilot fails its benefit and pair-count requirements
 - [[sources/runs/2026/09/2026-09-05-indexer-partial-tail-counterexample]] — Sparse indexer drops the current partial block because tensor true division replaced integer floor division
-- [[sources/runs/2026/09/2026-09-05-optimization-router-selection]] — Exact router and MTP selection checks pass; real request timing gates do not qualify selector or queue adoption
-- [[sources/runs/2026/09/2026-09-05-optimization-bounded-output]] — Socket saturation exposed a blocked send; corrected bounded queue passes 38 socket assertions and 74 live API checks
-- [[sources/runs/2026/09/2026-09-05-optimization-prefill-family-and-serving-intervals]] — Larger chronological prefill remains unqualified; short server A/A passes and all long paired timings are excluded
 
 ## More
 
-This folder has 531 files. The 500 most recent are listed above.
+This folder has 534 files. The 500 most recent are listed above.
 Use `dbmd query --type run --in sources` for the complete catalog.

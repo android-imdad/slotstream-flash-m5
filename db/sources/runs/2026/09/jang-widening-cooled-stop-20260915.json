@@ -1,0 +1,113 @@
+{
+  "format": "jang-widening-cooled-stop-v1",
+  "failure": {
+    "error": "EvidenceError: timing is ineligible: non-nominal or unknown operating conditions",
+    "format": "slotstream-widening-study-failure-v1"
+  },
+  "failure_sha256": "fc512fc8abe7ad4cac441774a98f13d249aeb9b8cb80b8f898445bf2d27b7def",
+  "completed_arms": 44,
+  "failed_timing_arm": "multiply-37-by-42/pair-01/scalar",
+  "stats_sha256": "3bb8dbb4fcfca2640d65749a04e129fa0c027f8db7f9b36cd7dec4f073164549",
+  "receipt_sha256": "6c94c18ffa069427aa4f2428a3ebb7da346e03a4b713ac21726b2f7c77000b66",
+  "before": {
+    "lowPowerModeEnabled": false,
+    "thermalState": "nominal"
+  },
+  "after": {
+    "lowPowerModeEnabled": false,
+    "thermalState": "fair"
+  },
+  "functional_success": true,
+  "memory_qualified": true,
+  "peak_bytes": 10034517392,
+  "settling": {
+    "cooldown": {
+      "elapsed_seconds": 30.025215125002433,
+      "interval_seconds": 5,
+      "observations": [
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 9.0667002950795e-05,
+          "observed_at_utc": "2026-09-15T16:35:33.758966+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 5.004874042002484,
+          "observed_at_utc": "2026-09-15T16:35:38.763596+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 10.008768416999374,
+          "observed_at_utc": "2026-09-15T16:35:43.767387+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 15.014091500001086,
+          "observed_at_utc": "2026-09-15T16:35:48.772592+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 20.017365957995935,
+          "observed_at_utc": "2026-09-15T16:35:53.775746+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 25.01993945799768,
+          "observed_at_utc": "2026-09-15T16:35:58.778203+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        },
+        {
+          "conditions": {
+            "lowPowerModeEnabled": false,
+            "thermalState": "nominal"
+          },
+          "elapsed_seconds": 30.025215125002433,
+          "observed_at_utc": "2026-09-15T16:36:03.783351+00:00",
+          "provider": "Foundation NSProcessInfo",
+          "ready": true,
+          "scope": "One pre-launch policy observation; all original request and qualification gates remain required."
+        }
+      ],
+      "stable_seconds": 30
+    },
+    "observed_elapsed_seconds": 2.004807500001334,
+    "policy": "fixed-before-full-model-launch",
+    "requested_seconds": 2.0
+  },
+  "binary_sha256": "f63dc19f1ad46595074447199c96148212ef970c153361cfcdb35f6094b4c286"
+}

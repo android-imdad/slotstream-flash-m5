@@ -22,6 +22,7 @@ import cache_study
 from common import (EvidenceError, atomic_json, fresh_output, harness_hashes, read_json,
                     sha256, validate_build_identity)
 from receipts import require_terminal_sampling, validate_receipt_file
+from readiness import wait_for_nominal
 
 FIXTURE = ROOT / "Tools/fixtures/flash/cache-study.json"
 REFERENCE_BINARY_SHA256 = "d3b0e7ffbcaf89186a8097a4dcd65493c595cf506adf7ef5098d787fc4a9c095"
@@ -294,7 +295,13 @@ def _run_arm(binary: Path, model: Path, prompt: dict[str, Any], policy: str,
                "--seed", "7", "--sample-footprint", "--stats-json", str(stats_path)]
     if policy != "scalar":
         command.extend(["--expert-widening", policy])
+    # The first complete-study attempt became thermally ineligible after
+    # repeated launches. Keep the original two-second VM settling interval,
+    # preceded by the same nominal window used by the 24 GB benchmark.
+    # Cooldown is outside model timing and never relaxes endpoint checks.
+    readiness = wait_for_nominal()
     settled = benchmark.settle_before_model_launch()
+    settled["cooldown"] = readiness
     code = benchmark.launch(evidence, MODEL_MEMORY_GB, MODEL_SECONDS, command,
                             run_set_id=run_set_id,
                             model_hash=sha256(model / "config.json"))

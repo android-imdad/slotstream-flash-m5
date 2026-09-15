@@ -15,6 +15,35 @@ import widen_study
 
 
 class WidenStudyTests(unittest.TestCase):
+    def test_cooldown_failure_prevents_model_launch(self):
+        with mock.patch.object(widen_study, "wait_for_nominal", side_effect=EvidenceError("cooldown failed")), \
+             mock.patch.object(widen_study.benchmark, "launch") as launch:
+            with self.assertRaisesRegex(EvidenceError, "cooldown failed"):
+                widen_study._run_arm(Path("binary"), Path("model"),
+                    {"id": "fixture", "text": "fixture"}, "scalar", Path("output"), "test")
+            launch.assert_not_called()
+
+    def test_cooldown_is_saved_and_precedes_settling_and_launch(self):
+        with tempfile.TemporaryDirectory() as raw:
+            output = Path(raw)
+            (output / "stats.json").write_text("{}")
+            model = output / "model"
+            model.mkdir()
+            (model / "config.json").write_text("{}")
+            events = []
+            readiness = {"stable_seconds": 30, "observations": [{"conditions": {"thermalState": "nominal"}}]}
+            receipt = {"result": {"functional_success": True}}
+            with mock.patch.object(widen_study, "wait_for_nominal", side_effect=lambda: events.append("cooldown") or readiness), \
+                 mock.patch.object(widen_study.benchmark, "settle_before_model_launch", side_effect=lambda: events.append("settle") or {"requested_seconds": 2}), \
+                 mock.patch.object(widen_study.benchmark, "launch", side_effect=lambda *a, **k: events.append("launch") or 0), \
+                 mock.patch.object(widen_study, "validate_receipt_file", return_value=receipt), \
+                 mock.patch.object(widen_study, "require_terminal_sampling"):
+                _, _, settled = widen_study._run_arm(Path("binary"), model,
+                    {"id": "fixture", "text": "fixture"}, "scalar", output, "test")
+            self.assertEqual(events, ["cooldown", "settle", "launch"])
+            self.assertEqual(settled["requested_seconds"], 2)
+            self.assertEqual(json.loads((output / "settling.json").read_text())["cooldown"], readiness)
+
     def rows(self, packed=0.8, first=1.0):
         result = []
         prompts = [item["id"] for item in widen_study.cache_study.load_fixture()["prompts"]]
