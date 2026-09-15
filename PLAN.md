@@ -116,7 +116,7 @@ Current local source state after the September 15 investigation. This is not an 
 | Full JANG_6S checkpoint and baseline | Complete | Pinned download verified; real generation and physical-memory evidence exist |
 | Tokenization, capture, metrics and terminal sampling | Complete at bounded scope | Immutable reference/corpus and versioned report validation |
 | Existing M5 GPU dispatch | Observed in instrumented diagnostic build | Production utilization unverified; no new ANE acceleration |
-| Exact packed widening | Implemented, explicit opt-in; current parity and screen pass | Both full-study attempts thermally inconclusive; complete cooled subsets do not qualify the whole cohort |
+| Exact packed widening | NEON CPU backend implemented under the existing explicit policy | Focused byte/source checks and standalone component comparison pass; new-backend full-model TPS remains unmeasured |
 | Neuron-block oracle | Closed at user-revised scope | Eight/six failed fidelity; four stopped incomplete; two not run |
 | Dependent predictor/sparse runtime/ANE | Not selected for that approach | No quality-passing neuron policy to advance |
 | Cache windows and loading layouts | Tested and rejected | No new policy or full-model artifact admitted |
@@ -132,6 +132,8 @@ JANG_4M full-model qualification, publisher/BF16 reference reproduction, broad/l
 Evidence: [[records/measurements/jang-flash-foundation-2026-09-15]], [[records/measurements/jang-exact-widening-2026-09-15]], [[records/measurements/jang-neuron-oracle-2026-09-15]], [[records/measurements/jang-loading-screens-2026-09-15]], [[records/measurements/jang-prefetch-cost-screen-2026-09-15]]. Admission decision: [[records/decisions/jang-flash-admission-2026-09-15]].
 
 Current-source follow-up: [[records/measurements/jang-widening-qualification-attempts-2026-09-15]] records passing prerequisites, both thermal stops and the separate bounded CPU sample. The CPU sample preserves exact output/work under recorded fair conditions but establishes no eligible speed or GPU-duration claim. Clean longer-prompt timing profiles never launched; owned prelaunch waiters were stopped, and no custom M5 kernel is admitted.
+
+Latest implementation-first follow-up: [[records/measurements/jang-simd-widening-2026-09-15]] records the new CAffine NEON backend, its exact tails and portable fallback, the release build, focused checks and the short conversion comparison. Earlier full-model timings and thermal exclusions belong to the preceding packed implementation. The next development performance comparison should match the saved 24 GB setup against that preceding packed baseline; component acceleration is not a new TPS claim. No scalar/serving default changed and no long model qualification was repeated.
 
 ## 0. Status tracker (living)
 Measured data lives in **[MEASUREMENTS.md](MEASUREMENTS.md)**; this file keeps the

@@ -27,6 +27,11 @@ All paired outputs and completed work matched exactly. The maximum observed
 packed-process footprint was 20.69 GB. First-text measurements exclude loading
 and cooldown. The configured context window is not a long-prompt quality test.
 
+The latest packed-widening implementation adds an ARM NEON CPU backend.
+Its conversion component is faster in a bounded comparison; full-model TPS
+for that backend has not yet been measured. The table above records the
+preceding implementation. [Latest implementation evidence](docs/JANG-FINDINGS.md).
+
 These measurements come from the implemented exact widening path. No new Neural
 Engine execution or native expert-prefetch worker was added. Neuron masks,
 reader scheduling and storage-layout experiments did not meet their admission

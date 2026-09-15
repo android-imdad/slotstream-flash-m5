@@ -22,10 +22,12 @@ let package = Package(
     ],
     targets: [
         .target(name: "CSlotpack"),
+        .target(name: "CAffine"),
         .target(
             name: "Slotstream",
             dependencies: [
                 "CSlotpack",
+                "CAffine",
                 .product(name: "MLX", package: "mlx-swift"),
                 .product(name: "MLXNN", package: "mlx-swift"),
                 .product(name: "MLXFast", package: "mlx-swift"),

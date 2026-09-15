@@ -73,7 +73,7 @@ private final class WideningFailure: @unchecked Sendable {
 
 extension Diagnostics {
     /// Byte-exact checks for the opt-in packed 4-to-6-bit affine-code widening.
-    /// This is pure Swift: it allocates bounded host buffers and touches no MLX
+    /// Uses bounded host buffers and the CPU backend, touching no MLX
     /// device, checkpoint, or filesystem state.
     public static func exactWidening() -> CheckReport {
         var c = CheckBuilder("exact-widening")
@@ -129,6 +129,45 @@ extension Diagnostics {
         }
         c.expect("all 65536 two-byte inputs match an independent bit oracle",
             exhaustive, firstMismatch)
+
+        // The individual two-byte cases above exercise the tail. Put every
+        // possible pair through the vector body as well, then cover its
+        // unaligned boundaries without permitting an over-wide final store.
+        do {
+            var bulk = [UInt8]()
+            bulk.reserveCapacity(131_072)
+            for word in 0 ... UInt16.max {
+                bulk.append(UInt8(truncatingIfNeeded: word))
+                bulk.append(UInt8(truncatingIfNeeded: word >> 8))
+            }
+            c.equal("vector body preserves every two-byte value",
+                try expand(bulk, count: bulk.count * 2, from: 4, to: 6, policy: .packed4To6),
+                oracle(bulk, count: bulk.count * 2, from: 4, to: 6))
+            var boundariesExact = true
+            for bytes in [2, 30, 32, 34, 62, 64, 66, 126, 128, 130] {
+                let source = Array(bulk[1000 ..< 1000 + bytes])
+                let expected = oracle(source, count: bytes * 2, from: 4, to: 6)
+                for offset in [1, 7, 15] {
+                    let sourceStorage = [UInt8](repeating: 0xa5, count: offset) + source + [0x5a]
+                    var targetStorage = [UInt8](repeating: 0xff, count: offset + expected.count + 1)
+                    try sourceStorage.withUnsafeBytes { input in
+                        try targetStorage.withUnsafeMutableBytes { output in
+                            try AffineCodes.widen(
+                                UnsafeRawBufferPointer(start: input.baseAddress! + offset, count: bytes),
+                                to: UnsafeMutableRawBufferPointer(start: output.baseAddress! + offset, count: expected.count),
+                                count: bytes * 2, from: 4, to: 6, policy: .packed4To6)
+                        }
+                    }
+                    boundariesExact = boundariesExact
+                        && Array(targetStorage[offset ..< offset + expected.count]) == expected
+                        && targetStorage.prefix(offset).allSatisfy { $0 == 0xff }
+                        && targetStorage.last == 0xff
+                }
+            }
+            c.expect("vector boundaries and unaligned tails preserve sentinels", boundariesExact)
+        } catch {
+            c.expect("vector body and tails widen exactly", false, String(describing: error))
+        }
 
         let boundarySource: [UInt8] = [0x10, 0x32, 0x54, 0x76, 0x98, 0xba]
         do {

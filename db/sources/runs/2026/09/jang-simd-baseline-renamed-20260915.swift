@@ -1,11 +1,10 @@
 import Foundation
-import CAffine
 
 /// Selects the exact integer-code expansion used when a checkpoint projection
 /// is narrower than the shared expert cache. The scalar implementation remains
 /// the default and the packed specialization is limited to exact 4-to-6-bit
 /// widening.
-public enum AffineWideningPolicy: String, Codable, Sendable {
+public enum BaselineAffineWideningPolicy: String, Codable, Sendable {
     case scalar
     case packed4To6 = "packed4-to6"
 }
@@ -13,7 +12,7 @@ public enum AffineWideningPolicy: String, Codable, Sendable {
 /// CPU row decoding with the checkpoint's original scale/output precision.
 /// Independent from the I/O and cache so real byte samples can be checked
 /// against MLX without loading a multi-gigabyte table.
-package enum AffineRow {
+package enum BaselineAffineRow {
     package static func decode(weights: [UInt8], scales: [UInt8], biases: [UInt8],
                                columns: Int, bits: Int, group: Int, fp16: Bool) throws -> [Float] {
         guard columns > 0, columns <= 65536, [3, 4, 6, 8].contains(bits),
@@ -25,7 +24,7 @@ package enum AffineRow {
                 let at = i / group * 2
                 let s = UInt16(scales[at]) | UInt16(scales[at + 1]) << 8
                 let b = UInt16(biases[at]) | UInt16(biases[at + 1]) << 8
-                let q = Float(AffineCodes.value(packed, index: i, bits: bits))
+                let q = Float(BaselineAffineCodes.value(packed, index: i, bits: bits))
                 if fp16 { return Float(Float16(Float(Float16(bitPattern: s)) * q + Float(Float16(bitPattern: b)))) }
                 return bf16Round(bf16ToFloat(s) * q + bf16ToFloat(b))
             }
@@ -38,7 +37,7 @@ package enum AffineRow {
 
 /// MLX affine codes form a little-endian bitstream, including codes crossing
 /// byte/word boundaries at three and six bits. No floating-point quantization.
-package enum AffineCodes {
+package enum BaselineAffineCodes {
     package static func value(_ bytes: UnsafeRawBufferPointer, index: Int, bits: Int) -> UInt8 {
         let bit = index * bits, byte = bit / 8, shift = bit % 8
         var word = UInt16(bytes[byte])
@@ -48,7 +47,7 @@ package enum AffineCodes {
 
     package static func widen(_ source: UnsafeRawBufferPointer, to target: UnsafeMutableRawBufferPointer,
                               count: Int, from bits: Int, to targetBits: Int,
-                              policy: AffineWideningPolicy = .scalar) throws {
+                              policy: BaselineAffineWideningPolicy = .scalar) throws {
         guard [3, 4, 6, 8].contains(bits), [4, 6, 8].contains(targetBits), targetBits >= bits,
               count >= 0, count <= Int.max / 8, count * bits % 8 == 0, count * targetBits % 8 == 0,
               source.count == count * bits / 8, target.count == count * targetBits / 8 else {
@@ -56,13 +55,20 @@ package enum AffineCodes {
         }
         if policy == .packed4To6, bits == 4, targetBits == 6, count > 0,
            !buffersOverlap(source, target) {
-            // NEON expands sixteen two-byte groups per iteration, without
-            // scratch storage or changing any code/scale/bias. The bridge
-            // handles unaligned buffers and the exact even-byte tail.
-            slotstream_affine_widen4to6(
-                source.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                target.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                source.count)
+            // Four nibbles occupy two input bytes and exactly three output
+            // bytes. Every output byte is assigned, so no clearing pass is
+            // needed and unaligned buffers remain safe.
+            var input = 0
+            var output = 0
+            while input < source.count {
+                let a = source[input]
+                let b = source[input + 1]
+                target[output] = (a & 0x0f) | ((a & 0x30) << 2)
+                target[output + 1] = ((a & 0xc0) >> 6) | ((b & 0x0f) << 4)
+                target[output + 2] = (b & 0xf0) >> 2
+                input += 2
+                output += 3
+            }
             return
         }
         target.initializeMemory(as: UInt8.self, repeating: 0)

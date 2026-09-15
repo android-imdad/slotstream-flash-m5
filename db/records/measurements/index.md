@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: records/measurements
-updated: 2026-09-15T16:51:40.418693Z
+updated: 2026-09-15T17:51:46.482558Z
 ---
 
 # records/measurements
 
+- [[records/measurements/jang-simd-widening-2026-09-15]] — NEON CPU widening is implemented; standalone conversion improves while full-model TPS remains unmeasured
 - [[records/measurements/jang-widening-qualification-attempts-2026-09-15]] — Current widening prerequisites pass; overall qualification remains thermally inconclusive
 - [[records/measurements/jang-support-validation-2026-09-12]] — JANG component, source-policy and transport validation passed; complete-model inference, KL, memory and throughput remain unqualified.
 - [[records/measurements/jang-prefetch-cost-screen-2026-09-15]] — JANG causal SSD-prefetch: empirical cost and overlap rejection

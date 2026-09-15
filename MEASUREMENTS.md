@@ -4386,6 +4386,15 @@ Swift compiler and active simulator processes were observed separately after the
 
 Evidence and immutable artifact hashes: [[sources/runs/2026/09/jang-widening-qualification-20260915]]. The earlier 24 GB development measurement remains a separate valid scoped result: [[records/measurements/jang-exact-widening-2026-09-15]]. Scalar and serving defaults are unchanged; parent final qualification, default activation and release remain pending.
 
+## JANG SIMD widening component result
+The explicit `packed4-to6` path now uses an ARM NEON CPU backend. It expands sixteen two-byte groups at once with structure loads/stores, writes every output byte without a clearing pass or scratch storage, and retains an exact tail and portable fallback. Existing Swift validation and overlap fallback remain intact. Generic scalar remains the default; scales, biases, cache geometry, routing and quantization are unchanged.
+
+A standalone component comparison used a 1,638,400-code projection, nine alternating paired rounds and 200 calls per arm. The previous Swift packed implementation and the new production widening code ran in the same process. Median conversion time was 0.190276 ms before and 0.019522 ms after: a 9.75x ratio of medians. Every pair retained exact bytes; the thermal endpoints were nominal and low-power mode was off. The JSON records all samples, including the slower first round. This is a CPU conversion measurement, not a reader-throughput or full-model TPS result.
+
+The release build passed. Its compiled C object includes NEON structure loads and stores. The focused native widening checks and bounded original-checkpoint byte comparisons passed, including exhaustive vector input pairs, unaligned boundaries, exact tails, overlap fallback and realistic projections. No long qualification campaign was repeated.
+
+Existing development TPS numbers refer to the previous packed backend. New-backend full-model throughput and formal qualification remain unmeasured; no new overall speed claim or default activation follows from the component result. Evidence: [[sources/runs/2026/09/jang-simd-widening-20260915]].
+
 ## JANG neuron-block oracle: fidelity rejection and operator stop
 The diagnostic oracle masks blocks of intermediate neurons inside each routed expert, while retaining full dense loading and down-projection computation. It does not implement sparse SSD reads. Original hidden values are scored against verified original column norms, and every selected mask is independently recomputed by the host. The extra diagnostic memory is charged before pool sizing.
 

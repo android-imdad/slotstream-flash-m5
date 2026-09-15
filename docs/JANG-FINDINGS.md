@@ -12,6 +12,13 @@ This [public WIP research fork](https://github.com/android-imdad/slotstream-flas
 
 ## Measured widening result
 
+The latest implementation adds an ARM NEON CPU backend to the existing
+`packed4-to6` option. Focused exact-byte and checkpoint-source checks passed.
+Its component comparison is recorded separately; full-model TPS for the NEON
+backend has not been measured. The development figures below belong to the
+preceding Swift packed implementation. [SIMD implementation and component
+evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md).
+
 A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening, about 2.2× scalar throughput.
 
 Protocol: three paired rounds per workload on the local M5 Max with 48 GB unified memory; a 24 GB process target; 32,768 configured context tokens; greedy seed 42; up to 128 output tokens; fresh CLI processes; prefix cache, MTP and vision off.

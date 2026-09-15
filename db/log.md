@@ -1018,3 +1018,6 @@ Recorded current widening prerequisites and completed workload subsets; preserve
 ## [2026-09-15 17:03] update | sources/runs/2026/09/jang-widening-qualification-20260915.md
 Verified every frozen cooled-cohort harness file against commit 0509f71; linked that immutable source before whitespace cleanup. Closure brain gates pass with the unchanged historical warnings.
 
+## [2026-09-15 18:01] update | records/plan/jang-flash-qualification-status.md
+Implemented the CAffine NEON backend for explicit packed widening. Standalone conversion comparison and focused native/source-byte checks pass; release build passes. Preserved scalar defaults and prior measurements; no full-model TPS result or long qualification campaign claimed.
+

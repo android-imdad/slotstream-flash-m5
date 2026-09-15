@@ -11,6 +11,11 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
 
 ## Completed
 
+- Latest optimization: the explicit packed-widening path now uses an internal
+  CAffine NEON backend. Release build, focused exhaustive/vector-tail checks and
+  bounded original-source comparisons pass. A standalone conversion comparison
+  is recorded; full-model TPS for this backend is unmeasured. See
+  [SIMD evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md).
 - Plans002–008,010,012: verified JANG_6S baseline; existing M5 diagnostic dispatch;
   tokenization, bounded capture, corpus/quality metrics and terminal sampling.
 - Plan011 implementation: exact packed4-to6 widening, default-off, with bounded
@@ -36,7 +41,9 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
 
 ## Remaining work
 
-1. Plan011's predeclared ten-pair qualification remains pending after two thermal
+1. Measure the new NEON backend against the preceding packed baseline using a
+   short matched 24 GB development comparison when resources permit.
+   Plan011's predeclared ten-pair qualification remains pending after two thermal
    stops. The cooled sky-blue/Python subsets are complete; arithmetic is not.
    Do not replace failed pairs or combine attempts. The separate 24 GB checkpoint
    remains development evidence.
@@ -68,6 +75,9 @@ A new method or budget needs its own predeclared investigation.
 - `.build/flash/runs/widen-qualify-cooled-20260915`
 - `.build/flash/runs/jang-stage5-cpu-sample-20260915`
 - `.build/flash/qualification-20260915`
+- `.build/flash/simd-widening-20260915`
+- `.build/flash/runs/pre-simd-widening-20260915`
+- `.build/flash/runs/simd-widening-source-component-20260915`
 
 The public portable extract is
 `db/sources/runs/2026/09/jang-flash-findings-20260915.json`. It preserves result

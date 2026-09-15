@@ -2,7 +2,7 @@
 
 ## Current disposition — September 15, 2026
 
-**IN PROGRESS — formal qualification is thermally inconclusive.** Current-source exact parity and the fresh screen passed. Both qualification attempts stopped at non-nominal thermal endpoints; the cooled attempt completed sky-blue and Python but not the full arithmetic cohort. No overall qualification or default activation is claimed. [Current evidence](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md).
+**IN PROGRESS — NEON optimization implemented; new-backend TPS unmeasured.** The existing `packed4-to6` policy now uses a CPU NEON bulk path with exact tails. The release build, focused vector/byte checks and bounded checkpoint-source comparisons pass. A short component comparison measured the conversion improvement; no long qualification campaign was repeated. [SIMD evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md). The earlier packed backend's qualification attempts remain [thermally inconclusive](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md); no overall qualification or default activation is claimed.
 
 [Evidence/current findings](009-oracle-execution.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
 
@@ -25,6 +25,14 @@ Add public `AffineWideningPolicy` with raw values `scalar` and `packed4-to6`, Co
 Add `--expert-widening scalar|packed4-to6` only to run and relevant diagnostic commands; do not put it in ModelOptions shared by serve. Serve must reject the unsupported flag before allocation. Report the effective engine policy in new run stats. Existing archived scalar stats without the field are recognized only through their verified known reference identity, not assumed for arbitrary binaries.
 
 ## Exact packed implementation
+
+Implementation follow-up: `Sources/CAffine/affine.c` now uses NEON structure
+loads/stores to expand sixteen two-byte groups per iteration. Swift retains
+the original validation and overlap fallback. The C backend needs no scratch
+storage, handles unaligned buffers and exact tails, and provides a portable
+fallback. `Package.swift` links the small internal CAffine target. Existing
+CLI/API policy names and generic scalar defaults are unchanged. Earlier full-model
+TPS results were measured with the preceding Swift packed loop, not this backend.
 
 Keep the old validation/error behavior and generic scalar routine for every other supported conversion. For a non-overlapping4→6 source/target pair, process four4-bit codes (two input bytes) into three complete output bytes. For source bytesa,b:
 
