@@ -25,6 +25,13 @@ Treat those commands below as intended interfaces. Public WIP fork availability 
 integration/release, JANG_4M full-model qualification or publisher/BF16 reproduction. The learned Expert Lookahead plan for the original checkpoint remains
 a separate unexecuted proposal.
 
+Later September 15 execution: current-source widening parity and a fresh screen
+passed, but both full-study attempts stopped at fair thermal endpoints. Complete
+cooled sky-blue/Python subsets do not qualify the incomplete whole cohort. A
+separate bounded packed-path CPU sample preserved exact output/work; it provides
+no GPU-duration or eligible performance claim. The clean longer-prompt timing
+profiles remained unrun. [Execution evidence](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md).
+
 [Current index](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md) · [Findings](../docs/JANG-FINDINGS.md) · [Admission decision](../db/records/decisions/jang-flash-admission-2026-09-15.md)
 
 > **Executor instructions:** Read this entire plan first. Follow the dependency table, execute one bounded stage at a time, and record each gate. This is a staged research and implementation plan: a rejected experiment is a useful result, but is not a shipped speedup. Do not enable an unsuccessful experiment or weaken a gate to finish the plan. Update the status in `plans/README.md` unless a reviewer owns that index.

@@ -20,7 +20,7 @@ measurement commits do not imply merge, push, upstream release or default rollou
 | [008](008-corpus-quality-metrics.md) | Freeze corpus and validate full-vocabulary quality metrics | P1 | L | 007,010,012 | DONE — reviewed `aa9b771`;896-position real cohort/metrics |
 | [009](009-neuron-block-oracle.md) | Measure neuron-block oracle quality and possible byte savings | P1 | L | 008 corpus and metrics | COMPLETE at user-revised scope — dense-ten exact; eight/six fail fidelity; lower counts stopped by user; no sparse runtime admission |
 | [010](010-prompt-tokenizer.md) | Freeze complete task prompts without inference | P1 | M | 007 tokenizer facade | DONE — reviewed `bc185df`, exact tokenizer overlap |
-| [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — opt-in path benchmarked at 24 GB (three pairs/workload); original ten-pair qualification remains pending |
+| [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — current parity/screen pass; both full-study attempts thermally inconclusive; completed cooled subsets do not qualify the whole cohort |
 | [012](012-archived-evidence-validation.md) | Verify archived harness bytes and immutable receipt joins | P1 | S | 008 uncommitted host implementation | DONE — reviewed in `aa9b771`; archive mutations rejected |
 | [013](013-balanced-read-scheduling.md) | Balance exact expert read jobs | P1 | M | 011 packed reader | COMPLETE — component rejected; default-depth reader calls about 40% longer, no generation activation |
 | [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
@@ -45,8 +45,10 @@ ANE execution was added.
 
 ## Pending, ranked
 
-1. **Plan011 qualification:** the original ten-pair study remains pending. The
-   separate three-pair-per-workload 24 GB checkpoint must keep its narrower claim.
+1. **Plan011 qualification:** both current-source study attempts stopped at fair
+   thermal endpoints. The cooled study completed sky-blue and Python, but not
+   arithmetic's required cohort. A fresh whole study under suitable thermal
+   conditions remains pending; no pair replacement or pooling is allowed.
 2. **Parent001 final tooling and qualification:** aggregate run-set creation,
    stage-seven gates/evaluator, required final coverage and selected-arm reporting
    are incomplete. Proposed interfaces in the parent plan are not runnable today.
@@ -62,6 +64,13 @@ runtime implementation. A different method/configuration requires its own
 predeclared quality, cost and performance investigation. Benchmark a stage before
 starting the next optimization; use the actual measured result to decide whether
 to proceed.
+
+**M5 profiling follow-up:** a bounded packed-path CPU stack diagnostic completed
+with exact output/work parity under recorded fair conditions. It observes reads,
+packed expansion, staging and waits, not GPU kernel durations. Clean 256-/1024-token
+request profiles remained unrun because nominal conditions were unavailable.
+No custom kernel is admitted from this evidence. [Current qualification/profile
+record](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md).
 
 ## Evidence and documentation
 

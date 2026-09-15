@@ -2,7 +2,7 @@
 type: run
 id: 01m2jzpe2xfqrwttmm8kx2j5rc
 created: 2026-09-15T16:51:39.741525+00:00
-updated: 2026-09-15T17:01:14.595777+00:00
+updated: 2026-09-15T17:03:28.775769+00:00
 summary: Current-source widening evidence, two thermal exclusions and a separate non-timing CPU sample
 binary: f63dc19f1ad46595074447199c96148212ef970c153361cfcdb35f6094b4c286
 captured_at: 2026-09-15
@@ -32,3 +32,5 @@ Frozen reproducible drivers: [request-profile preparation](jang-stage5-request-p
 Related exclusions: [[sources/runs/2026/09/jang-widening-thermal-stop-20260915]] and [[sources/runs/2026/09/jang-widening-cooled-stop-20260915]]. No new kernel, inference default, serving exposure, checkpoint or release was added.
 
 Validation closure: all existing static gates passed, including installer, downloader, memory and planner checks. The brain/projection/claims checks passed with the two pre-existing historical-log warnings. Original validation logs remain in `.build/flash/qualification-20260915`; [validation summary and hashes](jang-widening-session-validation-20260915.json) bind them. No owned model or profiling process remains. This does not change the thermally inconclusive qualification verdict.
+
+The complete frozen cooled-cohort harness matches Git commit `0509f71` byte-for-byte against its recorded harness hash map. A later whitespace-only cleanup of the shared readiness helper does not alter the saved evidence or its source identity.

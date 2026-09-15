@@ -36,4 +36,3 @@ def wait_for_nominal(*, stable_seconds=30, max_seconds=900, interval=5,
         if now - started >= max_seconds:
             raise EvidenceError("benchmark cooldown did not reach nominal conditions")
         sleep(min(interval, max_seconds - (now - started)))
-

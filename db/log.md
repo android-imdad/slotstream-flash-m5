@@ -1015,3 +1015,6 @@ User authorized a public WIP research repository. Added fork attribution, measur
 ## [2026-09-15 17:01] update | records/plan/jang-flash-qualification-status.md
 Recorded current widening prerequisites and completed workload subsets; preserved both thermal exclusions; added shared tested cooldown and separate CPU diagnostics. Formal qualification and clean longer-prompt profiles remain pending. Static and brain gates pass; owned model and profiling processes stopped.
 
+## [2026-09-15 17:03] update | sources/runs/2026/09/jang-widening-qualification-20260915.md
+Verified every frozen cooled-cohort harness file against commit 0509f71; linked that immutable source before whitespace cleanup. Closure brain gates pass with the unchanged historical warnings.
+

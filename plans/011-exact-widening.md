@@ -2,7 +2,7 @@
 
 ## Current disposition — September 15, 2026
 
-**IN PROGRESS — formal qualification remains.** Exact opt-in widening is implemented and its matched 24 GB development benchmark completed. The original ten-pair qualification and broader parent run-set are still pending.
+**IN PROGRESS — formal qualification is thermally inconclusive.** Current-source exact parity and the fresh screen passed. Both qualification attempts stopped at non-nominal thermal endpoints; the cooled attempt completed sky-blue and Python but not the full arithmetic cohort. No overall qualification or default activation is claimed. [Current evidence](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md).
 
 [Evidence/current findings](009-oracle-execution.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
 
@@ -47,6 +47,26 @@ Model component mode creates only CheckpointIndex/ExpertStore, never Engine/resi
 Admission: exact tests pass, packed CPU conversion is materially faster, and complete measured reader-phase evidence supports a plausible end-to-end benefit. A noisy control or unknown physical-read coverage is labeled inconclusive. No runtime performance claim follows solely from a microbenchmark. Do not broaden to metadata conversion/layout changes in this plan.
 
 ## Native parity and performance
+
+September 15 execution correction: the first current-source qualification attempt
+stopped after its nineteenth Python arm because an endpoint reported `fair`
+thermal conditions. Its incomplete cohort remains at
+`.build/flash/runs/widen-qualify-20260915` and supplies no qualification result.
+Subsequent ordinary arms require a continuous thirty-second window of observed
+nominal conditions with low-power mode off before the original two-second VM
+settling interval. This reuses the cooled development benchmark's policy and
+records the observations in `settling.json`. The wait is outside model timing;
+all existing endpoint, paging, exact-work, memory and performance gates remain
+unchanged. Restart the entire ten-pair-per-prompt cohort, with no replacement
+or reuse of individual pairs from the stopped attempt.
+
+The cooled successor at `.build/flash/runs/widen-qualify-cooled-20260915`
+also stopped: its second scalar arithmetic arm began nominal and ended fair.
+It preserves 44 completed launches and 22 complete pairs, with one pair
+timing-ineligible. Sky-blue and Python each completed ten eligible pairs; those
+subsets do not satisfy the required thirty-pair cohort. Formal qualification
+remains pending a suitable thermal window. Do not automatically replace the
+failed pair, pool either attempt, or describe the cooldown as a guarantee.
 
 Extend capture with explicit policy handling while preserving existing reference schemas. Scalar capture retains its existing format and behavior. Packed capture uses a separately named `slotstream-flash-widening-output-v1` containing the effective policy and the existing computational payload; host validation admits only this specific extra configuration/version. Preserve original observer semantics and128MiB reservation, normal numerical controls, cache capacity, input IDs and shapes. Do not weaken the old reference validator or call an unmodified archive a packed implementation.
 

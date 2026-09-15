@@ -15,6 +15,14 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
   tokenization, bounded capture, corpus/quality metrics and terminal sampling.
 - Plan011 implementation: exact packed4-to6 widening, default-off, with bounded
   parity and a matched three-pair-per-workload 24 GB development benchmark.
+- Plan011 follow-up: current-source component/native/host checks, fresh exact
+  parity and the fresh screen pass. Both full-study attempts are thermally
+  inconclusive. The shared cooldown is implemented and tested without changing
+  inference controls or acceptance thresholds.
+- Stage-five CPU diagnostic: a bounded packed short-prompt sample preserves
+  exact output/work. It ran under recorded fair conditions and has no eligible
+  performance timings or GPU-duration claim. Nominal-only long-prompt profiles
+  never launched; their owned waiters were stopped.
 - Plan009: dense-ten exact; eight/six fail fidelity. Four stopped by user after
   partial work, two untested. Do not resume lower-count tests automatically.
 - Plans004,013–015: cache windows, balanced read scheduling, expanded/source-native
@@ -28,8 +36,10 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
 
 ## Remaining work
 
-1. Plan011's predeclared ten-pair qualification remains pending. The separate
-   three-pair 24 GB checkpoint is measured evidence, not that qualification.
+1. Plan011's predeclared ten-pair qualification remains pending after two thermal
+   stops. The cooled sky-blue/Python subsets are complete; arithmetic is not.
+   Do not replace failed pairs or combine attempts. The separate 24 GB checkpoint
+   remains development evidence.
 2. Parent001's aggregate run-set, stage-seven gates/evaluator and final coverage
    remain incomplete. Proposed commands in the plan are not existing tooling.
 3. Broader/long-context qualification, JANG_4M full-model evidence and
@@ -52,6 +62,12 @@ A new method or budget needs its own predeclared investigation.
 - `.build/flash/runs/whole-expert-20260915`
 - `.build/flash/runs/source-native-20260915`
 - `.build/flash/runs/prefetch-cost-20260915`
+- `.build/flash/runs/widen-parity-qualification-20260915`
+- `.build/flash/runs/widen-screen-qualification-20260915`
+- `.build/flash/runs/widen-qualify-20260915`
+- `.build/flash/runs/widen-qualify-cooled-20260915`
+- `.build/flash/runs/jang-stage5-cpu-sample-20260915`
+- `.build/flash/qualification-20260915`
 
 The public portable extract is
 `db/sources/runs/2026/09/jang-flash-findings-20260915.json`. It preserves result
