@@ -1,3 +1,28 @@
+# Latest completed checkpoint — both storage layouts screened
+
+The user requested `commit and proceed`. The checkpoint through Plan013 was
+committed as `65d7e82` and `ba18325`; Plan014's expanded-layout experiment was
+committed as `2053804`. Plan015 then screened original-byte whole-expert records.
+Both layout screens are complete and rejected. Expanded total reader time was
+8.48% longer; source-native was essentially tied (0.44% longer point estimate),
+with no required 10% improvement. All timed cases were byte-exact and eligible.
+
+Evidence: `.build/flash/runs/whole-expert-20260915` and
+`.build/flash/runs/source-native-20260915`, each with independently revalidated
+artifact bytes, native source archive and decision. Latest build passed, 40 native
+T0 checks and 220 host tests passed. No model or owned test process remains.
+
+The new paths are diagnostic-only. No full-model repack, generation benchmark,
+serving/default activation, ANE execution or push followed these rejected screens.
+The previous 24 GB packed-widening engine benchmark remains the latest full-model
+result. Do not resume the user-stopped lower neuron-block tests. Predictor/ANE
+remains not_selected for that failed neuron approach; prefetch remains replay-only.
+
+Read Plans014–015 for exact screen scopes and results. Historical active-work and
+uncommitted-status statements below are superseded by this checkpoint.
+
+---
+
 # Completed checkpoint — whole-expert layout screen
 
 The user requested `commit and proceed`. Completed work through Plan 013 is now

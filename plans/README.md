@@ -21,6 +21,7 @@ A second fresh-context review checked executor readiness against the source. The
 | [012](012-archived-evidence-validation.md) | Verify archived harness bytes and immutable receipt joins | P1 | S | 008 uncommitted host implementation | DONE — reviewed in `aa9b771`; archive mutations rejected |
 | [013](013-balanced-read-scheduling.md) | Balance exact expert read jobs | P1 | M | 011 packed reader | COMPLETE — component rejected; default-depth reader calls about 40% longer, no generation activation |
 | [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
+| [015](015-source-native-layout.md) | Measure original-byte whole-expert records | P1 | M | 014 reported | COMPLETE — rejected; paired total reader time essentially tied, below the improvement gate |
 
 Execution checkout: `../slotstream-flash-m5`, branch `advisor/001-flash-m5`, starting at `93fb512`. The executor owns implementation there; the reviewer maintains this index and reviews each bounded stage. The original checkout holds the completed, verified download. Model weights are reused read-only; mutable build artifacts are separate. No merge, push, default activation or completed qualification is implied.
 
@@ -32,7 +33,7 @@ All new modes remain **off by default after qualification**. This plan exposes e
 
 Each stage records `accepted`, `rejected`, `blocked`, `already_used`, or `not_selected` with evidence/reasons. The plan stays TODO/IN PROGRESS while selected required work remains; a blocked required track prevents DONE. An unselected optional script need not exist or run. Large artifacts go under the already ignored `.build/flash/`, not `bench/flash/`.
 
-JANG_6S download, checksum verification and monitored smoke are complete (Plan 002). The M5 diagnostics are reviewed and committed after macOS file permission was granted on 2026-09-12. Basic file reads/Git were rechecked successfully and the exact leftover owned probe was stopped; no active profiler remained. Earlier system-trace budget failures and permission-blocked exports are preserved separately. An instrumented copy of pinned MLX confirmed grouped six-bit NAX submission and completed numerical evaluation; decode used qmv. Production trace utilization remains unverified and no LLM speedup is claimed. See Plan 003 review. Plans004–007 are now complete at their bounded scopes. The tokenizer/capture bridge preserves the original reference and exact chat answer boundary. Plan008 now builds the full frozen natural development corpus and quality metrics, followed by the dense-load neuron-block oracle. Storage-layout and heuristic-prefetch arms also remain unmeasured. Predictor training, sparse bundles/runtime, optional ANE, and final performance qualification remain conditional downstream work.
+JANG_6S download, checksum verification and monitored smoke are complete (Plan 002). The M5 diagnostics are reviewed and committed after macOS file permission was granted on 2026-09-12. Basic file reads/Git were rechecked successfully and the exact leftover owned probe was stopped; no active profiler remained. Earlier system-trace budget failures and permission-blocked exports are preserved separately. An instrumented copy of pinned MLX confirmed grouped six-bit NAX submission and completed numerical evaluation; decode used qmv. Production trace utilization remains unverified and no LLM speedup is claimed. See Plan 003 review. Plans004–007 are now complete at their bounded scopes. The tokenizer/capture bridge preserves the original reference and exact chat answer boundary. Plan008 now builds the full frozen natural development corpus and quality metrics, followed by the dense-load neuron-block oracle. Expanded and source-native storage layouts were screened in Plans014–015 and rejected; heuristic prefetch remains replay-only without timing admission. Predictor training, sparse bundles/runtime, optional ANE, and final performance qualification remain conditional downstream work.
 
 ## Findings considered and rejected
 
@@ -54,3 +55,11 @@ failed the predeclared component gate and remains diagnostic-only. The failed
 neuron prerequisite makes its trained predictor and optional ANE predictor
 `not_selected` for this approach. SSD prefetch remains replay-only without timing
 admission. No next optimization or full-model benchmark followed the rejection.
+
+
+After the user requested commit and continuation, Plans014–015 measured the
+existing expanded whole-expert layout and original-byte whole-expert samples.
+Both failed their reader-performance gates. Neither advanced to full-model
+repacking or generation. Code, tests and execution records are committed locally;
+no push or default activation is implied. The latest full-engine performance
+result remains the earlier matched 24 GB packed-widening benchmark.

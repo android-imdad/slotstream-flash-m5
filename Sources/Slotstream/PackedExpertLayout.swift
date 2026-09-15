@@ -164,6 +164,38 @@ package final class PackedExpertLayout {
         try beforeReadCommit?()
         try checkUnchanged()
     }
+    /// Bounded diagnostic source-native reader. The callback consumes one
+    /// complete original record on its I/O lane, before scratch is reused.
+    /// It may only write the caller's disjoint output row; it never uses MLX.
+    package func readTransformedBatch(_ keys: [ExpertKey], queueDepth: Int,
+        transform: (Int, UnsafeRawBufferPointer) throws -> Void) throws {
+        guard !keys.isEmpty, keys.count <= 10,
+              keys.allSatisfy({ (0 ..< manifest.layers).contains($0.layer) && (0 ..< manifest.experts).contains($0.expert) }) else {
+            throw CheckpointReadError.invalidRange
+        }
+        try checkUnchanged()
+        let failure = JoinedReadFailure()
+        let lanes = min(max(queueDepth, 1), keys.count)
+        DispatchQueue.concurrentPerform(iterations: lanes) { lane in
+            var scratch: UnsafeMutableRawPointer?
+            guard posix_memalign(&scratch, 16384, recordBytes) == 0, let scratch else {
+                failure.record(ModelError("source-native scratch allocation failed")); return
+            }
+            defer { free(scratch) }
+            for row in stride(from: lane, to: keys.count, by: lanes) {
+                do {
+                    try readFault?.beforeRead()
+                    let key = keys[row]
+                    try Self.read(fd, into: scratch, offset: (key.layer * manifest.experts + key.expert) * recordBytes,
+                        count: recordBytes)
+                    try transform(row, UnsafeRawBufferPointer(start: scratch, count: recordBytes))
+                } catch { failure.record(error) }
+            }
+        }
+        try failure.finish()
+        try beforeReadCommit?()
+        try checkUnchanged()
+    }
     /// The reader is a bounded seam for construction tests; production reads
     /// only the indexed original tensor spans. Faults run before publication.
     package static func build(directory: URL, identity: String, layers: Int, experts: Int, pieces: [Int],

@@ -16,6 +16,7 @@ struct Slotstream: ParsableCommand {
             WideningCheck.self,
             ReadSchedulingCheck.self,
             WholeExpertCheck.self,
+            SourceNativeCheck.self,
             FlashColumnNorms.self,
             FlashCapture.self, FlashTokenize.self, FlashTokenizePrompts.self,
             NgramGolden.self, DequantGolden.self, TemplateCheck.self, SamplerGolden.self, GovernorCheck.self,

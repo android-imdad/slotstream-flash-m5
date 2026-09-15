@@ -18,13 +18,18 @@ SIZES = {0: 3_174_400, 5: 3_584_000, 22: 3_993_600}
 RECORD = 4_300_800
 
 
-def decision(report, receipt):
-    if (report.get("format") != "slotstream-whole-expert-component-v1"
+def decision(report, receipt, *, representation="expanded"):
+    if representation not in ("expanded", "source-native"):
+        raise EvidenceError("unknown component representation")
+    source_native = representation == "source-native"
+    expected_format = "slotstream-source-native-component-v1" if source_native else "slotstream-whole-expert-component-v1"
+    if (report.get("format") != expected_format
             or report.get("check", {}).get("passed") is not True
             or report.get("layers") != LAYERS or report.get("experts") != EXPERTS
             or report.get("queueDepth") != 32):
         raise EvidenceError("component geometry or checks incomplete")
-    if report.get("originalRegionBytes") != sum(SIZES.values()) * 10 or report.get("artifactBytes") != RECORD * 30:
+    expected_artifact = sum(SIZES.values()) * 10 if source_native else RECORD * 30
+    if report.get("originalRegionBytes") != sum(SIZES.values()) * 10 or report.get("artifactBytes") != expected_artifact:
         raise EvidenceError("source/artifact byte accounting changed")
     if not report.get("rawReadControls") or any(row.get("noCacheReturnCode") != 0 or row.get("readAheadReturnCode") != 0
                                               for row in report["rawReadControls"]):
@@ -45,7 +50,8 @@ def decision(report, receipt):
             raise EvidenceError("unknown or duplicate component case")
         seen.add(identity)
         layer, count = identity
-        if case.get("rawSourceBytesPerCall") != SIZES[layer] * count or case.get("wholeSourceBytesPerCall") != RECORD * count:
+        whole_record = SIZES[layer] if source_native else RECORD
+        if case.get("rawSourceBytesPerCall") != SIZES[layer] * count or case.get("wholeSourceBytesPerCall") != whole_record * count:
             raise EvidenceError("per-call read bytes changed")
         if case.get("orders") != [["raw", "whole"] if (pair + LAYERS.index(layer)) % 2 == 0 else ["whole", "raw"] for pair in range(8)]:
             raise EvidenceError("pair count/order changed")
@@ -61,7 +67,7 @@ def decision(report, receipt):
         rows.append({"layer": layer, "count": count, "raw_median_seconds": statistics.median(raw),
                      "whole_median_seconds": statistics.median(whole),
                      "median_paired_reduction": statistics.median(1 - b / a for a, b in zip(raw, whole)),
-                     "read_byte_increase_fraction": RECORD / SIZES[layer] - 1})
+                     "read_byte_increase_fraction": whole_record / SIZES[layer] - 1})
     if len(seen) != 9: raise EvidenceError("missing component cases")
     reduction = statistics.median(1 - b / a for a, b in zip(totals["raw"], totals["whole"]))
     passes = reduction >= .10 and all(row["median_paired_reduction"] >= -.05 for row in rows)
@@ -72,18 +78,20 @@ def decision(report, receipt):
             "limits": "Repeated bounded sample; all reader work timed. No cold SSD or end-to-end inference claim."}
 
 
-def run(binary, model, output):
+def run(binary, model, output, *, representation="expanded"):
     output = fresh_output(output)
     try:
+        if representation not in ("expanded", "source-native"): raise EvidenceError("unknown component representation")
         if benchmark.archive(binary, output / "archive"): raise EvidenceError("archive failed")
         frozen = harness_hashes()
         atomic_json(output / "protocol.json", {"harness_hashes": frozen, "pairs_per_case": 8,
             "minimum_paired_total_reduction": .10, "maximum_per_case_regression": .05,
             "native_binary_sha256": sha256(output / "archive/bin/slotstream"),
-            "layers": LAYERS, "experts": EXPERTS, "batch_sizes": [1, 4, 10], "queue_depth": 32})
+            "layers": LAYERS, "experts": EXPERTS, "batch_sizes": [1, 4, 10], "queue_depth": 32, "representation": representation})
         atomic_json(output / "readiness.json", wait_for_nominal())
         destination = output / "launch"
-        command = [str((output / "archive/bin/slotstream").resolve()), "whole-expert-check",
+        subcommand = "source-native-check" if representation == "source-native" else "whole-expert-check"
+        command = [str((output / "archive/bin/slotstream").resolve()), subcommand,
                    "--model", str(model.resolve()), "--output", str((destination / "native").resolve())]
         if benchmark.launch(destination, .512, 180, command): raise EvidenceError("component launcher failed")
         receipt = validate_receipt_file(destination / "receipt.json")
@@ -92,7 +100,7 @@ def run(binary, model, output):
         if read_json(destination / "native/completion.json") != {"complete": True, "report_sha256": sha256(native)}:
             raise EvidenceError("native completion mismatch")
         if harness_hashes() != frozen: raise EvidenceError("harness changed during component run")
-        result = decision(read_json(native), receipt)
+        result = decision(read_json(native), receipt, representation=representation)
         result.update(native_report_sha256=sha256(native), receipt_sha256=sha256(destination / "receipt.json"),
                       protocol_sha256=sha256(output / "protocol.json"))
         atomic_json(output / "report.json", result)
@@ -108,5 +116,6 @@ def run(binary, model, output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for field in ("binary", "model", "output"): parser.add_argument("--" + field, type=Path, required=True)
+    parser.add_argument("--representation", choices=("expanded", "source-native"), default="expanded")
     args = parser.parse_args()
-    raise SystemExit(run(args.binary, args.model, args.output))
+    raise SystemExit(run(args.binary, args.model, args.output, representation=args.representation))

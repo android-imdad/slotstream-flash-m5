@@ -521,6 +521,76 @@ public final class ExpertStore {
         transferred = true
         return stagingArrays(buffers, rows: localKeys.count)
     }
+
+    package func buildSourceNativeSample(at directory: URL, layer: Int, experts: [Int]) throws -> SourceNativeExpertSample {
+        try ModelProcessGuard.acquire()
+        guard (0 ..< cfg.numLayers).contains(layer), !experts.isEmpty, experts.count <= 10,
+              Set(experts).count == experts.count,
+              experts.allSatisfy({ (0 ..< cfg.numExperts).contains($0) }) else {
+            throw ModelError("invalid source-native sample geometry")
+        }
+        let sourcePieces = refs[layer].map(\.rowBytes)
+        guard sourcePieces.reduce(0, +) * experts.count <= 256 << 20 else {
+            throw ModelError("source-native sample exceeds 256 MiB")
+        }
+        let original = try packedModelIdentity()
+        struct Identity: Encodable { let source: String; let layer: Int; let experts: [Int]; let format: String }
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
+        let identity = PackedExpertLayout.hex(try encoder.encode(Identity(source: original, layer: layer,
+            experts: experts, format: "original-source-pieces-diagnostic-v1")))
+        _ = try PackedExpertLayout.build(directory: directory, identity: identity, layers: 1,
+            experts: experts.count, pieces: sourcePieces, sourceUnchanged: {
+                guard try self.packedModelIdentity() == original else { throw ModelError("source-native source changed") }
+            }, reader: { _, expert, piece, destination in
+                try self.read(into: destination, layer: layer, piece: piece,
+                    offset: experts[expert] * sourcePieces[piece], count: sourcePieces[piece])
+            })
+        let layout = try PackedExpertLayout(directory: directory, identity: identity, layers: 1,
+            experts: experts.count, pieces: sourcePieces)
+        return SourceNativeExpertSample(layout: layout, layer: layer, experts: experts, owner: self)
+    }
+
+    package func readSourceNativeSample(_ sample: SourceNativeExpertSample, localExperts: [Int], queueDepth: Int) throws -> [MLXArray] {
+        guard sample.owner == ObjectIdentifier(self), !localExperts.isEmpty, localExperts.count <= 10,
+              localExperts.allSatisfy({ sample.experts.indices.contains($0) }) else {
+            throw ModelError("source-native sample ownership or keys mismatch")
+        }
+        let layer = sample.layer
+        let sourcePieces = refs[layer].map(\.rowBytes)
+        guard sample.layout.manifest.pieces == sourcePieces else { throw ModelError("source-native piece geometry changed") }
+        let buffers = try allocateStaging(rows: localExperts.count)
+        var transferred = false
+        defer { if !transferred { buffers.forEach { free($0) } } }
+        try sample.layout.readTransformedBatch(localExperts.map { ExpertKey(0, $0) }, queueDepth: queueDepth) { row, raw in
+            var offset = 0
+            for piece in 0 ..< 9 {
+                let count = sourcePieces[piece]
+                let input = UnsafeRawBufferPointer(rebasing: raw[offset ..< offset + count])
+                let destination = buffers[piece] + row * self.pieceRowBytes[piece]
+                if count == self.pieceRowBytes[piece] {
+                    memcpy(destination, input.baseAddress!, count)
+                } else if piece % 3 != 0 {
+                    guard self.cfg.format.isJANG, self.pieceRowBytes[piece] == count * 2 else {
+                        throw ModelError("source-native metadata conversion mismatch")
+                    }
+                    let output = destination.assumingMemoryBound(to: Float.self)
+                    for i in 0 ..< count / 2 {
+                        let bits = UInt16(input[2 * i]) | UInt16(input[2 * i + 1]) << 8
+                        output[i] = Float(Float16(bitPattern: bits))
+                    }
+                } else {
+                    let base = "model.layers.\(layer).mlp.switch_mlp." + Self.pieces[piece].replacingOccurrences(of: ".weight", with: "")
+                    try AffineCodes.widen(input,
+                        to: UnsafeMutableRawBufferPointer(start: destination, count: self.pieceRowBytes[piece]),
+                        count: self.cfg.hiddenSize * self.cfg.moeIntermediate, from: self.cfg.quantization(for: base).bits,
+                        to: self.cfg.expertBits, policy: self.effectiveWideningPolicy)
+                }
+                offset += count
+            }
+        }
+        transferred = true
+        return stagingArrays(buffers, rows: localExperts.count)
+    }
 }
 
 // MARK: - Slot pool

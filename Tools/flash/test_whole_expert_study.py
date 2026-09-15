@@ -64,5 +64,19 @@ class WholeExpertTests(unittest.TestCase):
         receipt["memory"]["peak_bytes"] = 512_000_001
         with self.assertRaises(EvidenceError): decision(report, receipt)
 
+    def test_source_native_requires_distinct_identity_and_original_byte_counts(self):
+        report, receipt = self.fixture()
+        with self.assertRaises(EvidenceError): decision(report, receipt, representation="source-native")
+        report["format"] = "slotstream-source-native-component-v1"
+        report["artifactBytes"] = report["originalRegionBytes"]
+        for case in report["cases"]: case["wholeSourceBytesPerCall"] = case["rawSourceBytesPerCall"]
+        result = decision(report, receipt, representation="source-native")
+        self.assertTrue(result["admit_engine_benchmark"])
+        self.assertTrue(all(row["read_byte_increase_fraction"] == 0 for row in result["cases"]))
+        with self.assertRaises(EvidenceError): decision(report, receipt)
+        with self.assertRaises(EvidenceError): decision(report, receipt, representation="unknown")
+        report["cases"][0]["wholeSourceBytesPerCall"] += 1
+        with self.assertRaises(EvidenceError): decision(report, receipt, representation="source-native")
+
 
 if __name__ == "__main__": unittest.main()
