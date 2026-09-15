@@ -2,12 +2,13 @@
 type: measurement
 id: 01m2aemp6k3r2rh1ffrnjmd9s2
 created: 2026-09-12T09:19:41.267528+00:00
-updated: 2026-09-12T09:19:41.267528+00:00
+updated: 2026-09-15T13:45:14.567775+00:00
 summary: JANG component, source-policy and transport validation passed; complete-model inference, KL, memory and throughput remain unqualified.
 date: 2026-09-12
 doc: measurements
 level: '2'
 machines: '[[records/machines/local-m5-max-48gb]]'
+note: Historical component-only checkpoint before the complete JANG_6S experiments; later evidence is recorded separately in the September 15 Flash measurements.
 order: '1210'
 runs: '[[sources/runs/2026/09/jang-support-validation]]'
 title: JANG local source validation

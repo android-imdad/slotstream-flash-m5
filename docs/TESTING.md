@@ -448,3 +448,65 @@ them. Run one model process at a time.
 
 Single runs vary by 15% or more on a loaded machine. If two runs disagree by
 that much, say so rather than picking the better one.
+
+
+## JANG Flash experiments
+
+The local source checkout includes exact-widening, neuron-oracle, reader-layout
+and prefetch-cost diagnostics. The current results and explicit rejections are
+summarized in [JANG Flash findings](JANG-FINDINGS.md). Component checks do not
+qualify full-model throughput, and passing teacher-forced masks would not by
+itself qualify free generation or a learned predictor.
+
+Build and run the weights-free native checks:
+
+```sh
+make build SLOTSTREAM_BUILD_JOBS=2
+.build/release/slotstream-checks --tier t0
+```
+
+With the original verified evaluation environment restored, run the host suite:
+
+```sh
+.build/flash/eval-env/bin/python -m unittest discover -s Tools/flash -p 'test_*.py'
+```
+
+That interpreter and pinned NumPy wheel live in ignored local artifacts. The
+current environment helper still refers to the original machine's bootstrap
+interpreter; it is not a portable clean-clone installer. If those inputs are
+missing, establish and verify an equivalent environment using
+[the evaluation plan](../plans/008-corpus-quality-metrics.md) before running the
+historical harness. Do not silently substitute an unverified interpreter or
+rewrite archived hashes.
+
+After downloading and verifying JANG_6S, a bounded reader calibration can run
+without constructing a full engine:
+
+```sh
+mkdir -p .build/flash/runs
+.build/release/slotstream prefetch-costs-check \
+  --model ./models/jang-6s --output .build/flash/runs/prefetch-costs-example
+```
+
+The output directory must be fresh. The command enforces its source-region,
+headroom and process-footprint bounds. A region bound limits unique source
+regions; repeated measurements can read those regions many times. This command
+calibrates costs and does not execute a prefetch worker.
+
+`widening-check`, `read-scheduling-check`, `whole-expert-check` and
+`source-native-check` provide other bounded component probes. `flash-capture`
+and `flash-column-norms` use separate quotas and memory reservations; consult
+`--help` and their specific plans before running them. All model jobs remain
+serial and use explicit admitted budgets.
+
+The full study drivers under `Tools/flash/` require matching reference binaries,
+model identities, frozen corpus/trace inputs and fresh output roots. Those large
+archives are not included in Git. The parent plan's aggregate run-set and
+stage-seven commands are still specifications; they are not implemented by the
+current `gates.py` or `evaluate.py` CLI. Follow [current qualification status](../db/records/plan/jang-flash-qualification-status.md), not a historical next-step note.
+
+The public [findings extract](../db/sources/runs/2026/09/jang-flash-findings-20260915.json)
+contains portable result fields and source hashes. Full original archives and
+harness snapshots remain local. Native whole-model results must be kept separate
+from replay/model estimates, synthetic checks and unqualified production-device
+utilization claims.

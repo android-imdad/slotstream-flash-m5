@@ -91,12 +91,11 @@ lock. No JANG compressed package is enabled. The CLI accepts explicit model
 aliases and directories; serving metadata identifies the actual quant and
 rejects a request naming a different loaded checkpoint.
 
-Verification is layered: existing regression checks, pure source-policy
-contracts, real weight-row comparisons against native MLX, and the production
-expert reader/cache with sparse metadata fixtures. These checks do not establish
-full-model numerical parity, memory peaks, context quality or throughput. Those
-require complete checkpoint downloads and reference inference on the target Mac.
-The source feature is experimental until that qualification exists.
+Verification now includes the complete pinned JANG_6S download, monitored full-model generation, bounded exact loading/logit/state comparisons, a natural development oracle cohort and paired full-model widening measurements on the local M5 Max. The original component checks also stand. These results do not reproduce the publisher's BF16/quantization reference, qualify JANG_4M full-model inference, or establish broad long-context quality.
+
+Exact `packed4-to6` widening is an explicit local run/Engine option, with scalar as the default. No CLI serving activation was added. The neuron-block oracle failed fidelity at the completed partial settings; lower counts stopped at user direction. Its predictor, sparse runtime and optional ANE predictor are not selected. Cache windows, balanced scheduling, whole-expert layouts and the tested heuristic-prefetch policies failed their scoped admission gates. No native prefetch or new ANE execution followed.
+
+Current qualification state: [[records/plan/jang-flash-qualification-status]]. Measured findings and limits: [[records/measurements/jang-exact-widening-2026-09-15]], [[records/measurements/jang-neuron-oracle-2026-09-15]], [[records/measurements/jang-loading-screens-2026-09-15]], [[records/measurements/jang-prefetch-cost-screen-2026-09-15]]. The larger paired study and parent final run-set remain pending; the source feature remains experimental.
 
 Implementation: Sources/Slotstream/CheckpointFormat.swift, Checkpoint.swift,
 JANGModels.swift, JANGManifests.swift, JANGPlanning.swift, ExpertStore.swift,
@@ -106,6 +105,31 @@ The Swift WeightStore instance retains the selected JANG manifest across
 status, verification and resumable download. Original static helpers keep
 their previous semantics. Expert-read counters count source bytes separately
 from expanded cache bytes.
+
+## JANG Flash experiment status and remaining qualification
+Public WIP repository: [https://github.com/android-imdad/slotstream-flash-m5](https://github.com/android-imdad/slotstream-flash-m5). Its `main` branch publishes the research source; this is separate from upstream integration or release. The original upstream remote and MIT attribution are retained.
+
+Current local source state after the September 15 investigation. This is not an upstream release or default activation.
+
+| Track | State | Evidence and limits |
+|---|---|---|
+| Full JANG_6S checkpoint and baseline | Complete | Pinned download verified; real generation and physical-memory evidence exist |
+| Tokenization, capture, metrics and terminal sampling | Complete at bounded scope | Immutable reference/corpus and versioned report validation |
+| Existing M5 GPU dispatch | Observed in instrumented diagnostic build | Production utilization unverified; no new ANE acceleration |
+| Exact packed widening | Implemented, explicit opt-in; development speedup measured | Original ten-pair qualification still pending |
+| Neuron-block oracle | Closed at user-revised scope | Eight/six failed fidelity; four stopped incomplete; two not run |
+| Dependent predictor/sparse runtime/ANE | Not selected for that approach | No quality-passing neuron policy to advance |
+| Cache windows and loading layouts | Tested and rejected | No new policy or full-model artifact admitted |
+| Heuristic SSD prefetch | Empirical screen rejected at tested budget | No native worker or generation speedup |
+| Parent final qualification | Pending | Aggregate run-set tooling, required final coverage and accepted candidate report remain incomplete |
+| Public evidence/docs | Updated with bounded findings | Generated projections and claims retain the reported scopes |
+| Serving/default rollout | Deferred | CLI serve has no widening flag; original defaults remain |
+
+Next qualification work: finish Plan011's predeclared larger paired study, then the selected exact-arm parent run-set and final reporting. `Tools/flash/runset.py` and the proposed stage-seven gate/evaluator interface are not implemented; those parent-plan commands are specifications, not runnable tooling. The three-pair checkpoint is not full qualification.
+
+JANG_4M full-model qualification, publisher/BF16 reference reproduction, broad/long-context coverage, production utilization claims and learned Expert Lookahead remain distinct uncompleted scopes. Do not transfer JANG_6S results to them. Detailed local status: `plans/README.md`; usage and findings: `docs/JANG.md` and `docs/JANG-FINDINGS.md`.
+
+Evidence: [[records/measurements/jang-flash-foundation-2026-09-15]], [[records/measurements/jang-exact-widening-2026-09-15]], [[records/measurements/jang-neuron-oracle-2026-09-15]], [[records/measurements/jang-loading-screens-2026-09-15]], [[records/measurements/jang-prefetch-cost-screen-2026-09-15]]. Admission decision: [[records/decisions/jang-flash-admission-2026-09-15]].
 
 ## 0. Status tracker (living)
 Measured data lives in **[MEASUREMENTS.md](MEASUREMENTS.md)**; this file keeps the
@@ -139,6 +163,12 @@ using slotstream after their first session rather than by what completes the mil
 ---
 
 Optimization execution follows [[records/plan/whole-engine-optimization-2026-09-04]]; [[records/plan/n6-prefill-bound-the-pass-then-read-each-expert-once]] supplies its detailed prefill contract. These are one program, with OPT status tracked once.
+
+### Local JANG Flash investigation
+
+The original checkpoint milestones retain their original evidence. The local JANG_6S track now has complete-weight generation and a measured explicit-widening development speedup; formal qualification remains pending. Neuron masking, cache windows, balanced reads, whole-expert layouts and the tested heuristic-prefetch policies did not advance. No native prefetch, new ANE execution or default/serving activation was added.
+
+Current per-track status and remaining tooling: [[records/plan/jang-flash-qualification-status]]. Admission decisions: [[records/decisions/jang-flash-admission-2026-09-15]]. Do not infer JANG_4M or original-checkpoint qualification from these JANG_6S results.
 
 ## 1. Goal
 
@@ -5548,6 +5578,8 @@ Public/default context stays65536/32768; MTP/vision limits stay65536. The full m
 The software implementation is delivered, but the whole plan is not complete: full native capacity, final applicable build/numerical/resource/API/client gates, public-limit activation and release/install/rollback still require their own evidence. This latest request allowed feasible context testing; available resources did not support a fresh model launch. No native test, memory waiter or expanded-capacity claim was introduced. Existing proxy and historical model receipts retain their original scope.
 
 ## Expert Lookahead: local training and exact prefetch experiment
+**Cross-reference, September 15:** the separate JANG_6S investigation rejected its previous-token and recent-frequency heuristics under a scoped empirical cost screen. That does not evaluate or reject the learned predictor specified here for the original checkpoint. This plan remains a separate unexecuted track; no predictor or native prefetch is claimed from the JANG experiments. See [[records/plan/jang-flash-qualification-status]].
+
 **Status: ready for execution. Five numbered review passes, two depth-two alignment reviews and a closing consistency review are complete; the fifth pass was a separate code-grounding review that corrected seven items. No predictor has been trained, no performance gain has been demonstrated, and this planning task launches no model or paid job.** This is the local successor experiment requested on September 10. Work is divided into an initial proof and conditional extensions so that a useful negative result is also a complete outcome.
 
 ### 1. Objective, scope and fixed decisions

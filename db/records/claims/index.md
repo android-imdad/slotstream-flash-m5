@@ -2,11 +2,29 @@
 type: index
 scope: type-folder
 folder: records/claims
-updated: 2026-09-11T10:48:38.354513Z
+updated: 2026-09-15T14:27:02.379136Z
 ---
 
 # records/claims
 
+- [[records/claims/jang-oracle-2]] — JANG oracle retained 2 result
+- [[records/claims/jang-loading-source-native]] — JANG source-native whole-expert layout component result
+- [[records/claims/jang-widening-coding]] — JANG widening coding measurements
+- [[records/claims/jang-oracle-6]] — JANG oracle retained 6 result
+- [[records/claims/jang-loading-expanded]] — JANG expanded whole-expert layout component result
+- [[records/claims/jang-widening-range]] — JANG explicit widening development range
+- [[records/claims/jang-oracle-8]] — JANG oracle retained 8 result
+- [[records/claims/jang-loading-scheduling]] — JANG balanced read scheduling component result
+- [[records/claims/jang-widening-reasoning]] — JANG widening reasoning measurements
+- [[records/claims/jang-widening-ratio]] — JANG widening approximate scalar-relative speedup
+- [[records/claims/jang-oracle-10]] — JANG oracle retained 10 result
+- [[records/claims/jang-prefetch-scope]] — JANG prefetch empirical-screen budget
+- [[records/claims/jang-widening-peak]] — JANG widening maximum observed physical peak
+- [[records/claims/jang-oracle-4]] — JANG oracle retained 4 result
+- [[records/claims/jang-widening-explanation]] — JANG widening explanation measurements
+- [[records/claims/jang-widening-protocol]] — JANG widening measured protocol
+- [[records/claims/jang-prefetch-recent]] — JANG recent-frequency modeled prefetch estimate
+- [[records/claims/jang-prefetch-previous]] — JANG previous-token modeled prefetch estimate
 - [[records/claims/peak-memory-32-gb-at-auto]] — The 32 GB automatic-plan figure is an estimate, not a measured lifetime footprint peak
 - [[records/claims/draft-depth-default-two]] — The adopted speculative draft-chain default is two tokens
 - [[records/claims/speculative-decode-x1-24-at-auto-floor]] — Speculative decode multiplies decode by 1.24 at auto's floor on the dev Mac

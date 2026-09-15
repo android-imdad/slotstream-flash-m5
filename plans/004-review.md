@@ -1,5 +1,7 @@
 # Plan 004 review — host tooling approved; live study blocked
 
+> Historical review/checkpoint at the stated source and evidence versions. Later completion, rejection and remaining work are reconciled in [the current index](README.md) and [JANG Flash findings](../docs/JANG-FINDINGS.md). Preserve the original evidence; do not treat historical active-work wording as a new task.
+
 Preserved commit: `d4bb01fac3a7c04dd5e1d427b090542609a6d5e0`, branch `advisor/001-flash-m5`.
 
 The reviewer read the full implementation/tests and compared CLOCK logic to `SlotPool.ensureCore` and `victim`. Independent verification passed all 84 Python tests and 14 replay self-tests, including full synthetic collection/analyzer validation through relative and absolute paths. Pinned metadata and bounded current headers were independently checked against the completed JANG_6S checkpoint. Scope is six Python/fixture files; no runtime, math, model, dependency or default policy change.
@@ -21,7 +23,7 @@ python3 Tools/flash/cache_study.py collect --model models/jang-6s --output .buil
 python3 Tools/flash/cache_study.py analyze --collection .build/flash/runs/window-collection-resume-1 --output .build/flash/runs/window-screen-resume-1
 ```
 
-Preserve the original failed attempts. One full model job at a time. Do not weaken the resource gate or infer a byte/time benefit from host tests. Plan 005 is prepared but not dispatched. Parent Plan 001 remains IN PROGRESS with its required model work blocked. No merge or push.
+Preserve the original failed attempts. One full model job at a time. Do not weaken the resource gate or infer a byte/time benefit from host tests. At this review checkpoint Plan005 had not been dispatched. It and the later model/corpus work subsequently completed; parent001 now remains in progress for final qualification, as described in the current index. No merge or push.
 
 ## Continuation after memory recovery
 

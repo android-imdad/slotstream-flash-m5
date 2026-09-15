@@ -1,5 +1,11 @@
 # Plan 003: Measure the existing M5 expert-kernel path
 
+## Current disposition — September 15, 2026
+
+**DONE at bounded diagnostic scope.** Instrumented pinned-MLX grouped NAX and decode qmv dispatch observed; production utilization remains unverified. No new ANE execution.
+
+[Evidence/current findings](003-review.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 > Executor: implement only this bounded diagnostic from Plan 001's stages 1/5. Preserve inference defaults and arithmetic. Reviewer maintains the index. Commit only in `advisor/001-flash-m5`; no merge/push. Report unsupported or unobserved hardware paths explicitly.
 
 ## Status

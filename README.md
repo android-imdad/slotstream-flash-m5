@@ -1,7 +1,60 @@
-# slotstream
+# Slotstream Flash M5 — WIP
 
-[![Latest release](https://img.shields.io/github/v/release/carloslfu/slotstream?label=latest%20release)](https://github.com/carloslfu/slotstream/releases/latest)
-[![GitHub stars](https://img.shields.io/github/stars/carloslfu/slotstream?style=flat&logo=github&label=stars)](#star-history)
+**Work in progress.** This is an experimental research fork of
+[Slotstream](https://github.com/carloslfu/slotstream), maintained by
+[android-imdad](https://github.com/android-imdad). It explores SSD-streamed
+JANG inference and exact loading improvements on Apple Silicon. The current
+results are development measurements; final qualification and serving/default
+rollout are unfinished.
+
+**Model used:** [JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S on Hugging Face](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S)
+([pinned revision used for these experiments](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S/tree/3781190c6bbdf0a7637beda49ba179822612058a)). The original weights
+are preserved; this fork streams experts as well as n-gram data from SSD.
+
+## M5 Max benchmarks — measured development results
+
+A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening, about 2.2× scalar throughput.
+
+Protocol: three paired rounds per workload on the local M5 Max with 48 GB unified memory; a 24 GB process target; 32,768 configured context tokens; greedy seed 42; up to 128 output tokens; fresh CLI processes; prefix cache, MTP and vision off.
+
+| Workload | Scalar tok/s | Packed tok/s | First text seconds, scalar → packed |
+|---|---:|---:|---:|
+| Coding | 3.331 | 7.409 | 5.311 → 2.584 |
+| Explanation | 3.199 | 6.983 | 5.870 → 2.930 |
+| Reasoning | 3.272 | 7.266 | 6.623 → 3.235 |
+
+All paired outputs and completed work matched exactly. The maximum observed
+packed-process footprint was 20.69 GB. First-text measurements exclude loading
+and cooldown. The configured context window is not a long-prompt quality test.
+
+These measurements come from the implemented exact widening path. No new Neural
+Engine execution or native expert-prefetch worker was added. Neuron masks,
+reader scheduling and storage-layout experiments did not meet their admission
+gates. [Full findings and evidence](docs/JANG-FINDINGS.md) distinguish measured
+results, model estimates, rejections and [remaining work](plans/README.md).
+
+## Build this WIP fork
+
+```sh
+git clone https://github.com/android-imdad/slotstream-flash-m5.git
+cd slotstream-flash-m5
+make build SLOTSTREAM_BUILD_JOBS=2
+
+```
+
+Then follow [the JANG guide](docs/JANG.md) to verify the selected checkpoint,
+preview memory and run with explicit widening. Scalar remains the default;
+CLI serving has no widening activation flag. The upstream installation/release
+links below install upstream Slotstream, not this fork's experiments.
+
+## Upstream Slotstream overview
+
+The following overview, release results and history describe the upstream
+default checkpoint. The JANG experiments above have their own text-only scope.
+The original MIT license and author attribution are retained.
+
+[![Latest release](https://img.shields.io/github/v/release/carloslfu/slotstream?label=upstream%20release)](https://github.com/carloslfu/slotstream/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/carloslfu/slotstream?style=flat&logo=github&label=upstream%20stars)](#star-history)
 
 **Run a 105 GB AI model on a 48 GB Mac.**
 
@@ -14,7 +67,7 @@ as Hermes. Developers can connect their own apps through its APIs or Swift libra
 
 [Get started](#install) · [Performance](#speed) · [Guides](#guides) · [Get help](#support)
 
-> **I'm building Sevra on Slotstream: private, personal AI optimized for your computer.**
+> **Upstream author Carlos Galarza is building Sevra on Slotstream: private, personal AI optimized for your computer.**
 > Sevra will choose a tested model for your hardware and keep that choice current
 > as models improve, with inference, memory and tools tuned together. You'll
 > control what it remembers and can access. The app is in development, starting
@@ -204,14 +257,18 @@ It isn't available in the current Slotstream engine.
 
 This local source checkout adds experimental support for the JANG_4M and
 JANG_6S quants of the same Qwen3.8-Flash-Next model. See the
-[JANG guide](docs/JANG.md) for pinned downloads, component checks and the
-remaining full-model qualification. The original checkpoint remains the default.
+[JANG guide](docs/JANG.md) for pinned downloads and explicit widening controls.
+A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening.
+[The findings](docs/JANG-FINDINGS.md) distinguish that development result from
+formal qualification, rejected experiments and unimplemented Neural Engine work.
+The original checkpoint remains the default.
 For other architectures, see [related projects](docs/ENGINEERING.md#related-projects).
 
 ## Why this exists
 
-I wanted to run this model on my own Mac, but the standard loader exhausted
-memory before producing a reply. Slotstream grew out of that experiment.
+Upstream author Carlos Galarza wanted to run this model on his Mac, but the
+standard loader exhausted memory before producing a reply. Slotstream grew
+out of that experiment.
 The [published measurements](MEASUREMENTS.md#m07--the-naive-path-fails-why-slotstream-exists)
 include that failed load and the experiments that followed.
 
@@ -219,6 +276,9 @@ The project was also [discussed on Hacker News](https://news.ycombinator.com/ite
 The questions and hardware reports from that discussion help guide the work.
 
 ## Support
+
+For this WIP fork and its experiments, [open an issue in this repository](https://github.com/android-imdad/slotstream-flash-m5/issues).
+The following upstream channels concern the original project and release.
 
 [Report a bug](https://github.com/carloslfu/slotstream/issues/new) if something
 doesn't work, or [share your Mac's results](docs/HARDWARE.md#how-to-measure)
@@ -241,19 +301,23 @@ Thank you for supporting its development.
 
 ## Who made this
 
-I'm [Carlos Galarza](https://www.carlosgalarza.com). I work on efficient AI
-and Executable Rationality, making machine cognition explicit and runnable.
-I also help teams run open models on their own hardware and debug agent
-workflows. For help or consulting, [email me](mailto:carloslfu@gmail.com).
+Original Slotstream was created by [Carlos Galarza](https://www.carlosgalarza.com),
+whose work includes efficient AI and Executable Rationality. For upstream help
+or consulting, [contact Carlos](mailto:carloslfu@gmail.com).
+
+This WIP research fork is maintained by [android-imdad](https://github.com/android-imdad).
+Its changes and evidence are documented in [JANG Flash findings](docs/JANG-FINDINGS.md).
 
 ## Star history
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/star-history-dark.svg">
-  <img alt="Slotstream GitHub star history, updated weekly" src="docs/assets/star-history.svg" width="960">
+  <img alt="Upstream Slotstream GitHub star-history snapshot" src="docs/assets/star-history.svg" width="960">
 </picture>
 
-The badge at the top shows the latest star count; this chart is updated weekly.
+The upstream badge shows its latest star count. This bundled chart is an upstream
+snapshot; see [upstream Slotstream](https://github.com/carloslfu/slotstream#star-history)
+for its current history. It is not this fork’s star count.
 
 ## License
 

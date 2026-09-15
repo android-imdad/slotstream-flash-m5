@@ -128,7 +128,9 @@ rewriting them. macOS swap adds writes when memory runs short. Automatic
 memory sizing helps, but a small Mac or an oversized manual setting can
 still swap heavily.
 
-**Can I use a different model or another operating system?** The current
-engine supports only `qwen3.8-flash-next:4bit` on Apple Silicon. Windows and
-Linux support for AMD and NVIDIA is planned for Sevra. See
+**Can I use a different model or another operating system?** The default
+checkpoint is `qwen3.8-flash-next:4bit` on Apple Silicon. This local source
+checkout also has [experimental JANG encodings](JANG.md) of the same model,
+with separate qualification limits. Windows and Linux support for AMD and
+NVIDIA is planned for Sevra. See
 [related projects](ENGINEERING.md#related-projects) for other runtimes.

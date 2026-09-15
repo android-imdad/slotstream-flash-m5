@@ -2,7 +2,7 @@
 type: index
 scope: type-folder
 folder: records/design
-updated: 2026-09-12T09:01:11.539800Z
+updated: 2026-09-15T13:45:14.613677Z
 ---
 
 # records/design

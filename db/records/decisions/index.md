@@ -2,11 +2,13 @@
 type: index
 scope: type-folder
 folder: records/decisions
-updated: 2026-09-11T18:47:56.003709Z
+updated: 2026-09-15T14:23:40.867759Z
 ---
 
 # records/decisions
 
+- [[records/decisions/jang-flash-public-wip-repository]] — Publish the JANG Flash research source as a public WIP fork
+- [[records/decisions/jang-flash-admission-2026-09-15]] — JANG Flash experiments remain opt-in and rejected tracks do not advance
 - [[records/decisions/global-paging-is-diagnostic]] — Treat host-wide paging as diagnostics, separate from functional and process-memory acceptance; preserve actual headroom, pressure and budget safeguards.
 - [[records/decisions/draft-depth-defaults-to-two]] — Two draft tokens are the adopted operating default; activation and memory policies remain separate
 - [[records/decisions/draft-depth-defaults-to-one-and-auto-floor-120-per-layer]] — Speculative decode drafts one token by default and auto enables it only at 120 experts per layer and up

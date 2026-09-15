@@ -1,5 +1,11 @@
 # 014 — Benchmark existing whole-expert storage
 
+## Current disposition — September 15, 2026
+
+**COMPLETE — expanded layout rejected.** Measured component result committed in 2053804; no full-model artifact or runtime activation admitted.
+
+[Evidence/current findings](../docs/JANG-FINDINGS.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 Status: COMPLETE — expanded layout rejected by the component screen. User authorized continuing after Plan 013 and committing
 the completed checkpoint. Commits `65d7e82` and `ba18325` preserve that checkpoint;
 large local executable archives remain ignored and their hashes are recorded.

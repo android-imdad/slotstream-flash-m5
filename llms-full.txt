@@ -6,10 +6,63 @@ Relative links below point at the same sections, which are all in this file.
 
 <!-- ===== README.md ===== -->
 
-# slotstream
+# Slotstream Flash M5 — WIP
 
-[![Latest release](https://img.shields.io/github/v/release/carloslfu/slotstream?label=latest%20release)](https://github.com/carloslfu/slotstream/releases/latest)
-[![GitHub stars](https://img.shields.io/github/stars/carloslfu/slotstream?style=flat&logo=github&label=stars)](#star-history)
+**Work in progress.** This is an experimental research fork of
+[Slotstream](https://github.com/carloslfu/slotstream), maintained by
+[android-imdad](https://github.com/android-imdad). It explores SSD-streamed
+JANG inference and exact loading improvements on Apple Silicon. The current
+results are development measurements; final qualification and serving/default
+rollout are unfinished.
+
+**Model used:** [JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S on Hugging Face](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S)
+([pinned revision used for these experiments](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S/tree/3781190c6bbdf0a7637beda49ba179822612058a)). The original weights
+are preserved; this fork streams experts as well as n-gram data from SSD.
+
+## M5 Max benchmarks — measured development results
+
+A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening, about 2.2× scalar throughput.
+
+Protocol: three paired rounds per workload on the local M5 Max with 48 GB unified memory; a 24 GB process target; 32,768 configured context tokens; greedy seed 42; up to 128 output tokens; fresh CLI processes; prefix cache, MTP and vision off.
+
+| Workload | Scalar tok/s | Packed tok/s | First text seconds, scalar → packed |
+|---|---:|---:|---:|
+| Coding | 3.331 | 7.409 | 5.311 → 2.584 |
+| Explanation | 3.199 | 6.983 | 5.870 → 2.930 |
+| Reasoning | 3.272 | 7.266 | 6.623 → 3.235 |
+
+All paired outputs and completed work matched exactly. The maximum observed
+packed-process footprint was 20.69 GB. First-text measurements exclude loading
+and cooldown. The configured context window is not a long-prompt quality test.
+
+These measurements come from the implemented exact widening path. No new Neural
+Engine execution or native expert-prefetch worker was added. Neuron masks,
+reader scheduling and storage-layout experiments did not meet their admission
+gates. [Full findings and evidence](docs/JANG-FINDINGS.md) distinguish measured
+results, model estimates, rejections and [remaining work](plans/README.md).
+
+## Build this WIP fork
+
+```sh
+git clone https://github.com/android-imdad/slotstream-flash-m5.git
+cd slotstream-flash-m5
+make build SLOTSTREAM_BUILD_JOBS=2
+
+```
+
+Then follow [the JANG guide](docs/JANG.md) to verify the selected checkpoint,
+preview memory and run with explicit widening. Scalar remains the default;
+CLI serving has no widening activation flag. The upstream installation/release
+links below install upstream Slotstream, not this fork's experiments.
+
+## Upstream Slotstream overview
+
+The following overview, release results and history describe the upstream
+default checkpoint. The JANG experiments above have their own text-only scope.
+The original MIT license and author attribution are retained.
+
+[![Latest release](https://img.shields.io/github/v/release/carloslfu/slotstream?label=upstream%20release)](https://github.com/carloslfu/slotstream/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/carloslfu/slotstream?style=flat&logo=github&label=upstream%20stars)](#star-history)
 
 **Run a 105 GB AI model on a 48 GB Mac.**
 
@@ -22,7 +75,7 @@ as Hermes. Developers can connect their own apps through its APIs or Swift libra
 
 [Get started](#install) · [Performance](#speed) · [Guides](#guides) · [Get help](#support)
 
-> **I'm building Sevra on Slotstream: private, personal AI optimized for your computer.**
+> **Upstream author Carlos Galarza is building Sevra on Slotstream: private, personal AI optimized for your computer.**
 > Sevra will choose a tested model for your hardware and keep that choice current
 > as models improve, with inference, memory and tools tuned together. You'll
 > control what it remembers and can access. The app is in development, starting
@@ -212,14 +265,18 @@ It isn't available in the current Slotstream engine.
 
 This local source checkout adds experimental support for the JANG_4M and
 JANG_6S quants of the same Qwen3.8-Flash-Next model. See the
-[JANG guide](docs/JANG.md) for pinned downloads, component checks and the
-remaining full-model qualification. The original checkpoint remains the default.
+[JANG guide](docs/JANG.md) for pinned downloads and explicit widening controls.
+A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening.
+[The findings](docs/JANG-FINDINGS.md) distinguish that development result from
+formal qualification, rejected experiments and unimplemented Neural Engine work.
+The original checkpoint remains the default.
 For other architectures, see [related projects](docs/ENGINEERING.md#related-projects).
 
 ## Why this exists
 
-I wanted to run this model on my own Mac, but the standard loader exhausted
-memory before producing a reply. Slotstream grew out of that experiment.
+Upstream author Carlos Galarza wanted to run this model on his Mac, but the
+standard loader exhausted memory before producing a reply. Slotstream grew
+out of that experiment.
 The [published measurements](MEASUREMENTS.md#m07--the-naive-path-fails-why-slotstream-exists)
 include that failed load and the experiments that followed.
 
@@ -227,6 +284,9 @@ The project was also [discussed on Hacker News](https://news.ycombinator.com/ite
 The questions and hardware reports from that discussion help guide the work.
 
 ## Support
+
+For this WIP fork and its experiments, [open an issue in this repository](https://github.com/android-imdad/slotstream-flash-m5/issues).
+The following upstream channels concern the original project and release.
 
 [Report a bug](https://github.com/carloslfu/slotstream/issues/new) if something
 doesn't work, or [share your Mac's results](docs/HARDWARE.md#how-to-measure)
@@ -249,19 +309,23 @@ Thank you for supporting its development.
 
 ## Who made this
 
-I'm [Carlos Galarza](https://www.carlosgalarza.com). I work on efficient AI
-and Executable Rationality, making machine cognition explicit and runnable.
-I also help teams run open models on their own hardware and debug agent
-workflows. For help or consulting, [email me](mailto:carloslfu@gmail.com).
+Original Slotstream was created by [Carlos Galarza](https://www.carlosgalarza.com),
+whose work includes efficient AI and Executable Rationality. For upstream help
+or consulting, [contact Carlos](mailto:carloslfu@gmail.com).
+
+This WIP research fork is maintained by [android-imdad](https://github.com/android-imdad).
+Its changes and evidence are documented in [JANG Flash findings](docs/JANG-FINDINGS.md).
 
 ## Star history
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/star-history-dark.svg">
-  <img alt="Slotstream GitHub star history, updated weekly" src="docs/assets/star-history.svg" width="960">
+  <img alt="Upstream Slotstream GitHub star-history snapshot" src="docs/assets/star-history.svg" width="960">
 </picture>
 
-The badge at the top shows the latest star count; this chart is updated weekly.
+The upstream badge shows its latest star count. This bundled chart is an upstream
+snapshot; see [upstream Slotstream](https://github.com/carloslfu/slotstream#star-history)
+for its current history. It is not this fork’s star count.
 
 ## License
 
@@ -402,9 +466,11 @@ rewriting them. macOS swap adds writes when memory runs short. Automatic
 memory sizing helps, but a small Mac or an oversized manual setting can
 still swap heavily.
 
-**Can I use a different model or another operating system?** The current
-engine supports only `qwen3.8-flash-next:4bit` on Apple Silicon. Windows and
-Linux support for AMD and NVIDIA is planned for Sevra. See
+**Can I use a different model or another operating system?** The default
+checkpoint is `qwen3.8-flash-next:4bit` on Apple Silicon. This local source
+checkout also has [experimental JANG encodings](JANG.md) of the same model,
+with separate qualification limits. Windows and Linux support for AMD and
+NVIDIA is planned for Sevra. See
 [related projects](ENGINEERING.md#related-projects) for other runtimes.
 
 
@@ -435,6 +501,8 @@ For AI agents, [llms.txt](../llms.txt) is the index and
 
 The [JANG guide](JANG.md) documents the experimental alternative checkpoint
 loader, original-value preservation and qualification boundaries in this checkout.
+[JANG Flash findings](JANG-FINDINGS.md) summarize the measured widening gain,
+rejected neuron/loading/prefetch experiments, existing M5 dispatch and remaining work.
 
 ## How it works
 
@@ -909,6 +977,12 @@ examples, and [integration tests](TESTING.md#openai-agent-integration) for
 protocol and real-client checks.
 
 
+The examples on this page use the default checkpoint. For a local experimental
+JANG server, select the actual loaded model returned by discovery and follow
+[JANG's serving limits](JANG.md). The explicit widening development benchmark
+was a CLI experiment and is not an enabled serving-default speed claim.
+
+
 <!-- ===== docs/CLI.md ===== -->
 
 # Command reference
@@ -988,7 +1062,9 @@ Plus the memory options.
 
 Download losslessly compressed model weights from Hugging Face, reconstructing
 the original files with resumable transfers and hash verification.
-The only model name is `qwen3.8-flash-next:4bit`, which is also the default.
+The default model name is `qwen3.8-flash-next:4bit`. This local source checkout
+also accepts the pinned experimental JANG aliases with raw downloads; see
+[JANG checkpoints](JANG.md). They do not use the default compressed package.
 
 | Flag | Meaning |
 |---|---|
@@ -1101,7 +1177,26 @@ lifetime RSS and current footprint; `lifetimePhysicalFootprintPeakBytes` exposes
 the native footprint peak separately. Sampling remains useful for attributing
 memory to a particular request and can miss allocations between samples.
 
+## Local JANG experiment commands
+
+These commands belong to this source checkout, not a claim about an installed
+upstream release. `run --expert-widening scalar|packed4-to6` selects exact code
+expansion; omission keeps scalar. Packed widening is JANG_6S-only and conflicts
+with packed expert-layout activation. CLI `serve` does not accept the flag.
+
+Diagnostic commands include `widening-check`, `flash-column-norms`,
+`flash-capture`, `read-scheduling-check`, `whole-expert-check`,
+`source-native-check`, and `prefetch-costs-check`. Use their `--help` and
+fresh evidence directories. Oracle configuration is accepted only by the
+explicit diagnostic capture mode, never normal run/serve. These probes do not
+activate sparse inference or native prefetch. See [findings](JANG-FINDINGS.md)
+and [reproduction](TESTING.md#jang-flash-experiments).
+
 ## Optimization defaults
+
+The defaults and planner curves in this section describe the original checkpoint.
+Experimental JANG checkpoints use their separate fixed-plan accounting and
+qualification limits; see [the JANG guide](JANG.md).
 
 The CLI resolves the selected optimization family automatically: compact
 runtime state and n-gram rows, bounded prompt-read grouping, committed prompt
@@ -1221,7 +1316,10 @@ This page covers the Ollama-style `/api/*` and OpenAI-style `/v1/*` endpoints.
 For the AI SDK gateway, see the [fx guide](FX.md). OpenAI tool calling is
 described below. The OpenAI tool and reasoning additions require Slotstream
 0.2.8 or later.
-Use `qwen3.8-flash-next:4bit` as the model name.
+Use `qwen3.8-flash-next:4bit` for the default checkpoint. A local experimental
+JANG server reports its actual loaded quant name through model discovery; use
+that name instead. See [JANG serving limits](JANG.md). HTTP requests do not
+activate packed widening, neuron masks, native prefetch or an ANE backend.
 
 Unknown fields, unsupported features, and malformed values return a 400
 error describing the problem. A wrong model name returns 400, or 404 on
@@ -1692,6 +1790,19 @@ include that work in the same request deadline and memory reservation.
 Explicit controls, saved control sets and public initializers retain their
 compatibility behavior; no numerical or capacity guarantee follows from
 enabling an experimental control.
+
+## Local JANG_6S exact widening
+
+The experimental source API accepts `expertWidening: .packed4To6` in either
+Engine initializer. Omission retains `.scalar`; inspect the read-only
+`engine.effectiveWideningPolicy` for the effective selection. The explicit fast
+policy rejects unsupported checkpoints and packed-layout combinations before
+resident/pool allocation. Original weights and quantization are unchanged.
+
+The neuron and storage sample helpers are package diagnostics, not qualified
+library inference modes. No ANE backend or native expert-prefetch worker was
+added. See [JANG usage](JANG.md) and [measured scope](JANG-FINDINGS.md). These APIs
+require this local source checkout; they are not a release-version promise.
 
 ## API stability
 
@@ -2521,6 +2632,68 @@ Single runs vary by 15% or more on a loaded machine. If two runs disagree by
 that much, say so rather than picking the better one.
 
 
+## JANG Flash experiments
+
+The local source checkout includes exact-widening, neuron-oracle, reader-layout
+and prefetch-cost diagnostics. The current results and explicit rejections are
+summarized in [JANG Flash findings](JANG-FINDINGS.md). Component checks do not
+qualify full-model throughput, and passing teacher-forced masks would not by
+itself qualify free generation or a learned predictor.
+
+Build and run the weights-free native checks:
+
+```sh
+make build SLOTSTREAM_BUILD_JOBS=2
+.build/release/slotstream-checks --tier t0
+```
+
+With the original verified evaluation environment restored, run the host suite:
+
+```sh
+.build/flash/eval-env/bin/python -m unittest discover -s Tools/flash -p 'test_*.py'
+```
+
+That interpreter and pinned NumPy wheel live in ignored local artifacts. The
+current environment helper still refers to the original machine's bootstrap
+interpreter; it is not a portable clean-clone installer. If those inputs are
+missing, establish and verify an equivalent environment using
+[the evaluation plan](../plans/008-corpus-quality-metrics.md) before running the
+historical harness. Do not silently substitute an unverified interpreter or
+rewrite archived hashes.
+
+After downloading and verifying JANG_6S, a bounded reader calibration can run
+without constructing a full engine:
+
+```sh
+mkdir -p .build/flash/runs
+.build/release/slotstream prefetch-costs-check \
+  --model ./models/jang-6s --output .build/flash/runs/prefetch-costs-example
+```
+
+The output directory must be fresh. The command enforces its source-region,
+headroom and process-footprint bounds. A region bound limits unique source
+regions; repeated measurements can read those regions many times. This command
+calibrates costs and does not execute a prefetch worker.
+
+`widening-check`, `read-scheduling-check`, `whole-expert-check` and
+`source-native-check` provide other bounded component probes. `flash-capture`
+and `flash-column-norms` use separate quotas and memory reservations; consult
+`--help` and their specific plans before running them. All model jobs remain
+serial and use explicit admitted budgets.
+
+The full study drivers under `Tools/flash/` require matching reference binaries,
+model identities, frozen corpus/trace inputs and fresh output roots. Those large
+archives are not included in Git. The parent plan's aggregate run-set and
+stage-seven commands are still specifications; they are not implemented by the
+current `gates.py` or `evaluate.py` CLI. Follow [current qualification status](../db/records/plan/jang-flash-qualification-status.md), not a historical next-step note.
+
+The public [findings extract](../db/sources/runs/2026/09/jang-flash-findings-20260915.json)
+contains portable result fields and source hashes. Full original archives and
+harness snapshots remain local. Native whole-model results must be kept separate
+from replay/model estimates, synthetic checks and unqualified production-device
+utilization claims.
+
+
 <!-- ===== docs/JANG.md ===== -->
 
 # JANG checkpoints (experimental local build)
@@ -2530,17 +2703,17 @@ Qwen3.8-Flash-Next checkpoints. It streams routed experts and n-gram rows
 from the original safetensors files, retaining the model's native router.
 The original PipeNetwork checkpoint remains the default.
 
-This is a source implementation, not an upstream release or a qualified
-full-model performance result. The component gates use real JANG weight-row
-samples and checkpoint metadata. Full generation, long-context quality,
-physical-memory peaks and throughput still require tests with complete weights.
+The tested model is [JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S),
+using [the pinned experiment revision](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S/tree/3781190c6bbdf0a7637beda49ba179822612058a).
+
+This is an experimental local source build, not an upstream release. The complete JANG_6S checkpoint is now verified and has full-model generation, memory and paired widening measurements. A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening. Formal qualification, broader/long-context coverage and JANG_4M full-model results remain incomplete. See [current findings and rejected experiments](JANG-FINDINGS.md).
 
 ## Build and check
 
 From this checkout, with Apple's command line tools installed:
 
 ```sh
-make build SLOTSTREAM_BUILD_JOBS=4
+make build SLOTSTREAM_BUILD_JOBS=2
 .build/release/slotstream jang-check
 ```
 
@@ -2594,13 +2767,13 @@ Run one model process at a time and retain headroom for other applications.
 `doctor` reads headers without loading the weights into the GPU:
 
 ```sh
-.build/release/slotstream doctor --model ./models/jang-4m
-.build/release/slotstream run --model ./models/jang-4m \
+.build/release/slotstream doctor --model ./models/jang-6s
+.build/release/slotstream run --model ./models/jang-6s \
   --prompt "Explain why the sky is blue." --max-tokens 128 --greedy \
-  --sample-footprint --stats-json ./jang-4m-run.json
+  --sample-footprint --stats-json ./jang-6s-run.json
 ```
 
-Substitute `./models/jang-6s` for the other checkpoint. The default JANG plan
+Substitute `./models/jang-4m` for the component-supported alternative; its full-model performance is not established by the JANG_6S results. The default JANG plan
 selects a conservative target from current device observations and then
 keeps that cache fixed. `--memory-gb` sets a total process target; requests
 that cannot fit live headroom are refused. The plan charges original resident
@@ -2610,11 +2783,33 @@ Its budget is not a measured physical peak. No throughput estimate is shown.
 For an API server:
 
 ```sh
-.build/release/slotstream serve --model ./models/jang-4m
+.build/release/slotstream serve --model ./models/jang-6s
 ```
 
 Clients must request the loaded JANG name reported by the API. A request for
 the original PipeNetwork quant is rejected when JANG is loaded.
+
+## Explicit exact widening
+
+Scalar expansion remains the default. The local `run` command accepts
+`--expert-widening packed4-to6` for JANG_6S only. It accelerates integer-code
+expansion without changing quantization or original files. The effective policy
+is recorded as `effective_expert_widening` in `--stats-json` output.
+
+After previewing memory and checking headroom, add the flag to a JANG_6S run:
+
+```sh
+.build/release/slotstream run --model ./models/jang-6s \
+  --expert-widening packed4-to6 --prompt "Explain why the sky is blue." \
+  --greedy --sample-footprint --stats-json ./jang-6s-packed.json
+```
+
+This example is a functional run, not the frozen benchmark workload. The flag
+is rejected for unsupported checkpoints and when combined with a packed expert
+layout. The CLI `serve` command has no widening flag and keeps scalar behavior;
+HTTP requests cannot select it. Neuron masks, balanced scheduling, layout
+samples and prefetch-cost probes are diagnostic-only and do not activate with
+this flag. No Neural Engine acceleration is added.
 
 ## Representation and boundaries
 
@@ -2639,18 +2834,14 @@ the original PipeNetwork quant is rejected when JANG is loaded.
 
 ## Qualification still needed
 
-A complete weight download and an independent reference run are needed to
-validate whole-model logits and useful generation on the target Mac. Then
-measure cold and warm runs, prefill, sustained decode, physical footprint,
-actual storage reads and long-context behavior. The component checks alone
-do not establish those results or reproduce the publisher's KL scores.
+Complete JANG_6S weights, real generation and bounded comparisons against the preserved unmodified JANG_6S engine now exist. The measured widening checkpoint does not complete the original larger paired study or parent final run-set. Broad/long-context task coverage, publisher/BF16 reference reproduction and JANG_4M full-model qualification remain separate gaps. A configured context window is not a test of a prompt reaching that limit. See [the current qualification plan](../db/records/plan/jang-flash-qualification-status.md).
 
 ## Swift library
 
 Use the selected instance for weight status, download and verification:
 
 ```swift
-let weights = WeightStore.resolving("JANG_4M")
+let weights = WeightStore.resolving("JANG_6S")
 try weights.download()
 let index = try CheckpointIndex(dir: weights.modelDirectory)
 let plan = try CheckpointMemory(index: index).plan(memoryGB: nil)
@@ -2658,10 +2849,15 @@ let engine = try await Engine(modelDir: weights.modelDirectory, plan: plan)
 ```
 
 For a custom directory use `WeightStore(modelDirectory: url,
-jangModel: JANGModels.jang4M)`. The original static WeightStore helpers retain
+jangModel: JANGModels.jang6S)`. The original static WeightStore helpers retain
 their original PipeNetwork semantics. Engine read-byte statistics count source
 expert payload, not bytes added by cache expansion; physical SSD traffic still
 requires operating-system measurement.
+
+For explicit JANG_6S widening in Swift, pass `expertWidening: .packed4To6` to
+the Engine initializer and inspect `engine.effectiveWideningPolicy`. Omission
+keeps `.scalar`. This is a local source API; the same checkpoint/layout refusal
+rules apply. It does not qualify a custom serving integration.
 
 
 <!-- ===== docs/TROUBLESHOOTING.md ===== -->
@@ -2824,6 +3020,25 @@ unavailable engine returns an explicit error instead of resuming partial state.
 For other unresolved problems, include your Mac model, memory, Slotstream
 version, the command you ran, and the error message. Remove credentials
 and private file contents before posting.
+
+
+## JANG results or experiment flags do not match this build
+
+The Flash experiments belong to the local source checkout. An installed upstream
+binary may not expose their commands. Check `slotstream --help` and use the
+source build described in [the JANG guide](JANG.md).
+
+Packed widening is explicit for JANG_6S; scalar is still the default. Check
+`effective_expert_widening` in the run's stats rather than assuming it is active.
+CLI `serve` does not accept the widening flag. Masks and reader/preload samples
+remain diagnostic-only after their scoped rejections; enabling unrelated
+optimization switches does not reproduce those experiments.
+
+Historical study validation may fail because the full local archive or pinned
+evaluation environment is absent. Restore matching inputs or create a separately
+identified new study. Do not replace an old reference with a current executable,
+change its hash, or mix incomplete/timing-ineligible runs into a completed cohort.
+[Current findings and limits](JANG-FINDINGS.md) identify the measured scopes.
 
 
 <!-- ===== docs/DOWNLOAD-FORMAT.md ===== -->
@@ -3208,21 +3423,41 @@ The full [engineering notes](ENGINEERING.md#speed) explain prompt-processing
 time, memory use, and the methods behind the performance claims.
 
 
+## Experimental JANG results
+
+The tables above retain their original default-checkpoint evidence. Local
+JANG_6S widening results come from a separate checkpoint and explicit settings;
+they do not update the default planner's throughput curve or qualify other Macs.
+See [JANG Flash findings](JANG-FINDINGS.md) for the measured device, budget and
+scope. Existing GPU dispatch observation is separate from Neural Engine
+execution, which was not added. JANG_4M full-model qualification remains pending.
+
+
 <!-- ===== CHANGELOG.md ===== -->
 
 # Changelog
 
-## Local unreleased: JANG checkpoint support
+## WIP fork — unreleased JANG checkpoint support
 
+- Publish the research source as a clearly labeled WIP fork with the measured
+  M5 Max benchmark table and JANG model source linked in the README.
 - Add pinned JANG_4M and JANG_6S downloads and text-mode expert streaming.
 - Preserve per-module precision, FP16 scales and mixed n-gram packing.
 - Price checkpoint-specific resident weights and cache records; keep JANG
   cache plans fixed and omit unmeasured speed estimates.
-- Add real weight-row numerical fixtures and configuration checks. Full-model
-  generation and performance qualification remain pending. See [JANG](docs/JANG.md).
+- Verify the complete JANG_6S checkpoint and exercise full-model generation,
+  bounded reference capture and a paired exact-widening development benchmark.
+- Add explicit run/Engine packed widening while retaining scalar defaults and
+  rejecting unsupported checkpoint/layout combinations.
+- Add neuron-oracle, read-scheduling, storage-layout and prefetch-cost diagnostics.
+  Rejected experiments remain inactive; no native prefetch or new ANE execution
+  was enabled. Formal qualification and serving integration remain pending.
+- Record measured and modeled outcomes in the canonical evidence store and
+  [current findings](docs/JANG-FINDINGS.md). See [JANG usage](docs/JANG.md).
 
 What each release changed, newest first. `curl | sh` installs the latest
-release; anything under **Unreleased** is on `main` only.
+release; **WIP fork** entries describe this public research source and are not a claim
+that the work is merged, released or installed upstream.
 
 ## 0.2.15 - 2026-09-11
 

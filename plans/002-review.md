@@ -1,5 +1,7 @@
 # Plan 002 execution review
 
+> Historical review/checkpoint at the stated source and evidence versions. Later completion, rejection and remaining work are reconciled in [the current index](README.md) and [JANG Flash findings](../docs/JANG-FINDINGS.md). Preserve the original evidence; do not treat historical active-work wording as a new task.
+
 - Worktree: `../slotstream-flash-m5`, branch `advisor/001-flash-m5`, base `93fb512`.
 - Implementation executor: `flash_executor` (GPT-5.6-sol, high effort).
 - Current verdict: APPROVE Plan 002 at `91bbaf7`, after two review rounds; parent Plan 001 remains IN PROGRESS.

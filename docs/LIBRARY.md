@@ -161,6 +161,19 @@ Explicit controls, saved control sets and public initializers retain their
 compatibility behavior; no numerical or capacity guarantee follows from
 enabling an experimental control.
 
+## Local JANG_6S exact widening
+
+The experimental source API accepts `expertWidening: .packed4To6` in either
+Engine initializer. Omission retains `.scalar`; inspect the read-only
+`engine.effectiveWideningPolicy` for the effective selection. The explicit fast
+policy rejects unsupported checkpoints and packed-layout combinations before
+resident/pool allocation. Original weights and quantization are unchanged.
+
+The neuron and storage sample helpers are package diagnostics, not qualified
+library inference modes. No ANE backend or native expert-prefetch worker was
+added. See [JANG usage](JANG.md) and [measured scope](JANG-FINDINGS.md). These APIs
+require this local source checkout; they are not a release-version promise.
+
 ## API stability
 
 `Engine.generate` currently uses callbacks. A typed delta stream, dedicated

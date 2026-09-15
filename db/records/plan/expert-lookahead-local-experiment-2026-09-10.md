@@ -3,7 +3,7 @@ type: plan
 meta-type: operational
 id: 01m27533r0pfx8hzadnvadhz2a
 created: 2026-09-11T02:35:04.831717+00:00
-updated: 2026-09-11T17:03:14.204121+00:00
+updated: 2026-09-15T13:45:14.651893+00:00
 summary: 'Local expert lookahead: causal capture, small predictors, bounded prefetch, exactness and held-out speed gates'
 date: 2026-09-10
 doc: plan
@@ -13,6 +13,8 @@ order: '337'
 title: 'Expert Lookahead: local training and exact prefetch experiment'
 status: ready
 ---
+**Cross-reference, September 15:** the separate JANG_6S investigation rejected its previous-token and recent-frequency heuristics under a scoped empirical cost screen. That does not evaluate or reject the learned predictor specified here for the original checkpoint. This plan remains a separate unexecuted track; no predictor or native prefetch is claimed from the JANG experiments. See [[records/plan/jang-flash-qualification-status]].
+
 **Status: ready for execution. Five numbered review passes, two depth-two alignment reviews and a closing consistency review are complete; the fifth pass was a separate code-grounding review that corrected seven items. No predictor has been trained, no performance gain has been demonstrated, and this planning task launches no model or paid job.** This is the local successor experiment requested on September 10. Work is divided into an initial proof and conditional extensions so that a useful negative result is also a complete outcome.
 
 ### 1. Objective, scope and fixed decisions

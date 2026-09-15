@@ -1,5 +1,11 @@
 # Plan 002: Implement the Flash experiment launcher and baseline evidence gate
 
+## Current disposition — September 15, 2026
+
+**DONE at bounded scope.** Launcher/archive gates, complete pinned JANG_6S verification and monitored baseline completed; reviewed in 91bbaf7.
+
+[Evidence/current findings](002-review.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 > Executor: follow this bounded implementation plan and verify every step. It executes the foundation of Plan 001 revision 2, not its optional sparse/M5 optimizations. Your reviewer maintains the plan index. Commit only your work in the isolated worktree; do not merge or push. Report measured results and unavailable checks separately.
 
 ## Status and prerequisites

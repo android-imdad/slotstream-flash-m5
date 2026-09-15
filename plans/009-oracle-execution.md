@@ -55,7 +55,7 @@ The first benchmark attempt was stopped after Foundation reported non-nominal (`
 
 ## Completed 24 GB benchmark
 
-The cooled cohort completed all nine pairs / eighteen arms. Every pair preserved exact output IDs and model work, matched the effective controls, stayed under the process-memory ceiling, and passed the timing-eligibility checks. The final archive still matches current native source. `verification.json` rechecks the receipts, actual artifacts, cooldown records and exact work joins.
+The cooled cohort completed all nine pairs / eighteen arms. Every pair preserved exact output IDs and model work, matched the effective controls, stayed under the process-memory ceiling, and passed the timing-eligibility checks. At benchmark completion the final archive matched the then-current native source. Subsequent diagnostics have changed the checkout; the original source-bound archive remains the historical reference. `verification.json` rechecks the receipts, actual artifacts, cooldown records and exact work joins.
 
 | Workload | Scalar median tok/s | Packed median tok/s | Throughput ratio | First text, scalar → packed | Packed maximum physical peak |
 |---|---:|---:|---:|---:|---:|
@@ -71,4 +71,4 @@ Evidence directory: `.build/flash/runs/engine-benchmark-24gb-cooled-20260915`.
 
 Report SHA-256: `d623c0ff1af9c3f03712d2dbe52b85e0e0b6b9eec752ab3e494f75e249edf5f8`.
 
-No model process remained after completion. No new optimization was started after this benchmark, and no defaults, checkpoint weights, merge or push were changed.
+No model process remained after benchmark completion. Subsequent experiments and their rejections are recorded in Plans013–016; original defaults and checkpoint weights remain unchanged, with no merge or push.

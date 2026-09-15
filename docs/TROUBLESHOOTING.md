@@ -156,3 +156,22 @@ unavailable engine returns an explicit error instead of resuming partial state.
 For other unresolved problems, include your Mac model, memory, Slotstream
 version, the command you ran, and the error message. Remove credentials
 and private file contents before posting.
+
+
+## JANG results or experiment flags do not match this build
+
+The Flash experiments belong to the local source checkout. An installed upstream
+binary may not expose their commands. Check `slotstream --help` and use the
+source build described in [the JANG guide](JANG.md).
+
+Packed widening is explicit for JANG_6S; scalar is still the default. Check
+`effective_expert_widening` in the run's stats rather than assuming it is active.
+CLI `serve` does not accept the widening flag. Masks and reader/preload samples
+remain diagnostic-only after their scoped rejections; enabling unrelated
+optimization switches does not reproduce those experiments.
+
+Historical study validation may fail because the full local archive or pinned
+evaluation environment is absent. Restore matching inputs or create a separately
+identified new study. Do not replace an old reference with a current executable,
+change its hash, or mix incomplete/timing-ineligible runs into a completed cohort.
+[Current findings and limits](JANG-FINDINGS.md) identify the measured scopes.

@@ -4331,3 +4331,77 @@ full-model generation, long-context answer test, KL reproduction, or actual
 inference memory/throughput measurement was performed. JANG MTP and vision
 remain disabled. This is experimental local source support, not an upstream
 release or proof of end-to-end inference on this Mac.
+
+## JANG Flash foundation and existing M5 dispatch
+The complete pinned JANG_6S checkpoint was downloaded and verified, and monitored full-model generation completed. This advances the earlier component-only checkpoint; it does not establish the publisher's quantization loss against BF16 or qualify JANG_4M full-model inference.
+
+Frozen natural tokenization, bounded activation/full-logit/state capture, terminal memory sampling and full-vocabulary quality metrics are implemented. Exact loading comparisons use the preserved unmodified JANG_6S engine, not another quantization. The reference/cohort archives and input identities remain immutable.
+
+An instrumented copy of pinned MLX observed `gather_qmm_rhs_nax` for the grouped expert case and `gather_qmv` for decode, followed by successful GPU evaluation and numerical checks. This establishes the existing diagnostic-build path. It does not establish production-binary utilization or a new acceleration gain. GPU Neural Accelerators and the separate Apple Neural Engine are different devices; no new ANE execution was implemented.
+
+Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. The source summary and private-dispatch report hashes are included in the portable extract. Plans002–008 and010/012 retain the individual foundation acceptance methods.
+
+## JANG exact widening: matched 24 GB development benchmark
+Explicit `packed4-to6` integer-code widening preserves represented weights and original files. Scalar remains the default; the fast policy is available to the local run command and Engine API for JANG_6S. The CLI serve command has no widening activation flag.
+
+Three paired rounds per workload ran on the local M5 Max with 48 GB unified memory. Both arms used the same JANG_6S checkpoint, a 24 GB process target, 32,768 configured context tokens, greedy seed 42, up to 128 output tokens, fresh CLI processes, prefix cache off, MTP off and vision off. Configured context is not a tested long-prompt length.
+
+| Workload | Scalar tok/s | Packed tok/s | First text seconds, scalar → packed |
+|---|---:|---:|---:|
+| Coding | 3.331 | 7.409 | 5.311 → 2.584 |
+| Explanation | 3.199 | 6.983 | 5.870 → 2.930 |
+| Reasoning | 3.272 | 7.266 | 6.623 → 3.235 |
+
+Packed throughput was 6.98–7.41 tok/s, about 2.2× scalar throughput. All nine pairs / eighteen arms had exact output IDs and work, matched controls, eligible timings and process peaks under target. Maximum observed packed physical footprint was 20.685329928 GB (20.69 GB rounded). First-text statistics exclude loading and cooldown.
+
+This is a measured development checkpoint, not the original ten-pair qualification, a held-out broad task-suite result, default rollout or upstream release. The separate upstream target uses another quantization and persistent HTTP serving with MTP/lookahead; it is not the causal before arm and was not beaten.
+
+Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. Original report SHA-256 `d623c0ff1af9c3f03712d2dbe52b85e0e0b6b9eec752ab3e494f75e249edf5f8`. The earlier fair-thermal attempt remains preserved as incomplete/ineligible and is not combined with the cooled cohort.
+
+## JANG neuron-block oracle: fidelity rejection and operator stop
+The diagnostic oracle masks blocks of intermediate neurons inside each routed expert, while retaining full dense loading and down-projection computation. It does not implement sparse SSD reads. Original hidden values are scored against verified original column norms, and every selected mask is independently recomputed by the host. The extra diagnostic memory is charged before pool sizing.
+
+These teacher-forced comparisons measure incremental error against unmodified JANG_6S, not quantization loss against BF16 or the publisher's reference.
+
+| Retained blocks | Positions | Mean KL | p99 KL | Top-1 agreement | PPL ratio | Result |
+|---|---:|---:|---:|---:|---:|---|
+| 10 | 896 | 0.0000 | 0.0000 | 100.00% | 1.0000 | Exact control passed |
+| 8 | 896 | 0.2036 | 2.2378 | 83.93% | 0.9962 | Fidelity rejected |
+| 6 | 896 | 0.4098 | 3.8357 | 74.33% | 0.9586 | Fidelity rejected |
+
+Four-block evaluation was stopped by the user after 512 of 896 positions; no complete verdict is claimed. Two blocks were not tested. The small PPL-ratio improvements for eight/six blocks do not override failed KL/top-1 gates. The original five-cohort protocol was not completed; the investigation closed at the user-revised scope.
+
+No mask is admitted to generation. The dependent neuron predictor, sparse runtime and optional ANE predictor are not selected for this failed approach. Different methods would require a separately defined investigation.
+
+Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. The retained-count reports and operator decision remain separate and hash-bound; Plans009 and its oracle execution record describe the full gates and stopping decision.
+
+## JANG exact-loading screens: rejected component candidates
+Native-CLOCK-reconciled recent-token cache windows failed the byte-saving admission gate, so no window policy was installed.
+
+Subsequent original-reader component studies compared complete output tensors and charged all timed allocation, read, conversion/copy and MLX wrapping work. Whole-expert artifacts were bounded diagnostic subsets, not full-model replacements. All original checkpoint files remained read-only.
+
+| Candidate | Measured reader-time outcome | Disposition |
+|---|---|---|
+| Balanced read scheduling | 40.39% longer at default queue depth | Rejected |
+| Expanded whole-expert layout | 8.48% longer paired total time | Rejected |
+| Source-native whole-expert layout | 0.44% longer point estimate; essentially tied | Rejected |
+
+The source-native near-tie is not evidence of a meaningful overall slowdown or speedup. None reached its predeclared admission threshold. No full-model repack, reader-policy activation or generation speedup followed these screens. They do not rule out every other layout or scheduling algorithm.
+
+Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. Plans004 and013–015 retain per-case timings, limits, failure/recovery checks and individual artifact identities. These are component measurements, not full-model throughput comparisons.
+
+## JANG causal SSD-prefetch: empirical cost and overlap rejection
+The existing previous-token and recent-eight-frequency forecasts were scored using exact historical routes, a complete original-reader cost grid and nine fresh matching packed-widening control runs. The historical scalar timings and a paging-ineligible old packed timing were not used. Every fresh control matched exact IDs, work, plan/numerical controls and native CLOCK read counts/bytes.
+
+Prefetch admission was evaluated at 14 GB with the original diagnostic workloads. Reader cost calibration covered all batch sizes from one through ten in three source precision classes, with eight repetitions per case. The largest calibration peak was 373,031,920 bytes under a 512 MB cap; maximum full-model control peak was 10,063,893,856 bytes under target. Timings were eligible and original source identities were unchanged.
+
+The model charges staging against the cache, grants free predictions/insertion, and permits all non-reader decode time as one global overlap budget. Observed cost extrema provide an optimistic sensitivity, not a physical bound or confidence interval.
+
+| Forecast | Modeled ideal-overlap estimate | Optimistic sample sensitivity | Result |
+|---|---:|---:|---|
+| Previous-token | -0.64% to +0.34% | At most +0.51% | Rejected |
+| Recent-frequency | 4.62–4.77% | At most 6.47% | Rejected |
+
+Both missed the predeclared ten-percent gate in every tested workload even under the optimistic sensitivity. These are empirical estimates, not measured native prefetch speedups. No worker or serving activation was implemented. The result is scoped to these forecasts and this budget; it does not establish a universal rejection at 24 GB or for learned predictors.
+
+Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. Original report SHA-256 `49cb662be69ad0fa866ff9c3078b7ef9aca33d332afa12ac95570b684cfb8519`; independent verification binds all control, calibration, readiness and settling artifacts. Plan016 retains the complete equations, per-workload table and limitations.

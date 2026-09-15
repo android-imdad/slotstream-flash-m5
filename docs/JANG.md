@@ -5,17 +5,17 @@ Qwen3.8-Flash-Next checkpoints. It streams routed experts and n-gram rows
 from the original safetensors files, retaining the model's native router.
 The original PipeNetwork checkpoint remains the default.
 
-This is a source implementation, not an upstream release or a qualified
-full-model performance result. The component gates use real JANG weight-row
-samples and checkpoint metadata. Full generation, long-context quality,
-physical-memory peaks and throughput still require tests with complete weights.
+The tested model is [JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S),
+using [the pinned experiment revision](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S/tree/3781190c6bbdf0a7637beda49ba179822612058a).
+
+This is an experimental local source build, not an upstream release. The complete JANG_6S checkpoint is now verified and has full-model generation, memory and paired widening measurements. A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening. Formal qualification, broader/long-context coverage and JANG_4M full-model results remain incomplete. See [current findings and rejected experiments](JANG-FINDINGS.md).
 
 ## Build and check
 
 From this checkout, with Apple's command line tools installed:
 
 ```sh
-make build SLOTSTREAM_BUILD_JOBS=4
+make build SLOTSTREAM_BUILD_JOBS=2
 .build/release/slotstream jang-check
 ```
 
@@ -69,13 +69,13 @@ Run one model process at a time and retain headroom for other applications.
 `doctor` reads headers without loading the weights into the GPU:
 
 ```sh
-.build/release/slotstream doctor --model ./models/jang-4m
-.build/release/slotstream run --model ./models/jang-4m \
+.build/release/slotstream doctor --model ./models/jang-6s
+.build/release/slotstream run --model ./models/jang-6s \
   --prompt "Explain why the sky is blue." --max-tokens 128 --greedy \
-  --sample-footprint --stats-json ./jang-4m-run.json
+  --sample-footprint --stats-json ./jang-6s-run.json
 ```
 
-Substitute `./models/jang-6s` for the other checkpoint. The default JANG plan
+Substitute `./models/jang-4m` for the component-supported alternative; its full-model performance is not established by the JANG_6S results. The default JANG plan
 selects a conservative target from current device observations and then
 keeps that cache fixed. `--memory-gb` sets a total process target; requests
 that cannot fit live headroom are refused. The plan charges original resident
@@ -85,11 +85,33 @@ Its budget is not a measured physical peak. No throughput estimate is shown.
 For an API server:
 
 ```sh
-.build/release/slotstream serve --model ./models/jang-4m
+.build/release/slotstream serve --model ./models/jang-6s
 ```
 
 Clients must request the loaded JANG name reported by the API. A request for
 the original PipeNetwork quant is rejected when JANG is loaded.
+
+## Explicit exact widening
+
+Scalar expansion remains the default. The local `run` command accepts
+`--expert-widening packed4-to6` for JANG_6S only. It accelerates integer-code
+expansion without changing quantization or original files. The effective policy
+is recorded as `effective_expert_widening` in `--stats-json` output.
+
+After previewing memory and checking headroom, add the flag to a JANG_6S run:
+
+```sh
+.build/release/slotstream run --model ./models/jang-6s \
+  --expert-widening packed4-to6 --prompt "Explain why the sky is blue." \
+  --greedy --sample-footprint --stats-json ./jang-6s-packed.json
+```
+
+This example is a functional run, not the frozen benchmark workload. The flag
+is rejected for unsupported checkpoints and when combined with a packed expert
+layout. The CLI `serve` command has no widening flag and keeps scalar behavior;
+HTTP requests cannot select it. Neuron masks, balanced scheduling, layout
+samples and prefetch-cost probes are diagnostic-only and do not activate with
+this flag. No Neural Engine acceleration is added.
 
 ## Representation and boundaries
 
@@ -114,18 +136,14 @@ the original PipeNetwork quant is rejected when JANG is loaded.
 
 ## Qualification still needed
 
-A complete weight download and an independent reference run are needed to
-validate whole-model logits and useful generation on the target Mac. Then
-measure cold and warm runs, prefill, sustained decode, physical footprint,
-actual storage reads and long-context behavior. The component checks alone
-do not establish those results or reproduce the publisher's KL scores.
+Complete JANG_6S weights, real generation and bounded comparisons against the preserved unmodified JANG_6S engine now exist. The measured widening checkpoint does not complete the original larger paired study or parent final run-set. Broad/long-context task coverage, publisher/BF16 reference reproduction and JANG_4M full-model qualification remain separate gaps. A configured context window is not a test of a prompt reaching that limit. See [the current qualification plan](../db/records/plan/jang-flash-qualification-status.md).
 
 ## Swift library
 
 Use the selected instance for weight status, download and verification:
 
 ```swift
-let weights = WeightStore.resolving("JANG_4M")
+let weights = WeightStore.resolving("JANG_6S")
 try weights.download()
 let index = try CheckpointIndex(dir: weights.modelDirectory)
 let plan = try CheckpointMemory(index: index).plan(memoryGB: nil)
@@ -133,7 +151,12 @@ let engine = try await Engine(modelDir: weights.modelDirectory, plan: plan)
 ```
 
 For a custom directory use `WeightStore(modelDirectory: url,
-jangModel: JANGModels.jang4M)`. The original static WeightStore helpers retain
+jangModel: JANGModels.jang6S)`. The original static WeightStore helpers retain
 their original PipeNetwork semantics. Engine read-byte statistics count source
 expert payload, not bytes added by cache expansion; physical SSD traffic still
 requires operating-system measurement.
+
+For explicit JANG_6S widening in Swift, pass `expertWidening: .packed4To6` to
+the Engine initializer and inspect `engine.effectiveWideningPolicy`. Omission
+keeps `.scalar`. This is a local source API; the same checkpoint/layout refusal
+rules apply. It does not qualify a custom serving integration.

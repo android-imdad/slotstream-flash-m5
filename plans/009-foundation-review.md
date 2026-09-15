@@ -1,16 +1,18 @@
 # Neuron and prefetch implementation checkpoint — September 15
 
+> Historical review/checkpoint at the stated source and evidence versions. Later completion, rejection and remaining work are reconciled in [the current index](README.md) and [JANG Flash findings](../docs/JANG-FINDINGS.md). Preserve the original evidence; do not treat historical active-work wording as a new task.
+
 ## Scope
 
-The user clarified that continuation means neuron skipping, SSD prefetching and Neural Engine execution. This delivery advances their prerequisites and the internal neuron-mask component. Plan 009 and the parent plan remain **IN PROGRESS**. Existing M5 GPU accelerator verification remains unchanged; no new Neural Engine execution is implemented or claimed.
+The user clarified that continuation means neuron skipping, SSD prefetching and Neural Engine execution. This historical delivery advanced their prerequisites and the internal neuron-mask component. Plan009 and the parent were in progress at that checkpoint; Plan009 has since closed at the user-revised scope. Existing M5 GPU accelerator verification remains unchanged; no new Neural Engine execution is implemented or claimed.
 
-Checkout: `/Users/imdad/Documents/projects/slotstream-flash-m5`, existing branch `advisor/001-flash-m5`. Changes are local and uncommitted. Prior widening changes and the separate upstream 24 GB target remain present. The new work does not change checkpoint weights, quantization, normal generation, serving defaults or dependency pins.
+Checkout: `/Users/imdad/Documents/projects/slotstream-flash-m5`, existing branch `advisor/001-flash-m5`. Changes were local and uncommitted at this checkpoint; the subsequent implementation and findings are now committed in the branch history. Prior widening changes and the separate upstream 24 GB target remain present. The new work does not change checkpoint weights, quantization, normal generation, serving defaults or dependency pins.
 
 ## Implemented
 
 - `FlashNeuronScoring`: original FP32 values, sequential FP64 column sums and square roots, one final FP32 rounding; signed SwiGLU contribution scores; deterministic 64-neuron block selection.
 - `flash-column-norms`: sample/full export through the existing expert reader. One expert at a time; no Engine or resident trunk. The model process lock, bounded writer, descriptor/path identities, metadata hashes and archived executable provenance protect the export. A small package wrapper leaves the standalone ProcessMemory compilation gate intact.
-- `FlashHiddenTransform` and `FlashNeuronMaskTransform`: package-scoped, default-nil hook distinct from observation. The original hidden tensor is observed first. Ten blocks returns the same MLX tensor object; partial masks retain dtype and the full down-projection shape. Multi-token, split-rank, resident-overlap and expert-workspace combinations are rejected. Failures propagate through the checked forward before its state is committed. The adapter responsible for the additional norm reservation and document/mask-artifact lifecycle is **not yet implemented**, so public run/serve/capture cannot activate this component.
+- `FlashHiddenTransform` and `FlashNeuronMaskTransform`: package-scoped, default-nil hook distinct from observation. The original hidden tensor is observed first. Ten blocks returns the same MLX tensor object; partial masks retain dtype and the full down-projection shape. Multi-token, split-rank, resident-overlap and expert-workspace combinations are rejected. Failures propagate through the checked forward before its state is committed. The charged adapter was not implemented at this checkpoint. It was subsequently completed for explicit diagnostic capture; normal run/serve still cannot activate the mask.
 - `calibrate.py`: strict norm-file validation and complete development-corpus block scoring. Records zeros, contribution scores, five predeclared masks, per-category/layer summaries and individual-neuron block unions. Norms are read-only mappings; activation/scoring work is streamed. Hypothetical bundled source bytes are separated from measured savings and model quality.
 - `prefetch_study.py`: previous-token and recent-eight-token frequency forecasts at the preceding layer boundary. Forecasts never inspect the future router or modify CLOCK. Charges original staging plus expanded insertion scratch by reducing the candidate pool; reports the induced cache difference, useful/wasted reads and one-batch staging bound. This is replay, not native asynchronous prefetch.
 - Historical prompt validation accepts a directory alias only when it resolves to the same executable; binary, archive, metadata and receipt hashes remain required. The old checkout path is a compatibility symlink to the moved checkout; recorded archives were not rewritten.
@@ -40,14 +42,14 @@ The initial moved-checkout build failed on duplicate absolute module-cache paths
 
 Final validation passed: release build, 201 host tests, 39 T0 checks, the seven-assertion native mask check, original JANG numerics and the complete repository static battery. The final archived binary also matched the immutable reference's full logits, routes, retained state and token IDs at all 12 positions in the accepted small natural development shard with the mask hook disabled (`runs/neuron-default-parity-20260915`). The source-bound archive is `runs/neuron-foundation-final-archive-20260915`.
 
-No full-model masked logits, perplexity, free generation, native prefetch speed or Neural Engine predictor timing is qualified here. The internal mask component must remain inaccessible to public CLI modes until its charged adapter exists. The measured upstream 24 GB target in `BASELINE.md` has not been beaten by this work.
+This foundation checkpoint did not establish masked full-model quality or runtime speed. Subsequent oracle cohorts and the prefetch cost screen are recorded separately; no partial mask, native prefetch speedup or Neural Engine predictor was qualified. The measured upstream 24 GB target in `BASELINE.md` has not been beaten by this work.
 
-## Exact next implementation
+## Follow-up disposition
 
-1. Add the Plan 009 versioned oracle config, single norm-table ownership, additional 80 MiB reservation, streaming mask artifacts and document reset to `flash-capture`. Preserve dense warmup and immutable reference formats. Register dedicated oracle validation and a complete cohort evaluator.
-2. Prove ten-block full-logit/route/state parity, then run the predeclared development cohorts for 8, 6, 4 and 2 blocks. Preserve the original quality thresholds. Full-model quality, not contribution scores, determines acceptance.
-3. Only a useful quality-passing mask can advance to free-generation checks and the causal trained block predictor. Neural Engine/Core ML work compares that useful predictor with CPU/MLX including synchronization and memory; it is not a whole-expert ANE port.
-4. Prefetch needs a measured overlap/cost case before native staging is justified. The simple forecasts above have poor byte economics; do not translate their coverage into a speedup or silently omit staging/cache costs.
+1. The charged versioned oracle adapter, norm ownership, streaming masks and complete-cohort evaluator were implemented in Plan009.
+2. Dense-ten parity passed. Eight/six blocks failed fidelity; four stopped incomplete at user direction and two was not tested. Do not resume the original lower-count sequence automatically.
+3. The dependent free-generation/predictor/sparse-runtime/ANE path was not selected because no tested partial mask passed the gate.
+4. Plan016 completed the measured reader-cost/overlap screen; both existing heuristic-prefetch policies were rejected at its matched budget. No native worker was admitted.
 
 Reproduce the completed stages:
 

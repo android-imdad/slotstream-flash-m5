@@ -14,6 +14,8 @@ concurrency:
 
 jobs:
   update:
+    # Preserve upstream automation without scheduling bot commits in research forks.
+    if: github.repository == 'carloslfu/slotstream'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

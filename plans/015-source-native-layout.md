@@ -1,5 +1,11 @@
 # 015 — Source-native whole-expert layout screen
 
+## Current disposition — September 15, 2026
+
+**COMPLETE — source-native layout rejected.** The original-byte layout was essentially tied overall and missed admission; committed in 01d5b6b.
+
+[Evidence/current findings](../docs/JANG-FINDINGS.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 Status: COMPLETE — rejected; no useful total reader-time improvement. Continues the user's authorized exact-loading work after
 the completed Plan 014 benchmark was reported and committed as `2053804`.
 

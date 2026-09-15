@@ -75,7 +75,9 @@ Plus the memory options.
 
 Download losslessly compressed model weights from Hugging Face, reconstructing
 the original files with resumable transfers and hash verification.
-The only model name is `qwen3.8-flash-next:4bit`, which is also the default.
+The default model name is `qwen3.8-flash-next:4bit`. This local source checkout
+also accepts the pinned experimental JANG aliases with raw downloads; see
+[JANG checkpoints](JANG.md). They do not use the default compressed package.
 
 | Flag | Meaning |
 |---|---|
@@ -188,7 +190,26 @@ lifetime RSS and current footprint; `lifetimePhysicalFootprintPeakBytes` exposes
 the native footprint peak separately. Sampling remains useful for attributing
 memory to a particular request and can miss allocations between samples.
 
+## Local JANG experiment commands
+
+These commands belong to this source checkout, not a claim about an installed
+upstream release. `run --expert-widening scalar|packed4-to6` selects exact code
+expansion; omission keeps scalar. Packed widening is JANG_6S-only and conflicts
+with packed expert-layout activation. CLI `serve` does not accept the flag.
+
+Diagnostic commands include `widening-check`, `flash-column-norms`,
+`flash-capture`, `read-scheduling-check`, `whole-expert-check`,
+`source-native-check`, and `prefetch-costs-check`. Use their `--help` and
+fresh evidence directories. Oracle configuration is accepted only by the
+explicit diagnostic capture mode, never normal run/serve. These probes do not
+activate sparse inference or native prefetch. See [findings](JANG-FINDINGS.md)
+and [reproduction](TESTING.md#jang-flash-experiments).
+
 ## Optimization defaults
+
+The defaults and planner curves in this section describe the original checkpoint.
+Experimental JANG checkpoints use their separate fixed-plan accounting and
+qualification limits; see [the JANG guide](JANG.md).
 
 The CLI resolves the selected optimization family automatically: compact
 runtime state and n-gram rows, bounded prompt-read grouping, committed prompt

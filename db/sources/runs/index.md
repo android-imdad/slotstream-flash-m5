@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: sources/runs
-updated: 2026-09-12T09:20:16.249937Z
+updated: 2026-09-15T14:07:37.952015Z
 ---
 
 # sources/runs
 
+- [[sources/runs/2026/09/jang-flash-findings-20260915]] — Portable JANG Flash findings from completed local experiments
 - [[sources/runs/2026/09/jang-support-validation]] — Passing source build, JANG numerical and streaming fixtures, regression catalogue and static transport gates; full-model inference untested.
 - [[sources/runs/2026/09/2026-09-11-release-0-2-15-published-and-installed]] — v0.2.15 CI-artifact acceptance 25/25, publication with verified attestation, installation and installed-release acceptance 31/31.
 - [[sources/runs/2026/09/2026-09-11-global-paging-policy-native-pass]] — Full MTP/vision, governor and context checks pass under the paging-diagnostic policy with real memory ceilings intact.
@@ -506,9 +507,8 @@ updated: 2026-09-12T09:20:16.249937Z
 - [[sources/runs/2026/09/2026-09-05-optimization-router-selection]] — Exact router and MTP selection checks pass; real request timing gates do not qualify selector or queue adoption
 - [[sources/runs/2026/09/2026-09-05-optimization-bounded-output]] — Socket saturation exposed a blocked send; corrected bounded queue passes 38 socket assertions and 74 live API checks
 - [[sources/runs/2026/09/2026-09-05-optimization-prefill-family-and-serving-intervals]] — Larger chronological prefill remains unqualified; short server A/A passes and all long paired timings are excluded
-- [[sources/runs/2026/09/2026-09-05-optimization-large-tile-and-frontier]] — Large tile and compact frontier exact gates pass; every paired performance comparison is excluded
 
 ## More
 
-This folder has 530 files. The 500 most recent are listed above.
+This folder has 531 files. The 500 most recent are listed above.
 Use `dbmd query --type run --in sources` for the complete catalog.

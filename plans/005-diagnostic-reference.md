@@ -1,5 +1,11 @@
 # Plan 005: Establish the bounded diagnostic reference for neuron experiments
 
+## Current disposition — September 15, 2026
+
+**DONE at bounded scope.** The frozen logit/route/state reference and observation parity were accepted; later corpus and oracle work completed separately.
+
+[Evidence/current findings](005-review.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status
 
 - Priority P1; effort L; risk MED. DONE at bounded scope; accepted archive and independent terminal-qualified parity are recorded in 005-review.md.

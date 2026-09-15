@@ -12,7 +12,7 @@ The README, user guides, engineering notes, and changelog are combined in
 
 ## Facts
 
-- The only model is `qwen3.8-flash-next:4bit`; the engine is built around its geometry.
+- The default checkpoint is `qwen3.8-flash-next:4bit`; this local source checkout also supports experimental JANG encodings of the same model. See docs/JANG.md for their separate limits.
 - The current engine requires Apple Silicon, MLX, and Metal. Windows and Linux support for AMD and NVIDIA is planned for Sevra. Other models, including the dense Qwen3.8-27B, are unsupported.
 - Requirements: Apple Silicon, macOS 14+, ~110 GB of free disk. Weights: 105.3 GB in 25 files (the 1.5 GB draft head is optional), sha256-pinned, at `~/.slotstream/models/qwen38-flash-next-mlx-4bit`.
 - Install: `curl -fsSL https://raw.githubusercontent.com/carloslfu/slotstream/main/install.sh | sh` puts the latest release in `~/.slotstream/bin` (binary plus `mlx.metallib`, no Python); rerun to upgrade.
@@ -73,3 +73,10 @@ The README, user guides, engineering notes, and changelog are combined in
 - [Tools/verify.sh](https://raw.githubusercontent.com/carloslfu/slotstream/main/Tools/verify.sh): the acceptance battery; [Tools/e2e_release.sh](https://raw.githubusercontent.com/carloslfu/slotstream/main/Tools/e2e_release.sh) re-tests the installed binary; [Tools/llms_full.sh](https://raw.githubusercontent.com/carloslfu/slotstream/main/Tools/llms_full.sh) regenerates llms-full.txt
 
 - [Experimental JANG checkpoints](docs/JANG.md): pinned downloads, text streaming, original-value preservation and qualification limits.
+
+## Local JANG Flash findings
+
+- A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening. This is a paired development result, not completed final qualification or default rollout.
+- Scalar remains the default. CLI run and Engine support explicit packed widening; CLI serve has no widening flag. No native prefetch, sparse inference or new ANE execution was enabled.
+- Neuron masks failed fidelity; the lower counts stopped at user direction. The dependent predictor/ANE path was not selected. Cache windows, balanced scheduling, whole-expert layouts and the tested heuristic prefetch policies failed their scoped gates.
+- [JANG Flash findings](docs/JANG-FINDINGS.md), [current plan](db/records/plan/jang-flash-qualification-status.md), and [portable evidence](db/sources/runs/2026/09/jang-flash-findings-20260915.json) distinguish measured, modeled, rejected and pending work.

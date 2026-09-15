@@ -1,5 +1,11 @@
 # Plan008: Freeze the shared corpus and implement quality metrics
 
+## Current disposition — September 15, 2026
+
+**DONE at bounded scope.** Frozen corpus, complete development reference and full-vocabulary metrics accepted in aa9b771. This is infrastructure, not final model qualification.
+
+[Evidence/current findings](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status
 
 DONE at bounded scope after012 repair and independent actual integration. The archived tokenizer produced all196 teacher documents (7672 positions across splits) and1164 scored prompts (104443 IDs,longest407). The new896-position development reference cohort completed14 serial processes, each with terminal-before-reap evidence, maximum physical peak9808909376B. Complete cohort validation and full-vocabulary self-comparison passed. Root approved the14 source/fixture/schema/test files for scoped commit; no optimization or final model qualification is implied.
@@ -8,7 +14,7 @@ Reopened for final integration after Plan012's bounded repair passed independent
 
 BLOCKED after two implementation review rounds: a copied archived execution-harness source file can change without `validate_cohort` rejecting it. Original evidence was not modified. The bounded remaining validation repair is Plan012; no complete natural model cohort or source commit is accepted until that repair and the remaining actual tokenization/capture checks pass. Independent exact widening work011 continues.
 
-P1; effort L; risk MED. IN PROGRESS; Plan007 is reviewed DONE at source baseline `0b032fa8b9ded947c16e9b62ddf4e897dcb3f49a`. Its source diff, exact archived adapter, actual parity evidence, source datasets and isolated evaluation environment were reconciled before dispatch. Same isolated worktree/branch. Reviewer owns plans; source commits after review, no merge/push. This completes the corpus/numerical-metric prerequisite of parent001, not an optimization or final model qualification.
+P1; effort L; risk MED. Historical implementation brief, now completed; Plan007 is reviewed DONE at source baseline `0b032fa8b9ded947c16e9b62ddf4e897dcb3f49a`. Its source diff, exact archived adapter, actual parity evidence, source datasets and isolated evaluation environment were reconciled before dispatch. Same isolated worktree/branch. Reviewer owns plans; source commits after review, no merge/push. This completes the corpus/numerical-metric prerequisite of parent001, not an optimization or final model qualification.
 
 ## Existing evidence and resources
 

@@ -1,5 +1,7 @@
 # Plan005 review — implementation approved; reference pending Plan006
 
+> Historical review/checkpoint at the stated source and evidence versions. Later completion, rejection and remaining work are reconciled in [the current index](README.md) and [JANG Flash findings](../docs/JANG-FINDINGS.md). Preserve the original evidence; do not treat historical active-work wording as a new task.
+
 Preserved source commit: `2a25359c701a78c75c3c69cbdb36d0a43d5af4b4`.
 
 Two formal review rounds resolved bounded manifest/copy/metadata accounting, complete state identity hashing, finite tensor checks, exact policy and environment joins, actual resident/miss callback coverage, checked reservation behavior and consistent input validation. Independent verification passed the fresh strict Flash gate with 99 Python tests, all 50 native groups / 27519 assertions, and the complete repository static gates. Native CLI boundary refusals occur before model allocation.

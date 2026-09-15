@@ -1,3 +1,5 @@
+> Current candidate status: the matched packed-widening development benchmark is complete and did not beat this separate upstream target. See [JANG Flash findings](docs/JANG-FINDINGS.md) and [current qualification status](db/records/plan/jang-flash-qualification-status.md). The frozen baseline files retain their original bytes and historical next-step wording.
+
 # Active JANG_6S performance target
 
 The user selected the verified upstream Slotstream 0.2.18 benchmark as the baseline to beat with JANG_6S.

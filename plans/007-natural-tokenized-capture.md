@@ -1,5 +1,11 @@
 # Plan007: Freeze natural text into bounded capture shards
 
+## Current disposition — September 15, 2026
+
+**DONE.** Natural tokenization/capture bridge accepted at 0b032fa; the reference archive remains immutable.
+
+[Evidence/current findings](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status and purpose
 
 DONE at reviewed source commit `0b032fa8b9ded947c16e9b62ddf4e897dcb3f49a`. The review and real-data evidence below qualify only this tokenizer/capture bridge.

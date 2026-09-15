@@ -1,10 +1,16 @@
 # Plan012: Verify archived harness bytes and immutable receipt joins
 
+## Current disposition — September 15, 2026
+
+**DONE.** Archive inventory, actual-byte and immutable receipt-join validation accepted with Plan008 in aa9b771.
+
+[Evidence/current findings](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status and scope
 
 DONE at bounded scope after one revision round. Root independently passed33 host tests and a copied real-cohort mutation test: original copied cohort passed; changed archived capture.py failed; changing its file hash plus cohort self-hashes while preserving the original launcher digest also failed. The original evidence was untouched. The final small revision rejects nested snapshot.json artifacts and symlinked roots/manifests. Source is committed with008 after its remaining real-tokenization/capture integration, not separately from its dependent uncommitted modules.
 
-P1; effort S; risk MED. IN PROGRESS; bounded successor repair for the blocked008 host implementation after its two formal review rounds. Same isolated checkout/branch atbc185df plus uncommitted008 source. Own only metrics.py, corpus.py, their tests and a small shared snapshot-validation helper/schema if needed. No capture.py, Swift, model, optimization, dataset content or evaluator arithmetic changes. Root owns plans; widening executor owns its separate source/capture/performance files. No source commit or model run until review.
+P1; effort S; risk MED. Historical implementation brief, now completed; bounded successor repair for the blocked008 host implementation after its two formal review rounds. Same isolated checkout/branch atbc185df plus uncommitted008 source. Own only metrics.py, corpus.py, their tests and a small shared snapshot-validation helper/schema if needed. No capture.py, Swift, model, optimization, dataset content or evaluator arithmetic changes. Root owns plans; widening executor owns its separate source/capture/performance files. No source commit or model run until review.
 
 ## Confirmed defect
 

@@ -23,6 +23,8 @@ For AI agents, [llms.txt](../llms.txt) is the index and
 
 The [JANG guide](JANG.md) documents the experimental alternative checkpoint
 loader, original-value preservation and qualification boundaries in this checkout.
+[JANG Flash findings](JANG-FINDINGS.md) summarize the measured widening gain,
+rejected neuron/loading/prefetch experiments, existing M5 dispatch and remaining work.
 
 ## How it works
 

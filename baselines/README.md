@@ -12,3 +12,7 @@ The JANG comparison runner consumes the saved requests and target numbers from
 under `.build/flash/runs/`. Full raw Flash run artifacts also remain under that
 ignored directory. The `plans/` execution records identify their exact paths and
 methods. No remote upload of these large local artifacts is implied by a commit.
+
+Current candidate outcomes are maintained in [JANG Flash findings](../docs/JANG-FINDINGS.md)
+and the [plan index](../plans/README.md). A frozen archive's README records the
+state at capture time; later progress does not rewrite that archive or its hashes.

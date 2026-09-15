@@ -1,5 +1,11 @@
 # Plan 004: Measure whether a recent-token expert window reduces JANG traffic
 
+## Current disposition — September 15, 2026
+
+**COMPLETE — candidate windows rejected.** Native CLOCK replay reconciled exactly; no recent-window policy met admission.
+
+[Evidence/current findings](004-review.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 > Execute this bounded development study after the reviewed M5 diagnostic work. It implements the measurement/replay gate of parent Plan 001 stage 2, not a new runtime eviction policy. Preserve the model and defaults. The reviewer maintains the index; commit only scoped tooling in the isolated worktree, never merge or push.
 
 ## Status and context

@@ -1,5 +1,11 @@
 # Plan 006: Capture the final Darwin lifetime peak before reaping a child
 
+## Current disposition — September 15, 2026
+
+**DONE.** Terminal-before-reap physical-memory sampling was implemented and verified in 7f63f0b.
+
+[Evidence/current findings](006-review.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status and ownership
 
 DONE at reviewed commit `7f63f0b1ebaac1e443defb09ab7e3ad6ccc6b608`. P1; effort M; risk MED. Necessary launcher prerequisite discovered during independent Plan005 review. The prior Plan005 source changes passed review/native/static gates; its reference acceptance remains blocked by this distinct pre-existing Plan002 launcher defect. Reconciled at preserved Plan005 commit `2a25359c701a78c75c3c69cbdb36d0a43d5af4b4`; native source remains frozen during this Python-only fix. Work only in `/Users/imdad/Documents/Codex/2026-09-12/wha/outputs/slotstream-flash-m5`, branch `advisor/001-flash-m5`. Reviewer owns plans; no merge or push.

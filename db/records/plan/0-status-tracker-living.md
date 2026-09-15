@@ -3,7 +3,7 @@ type: plan
 meta-type: operational
 id: 01m1hhwmw2fj49hd8h7mq80pkk
 created: 2026-09-02T17:15:26.978326+00:00
-updated: 2026-09-11T09:02:49.936429+00:00
+updated: 2026-09-15T14:07:37.973338+00:00
 summary: 0. Status tracker (living)
 date: 2026-08-28
 doc: plan
@@ -44,3 +44,9 @@ using slotstream after their first session rather than by what completes the mil
 ---
 
 Optimization execution follows [[records/plan/whole-engine-optimization-2026-09-04]]; [[records/plan/n6-prefill-bound-the-pass-then-read-each-expert-once]] supplies its detailed prefill contract. These are one program, with OPT status tracked once.
+
+### Local JANG Flash investigation
+
+The original checkpoint milestones retain their original evidence. The local JANG_6S track now has complete-weight generation and a measured explicit-widening development speedup; formal qualification remains pending. Neuron masking, cache windows, balanced reads, whole-expert layouts and the tested heuristic-prefetch policies did not advance. No native prefetch, new ANE execution or default/serving activation was added.
+
+Current per-track status and remaining tooling: [[records/plan/jang-flash-qualification-status]]. Admission decisions: [[records/decisions/jang-flash-admission-2026-09-15]]. Do not infer JANG_4M or original-checkpoint qualification from these JANG_6S results.

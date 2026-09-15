@@ -2,12 +2,12 @@
 type: index
 scope: type-folder
 folder: records/machines
-updated: 2026-09-12T09:19:41.219740Z
+updated: 2026-09-15T14:10:41.741058Z
 ---
 
 # records/machines
 
-- [[records/machines/local-m5-max-48gb]] — Local Apple M5 Max used for source builds and bounded JANG component validation.
+- [[records/machines/local-m5-max-48gb]] — Local Apple M5 Max used for bounded JANG checks and the scoped JANG_6S full-model and Flash experiments.
 - [[records/machines/github-actions-macos-26]] — Ephemeral macOS CI runner pool
 - [[records/machines/macbook-air-m5-32gb]] — MacBook Air, Apple M5, 32 GB (community)
 - [[records/machines/macbook-pro-m5-max-128gb]] — MacBook Pro 16-inch, Apple M5 Max, 128 GB (community)

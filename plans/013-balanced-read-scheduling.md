@@ -1,5 +1,11 @@
 # 013 — Balance exact expert read jobs
 
+## Current disposition — September 15, 2026
+
+**COMPLETE — rejected.** The bounded component screen failed; diagnostics remain available and generation remains unchanged. Committed in 65d7e82/ba18325.
+
+[Evidence/current findings](../docs/JANG-FINDINGS.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 Status: COMPLETE — rejected by the component performance screen. User authorized continuing optimizations on September 15,
 with a benchmark after each stage before another optimization.
 
@@ -90,5 +96,4 @@ before reaping. `report.json` and its completion marker record the rejection.
 
 A full-engine performance run was not admitted. The preceding 24 GB packed
 widening result (about 6.98–7.41 tok/s) remains the last completed engine benchmark;
-this experiment establishes no additional generation speedup. All changes are
-local and uncommitted, with no merge, push, serving activation or default rollout.
+this experiment establishes no additional generation speedup. The implementation and execution records were committed in 65d7e82/ba18325, with no merge, push, serving activation or default rollout.

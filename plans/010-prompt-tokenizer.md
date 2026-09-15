@@ -1,5 +1,11 @@
 # Plan010: Freeze complete task prompts without inference
 
+## Current disposition — September 15, 2026
+
+**DONE.** Complete task-prompt tokenization accepted in bc185df, with exact overlap checks.
+
+[Evidence/current findings](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status and dependency
 
 P1; effort M; risk MED. DONE at reviewed source commit `bc185df` after one revision round. Core source baseline0b032fa, plan commitf61730d. Depends on DONE007; supplies008's exact scored-prompt IDs and later009 diagnostic generation. Same isolated worktree/branch. Reviewer owns plans. No merge/push.

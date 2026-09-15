@@ -1006,3 +1006,9 @@ Replaced the post-build commit note with a statement that holds as main advances
 ## [2026-09-12 09:22] update | records/design/jang-checkpoint-support.md
 Added experimental JANG_4M and JANG_6S text support, pinned downloads, exact expert streaming, checked memory accounting and reproducible component validation. Full-model inference, KL and performance remain unqualified.
 
+## [2026-09-15 14:10] update | records/plan/jang-flash-qualification-status.md
+Reconciled completed JANG_6S baseline, widening, oracle and loading/prefetch findings with remaining qualification. Added portable evidence, five measurement records, admission decisions and eighteen public claims; updated guides and plan statuses while preserving historical results.
+
+## [2026-09-15 14:23] update | records/decisions/jang-flash-public-wip-repository.md
+User authorized a public WIP research repository. Added fork attribution, measured M5 Max results and verified JANG model links; preserve upstream origin and publish only to the new repository.
+

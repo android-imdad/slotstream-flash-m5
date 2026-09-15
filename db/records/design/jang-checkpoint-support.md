@@ -2,9 +2,9 @@
 type: design
 id: 01m2abprd1se5kr05ch8rmt890
 created: 2026-09-12T08:28:23.328829+00:00
-updated: 2026-09-12T09:01:11.539800+00:00
+updated: 2026-09-15T13:45:14.613677+00:00
 summary: Experimental pinned JANG checkpoint loading and expert streaming, original-value preservation, fixed memory planning and explicit qualification limits.
-date: 2026-09-12
+date: 2026-09-15
 doc: plan
 level: '2'
 order: '6'
@@ -42,12 +42,11 @@ lock. No JANG compressed package is enabled. The CLI accepts explicit model
 aliases and directories; serving metadata identifies the actual quant and
 rejects a request naming a different loaded checkpoint.
 
-Verification is layered: existing regression checks, pure source-policy
-contracts, real weight-row comparisons against native MLX, and the production
-expert reader/cache with sparse metadata fixtures. These checks do not establish
-full-model numerical parity, memory peaks, context quality or throughput. Those
-require complete checkpoint downloads and reference inference on the target Mac.
-The source feature is experimental until that qualification exists.
+Verification now includes the complete pinned JANG_6S download, monitored full-model generation, bounded exact loading/logit/state comparisons, a natural development oracle cohort and paired full-model widening measurements on the local M5 Max. The original component checks also stand. These results do not reproduce the publisher's BF16/quantization reference, qualify JANG_4M full-model inference, or establish broad long-context quality.
+
+Exact `packed4-to6` widening is an explicit local run/Engine option, with scalar as the default. No CLI serving activation was added. The neuron-block oracle failed fidelity at the completed partial settings; lower counts stopped at user direction. Its predictor, sparse runtime and optional ANE predictor are not selected. Cache windows, balanced scheduling, whole-expert layouts and the tested heuristic-prefetch policies failed their scoped admission gates. No native prefetch or new ANE execution followed.
+
+Current qualification state: [[records/plan/jang-flash-qualification-status]]. Measured findings and limits: [[records/measurements/jang-exact-widening-2026-09-15]], [[records/measurements/jang-neuron-oracle-2026-09-15]], [[records/measurements/jang-loading-screens-2026-09-15]], [[records/measurements/jang-prefetch-cost-screen-2026-09-15]]. The larger paired study and parent final run-set remain pending; the source feature remains experimental.
 
 Implementation: Sources/Slotstream/CheckpointFormat.swift, Checkpoint.swift,
 JANGModels.swift, JANGManifests.swift, JANGPlanning.swift, ExpertStore.swift,

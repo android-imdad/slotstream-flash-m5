@@ -12,7 +12,10 @@ This page covers the Ollama-style `/api/*` and OpenAI-style `/v1/*` endpoints.
 For the AI SDK gateway, see the [fx guide](FX.md). OpenAI tool calling is
 described below. The OpenAI tool and reasoning additions require Slotstream
 0.2.8 or later.
-Use `qwen3.8-flash-next:4bit` as the model name.
+Use `qwen3.8-flash-next:4bit` for the default checkpoint. A local experimental
+JANG server reports its actual loaded quant name through model discovery; use
+that name instead. See [JANG serving limits](JANG.md). HTTP requests do not
+activate packed widening, neuron masks, native prefetch or an ANE backend.
 
 Unknown fields, unsupported features, and malformed values return a 400
 error describing the problem. A wrong model name returns 400, or 404 on

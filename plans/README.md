@@ -1,9 +1,12 @@
-# Implementation plans
+# Implementation plans — current status
 
-Revised with the improve skill on 2026-09-12 against local commit `93fb512` (plan revision 2).
-This is a focused plan for the requested flash-inference and M5 work, not a whole-repository audit. Source code was not modified for this planning pass.
+**Public WIP research repository:** [android-imdad/slotstream-flash-m5](https://github.com/android-imdad/slotstream-flash-m5), branch `main`. The local working branch remains `advisor/001-flash-m5`; the original `origin` remote remains upstream. Publication here does not mean an upstream merge, release or default activation.
 
-A second fresh-context review checked executor readiness against the source. The revision adds an independent M5 track, actual predictor training/evaluation commands, fresh-build and required-test gates, immutable evidence joins, and consistent opt-in activation. It also separates training/development/final data and corrects the statistical claims the small fixed task suite can support.
+Updated September 15, 2026 after the user's requested Flash/M5 experiments and
+documentation reconciliation. The original plans were authored on September 12;
+their dated briefs/reviews are retained as history, not new pending tasks.
+Execution remains on `advisor/001-flash-m5` in this repository. Source and
+measurement commits do not imply merge, push, upstream release or default rollout.
 
 | Plan | Title | Priority | Effort | Dependency | Status |
 |---|---|---|---|---|---|
@@ -22,44 +25,65 @@ A second fresh-context review checked executor readiness against the source. The
 | [013](013-balanced-read-scheduling.md) | Balance exact expert read jobs | P1 | M | 011 packed reader | COMPLETE — component rejected; default-depth reader calls about 40% longer, no generation activation |
 | [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
 | [015](015-source-native-layout.md) | Measure original-byte whole-expert records | P1 | M | 014 reported | COMPLETE — rejected; paired total reader time essentially tied, below the improvement gate |
+| [016](016-prefetch-cost-screen.md) | Price causal SSD-prefetch timing and overlap | P1 | M | Existing trace replay and packed widening | COMPLETE — both forecasts rejected by matched 14 GB timing/cost screen; no native worker |
 
-Execution checkout: `../slotstream-flash-m5`, branch `advisor/001-flash-m5`, starting at `93fb512`. The executor owns implementation there; the reviewer maintains this index and reviews each bounded stage. The original checkout holds the completed, verified download. Model weights are reused read-only; mutable build artifacts are separate. No merge, push, default activation or completed qualification is implied.
+## Outcome
 
-September 15 continuation: the checkout now lives at `/Users/imdad/Documents/projects/slotstream-flash-m5`, on the existing `advisor/001-flash-m5` branch. The user specifically selected neuron skipping, SSD prefetching and Neural Engine execution for continued work. See [the bounded implementation and evidence checkpoint](009-foundation-review.md). Existing M5 GPU dispatch verification is separate from the pending Neural Engine predictor experiment. No approximate generation or serving mode has been activated.
+The complete pinned JANG_6S checkpoint is verified and real generation has been
+measured. Explicit exact widening has a matched development speedup. Its formal
+qualification remains unfinished. Neuron masking, cache windows, balanced reads,
+whole-expert layouts and the tested heuristic prefetch policies did not pass
+their respective gates. Rejected diagnostics remain available for evidence;
+they are not enabled inference features.
 
-Follow the dependency table, not numerical stage order. The first useful delivery is **0 → 1 → independent 2/5 → 7**: a baseline, actual M5 dispatch, exact-loading experiments, and a qualified report. Full-model jobs stay serial. Neuron work follows **1 → 3 → 4 → 7** only when the actual trained predictor passes; optional ANE follows **3 → 6 → 7**. A sparse rejection does not block M5 or exact loading.
+The neuron oracle closed at the user's revised scope: eight/six failed fidelity,
+four stopped incomplete and two untested. Its predictor, sparse runtime and
+optional Neural Engine predictor are **not selected** for this approach. Do not
+resume the lower-count jobs automatically. Existing M5 GPU dispatch was observed
+in an instrumented build; production utilization is still unverified and no new
+ANE execution was added.
 
-All new modes remain **off by default after qualification**. This plan exposes explicit local run/library experiments; serving integration and default rollout are deferred. A completed investigation with no winning candidate is reported as such, never as a qualified speedup.
+## Pending, ranked
 
-Each stage records `accepted`, `rejected`, `blocked`, `already_used`, or `not_selected` with evidence/reasons. The plan stays TODO/IN PROGRESS while selected required work remains; a blocked required track prevents DONE. An unselected optional script need not exist or run. Large artifacts go under the already ignored `.build/flash/`, not `bench/flash/`.
+1. **Plan011 qualification:** the original ten-pair study remains pending. The
+   separate three-pair-per-workload 24 GB checkpoint must keep its narrower claim.
+2. **Parent001 final tooling and qualification:** aggregate run-set creation,
+   stage-seven gates/evaluator, required final coverage and selected-arm reporting
+   are incomplete. Proposed interfaces in the parent plan are not runnable today.
+3. **Broader scope:** long-context/task coverage, JANG_4M full-model evidence,
+   publisher/BF16 reference reproduction and portable evaluation/bootstrap inputs
+   remain unqualified. Do not apply JANG_6S results to them.
+4. **Deferred integration:** serving/default rollout, upstream integration/release and production
+   M5 utilization claims remain separate work. The original-checkpoint learned
+   Expert Lookahead proposal was not evaluated by the JANG heuristic screens.
 
-JANG_6S download, checksum verification and monitored smoke are complete (Plan 002). The M5 diagnostics are reviewed and committed after macOS file permission was granted on 2026-09-12. Basic file reads/Git were rechecked successfully and the exact leftover owned probe was stopped; no active profiler remained. Earlier system-trace budget failures and permission-blocked exports are preserved separately. An instrumented copy of pinned MLX confirmed grouped six-bit NAX submission and completed numerical evaluation; decode used qmv. Production trace utilization remains unverified and no LLM speedup is claimed. See Plan 003 review. Plans004–007 are now complete at their bounded scopes. The tokenizer/capture bridge preserves the original reference and exact chat answer boundary. Plan008 now builds the full frozen natural development corpus and quality metrics, followed by the dense-load neuron-block oracle. Expanded and source-native storage layouts were screened in Plans014–015 and rejected; heuristic prefetch remains replay-only without timing admission. Predictor training, sparse bundles/runtime, optional ANE, and final performance qualification remain conditional downstream work.
+No current neuron, layout or heuristic-prefetch candidate is admitted for further
+runtime implementation. A different method/configuration requires its own
+predeclared quality, cost and performance investigation. Benchmark a stage before
+starting the next optimization; use the actual measured result to decide whether
+to proceed.
 
-## Findings considered and rejected
+## Evidence and documentation
 
-- Treating M5 GPU Neural Accelerators as the Apple Neural Engine: they are separate execution devices with different APIs.
-- Adding accelerator support from scratch before profiling: the pinned MLX source already contains NAX dispatch; verify the running path first.
-- Assuming the paper's ReLU sparsity applies to Qwen SwiGLU: neuron omission requires its own accuracy and useful-block-sparsity evidence.
-- Replacing native 6-bit affine weights with a convenient 4-bit tensor format: changes the selected quant and its numerical quality.
-- Requantizing down-projection columns after transposition: loses the original quantization-group contract.
-- Repeating the old background read-ahead design without evidence: repository measurements found it slower; any new predictor must cover all staging and coordination costs.
-- Converting the whole out-of-RAM MoE to Core ML / ANE: outside this plan; the bounded predictor is the tractable initial experiment.
-- Copying the paper's speedup numbers or current Pipe4 benchmarks into JANG claims: requires new same-device, same-checkpoint measurements.
+- [Public findings](../docs/JANG-FINDINGS.md) — measured widening, failed fidelity,
+  reader experiments, modeled prefetch estimates and explicit limits.
+- [JANG usage](../docs/JANG.md) — local build, weight verification, run/library
+  widening controls and serving boundaries.
+- [Canonical current plan](../db/records/plan/jang-flash-qualification-status.md)
+  and [admission decision](../db/records/decisions/jang-flash-admission-2026-09-15.md).
+- [Portable evidence](../db/sources/runs/2026/09/jang-flash-findings-20260915.json)
+  — approved fields and hashes of original completed reports.
+- [Current handoff](EXECUTION-HANDOFF.md) — remaining work and immutable local
+  archive locations; old active process IDs remain only in Git history.
 
-Not audited: unrelated server/API behavior, downloader correctness, product UX, security, or general code quality. This plan reuses the existing test and memory boundaries and adds tests specifically for the proposed work.
+Full binaries, logits, traces and sample payloads remain in ignored local archives.
+A fresh clone does not contain all historical inputs. Preserve matching source,
+model, native and harness identities; never rewrite an old hash to accept a new
+binary. The old checkout path remains an alias for reading historical artifacts.
+No model process is currently running.
 
-
-September 15 next-stage result: [Plan 013](013-balanced-read-scheduling.md) tested
-balanced exact read scheduling against the existing packed-widening reader. It
-failed the predeclared component gate and remains diagnostic-only. The failed
-neuron prerequisite makes its trained predictor and optional ANE predictor
-`not_selected` for this approach. SSD prefetch remains replay-only without timing
-admission. No next optimization or full-model benchmark followed the rejection.
-
-
-After the user requested commit and continuation, Plans014–015 measured the
-existing expanded whole-expert layout and original-byte whole-expert samples.
-Both failed their reader-performance gates. Neither advanced to full-model
-repacking or generation. Code, tests and execution records are committed locally;
-no push or default activation is implied. The latest full-engine performance
-result remains the earlier matched 24 GB packed-widening benchmark.
+All new runtime modes remain off by default. Full-model jobs remain serial on the
+shared Mac, use explicit budgets and preflight headroom, and keep benchmark timing
+eligibility separate from functional/global-paging diagnostics. This index covers
+the selected Flash/M5 investigation, not unrelated server, downloader or product
+roadmaps.

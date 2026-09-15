@@ -1,5 +1,11 @@
 # Plan009: Measure neuron-block oracle quality and possible byte savings
 
+## Current disposition — September 15, 2026
+
+**COMPLETE at user-revised scope.** Dense control exact; eight/six blocks failed fidelity. Four was stopped incomplete and two untested. Predictor/sparse runtime/ANE not selected for this approach.
+
+[Evidence/current findings](009-oracle-execution.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status
 
 **September 15 operator revision:** The user stopped tests below six blocks after the complete eight- and six-block cohorts failed fidelity thresholds. The adapter/evaluator and the revised investigation scope are complete: dense-ten passed all 896 positions exactly; eight and six failed; four stopped after 512 validated positions and has no complete verdict; two was not run. The original five-cohort protocol below remains preserved as history and is not claimed complete. No partial mask, sparse reader or predictor was admitted. Benchmarking the usable exact engine follows before new optimization work.

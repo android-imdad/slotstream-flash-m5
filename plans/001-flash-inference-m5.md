@@ -1,5 +1,32 @@
 # Plan 001: Adapt LLM in a flash to Qwen MoE streaming and qualify M5 acceleration
 
+## Current execution status — September 15, 2026
+
+**IN PROGRESS: selected final qualification remains unfinished.** The original
+stage instructions below are the design/protocol, not evidence that every
+interface exists. The current local index and canonical status supersede old
+resource handoffs and conditional next-step wording.
+
+| Stage | Current disposition |
+|---|---|
+| Baseline and observation foundation | Complete at bounded scopes; complete JANG_6S verification and real generation exist |
+| Exact loading | Packed widening implemented with a measured opt-in development gain; window/scheduling/layout candidates rejected |
+| Neuron oracle | Closed at user-revised scope; eight/six failed fidelity, four stopped incomplete, two not run |
+| Trained neuron predictor and sparse runtime | Not selected after the oracle rejection |
+| M5 GPU path | Existing dispatch observed in instrumented build; production utilization unverified; no new GPU speedup claimed |
+| Optional ANE predictor | Not selected for this failed neuron approach; no ANE execution implemented |
+| Heuristic prefetch | Existing two forecasts rejected by the matched 14 GB empirical cost screen; no native worker |
+| Final qualification/reporting | Remaining run-set tooling and final coverage/qualification incomplete; public findings and canonical records now updated |
+
+The measured 24 GB widening checkpoint does not complete Plan011's original
+ten-pair qualification or this plan's final suite. `Tools/flash/runset.py` and
+the proposed stage-seven `gates.py`/`evaluate.py` commands are not implemented.
+Treat those commands below as intended interfaces. Public WIP fork availability does not imply serving/default rollout, upstream
+integration/release, JANG_4M full-model qualification or publisher/BF16 reproduction. The learned Expert Lookahead plan for the original checkpoint remains
+a separate unexecuted proposal.
+
+[Current index](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md) · [Findings](../docs/JANG-FINDINGS.md) · [Admission decision](../db/records/decisions/jang-flash-admission-2026-09-15.md)
+
 > **Executor instructions:** Read this entire plan first. Follow the dependency table, execute one bounded stage at a time, and record each gate. This is a staged research and implementation plan: a rejected experiment is a useful result, but is not a shipped speedup. Do not enable an unsuccessful experiment or weaken a gate to finish the plan. Update the status in `plans/README.md` unless a reviewer owns that index.
 >
 > **Drift check:** `git diff --stat 93fb512..HEAD -- Sources Tools Package.swift Package.resolved Makefile CLAUDE.md docs db/records plans`
@@ -506,16 +533,16 @@ Required cases:
 
 ## Done criteria
 
-- [ ] Stage 0 complete-checkpoint baseline and provenance exist.
+- [x] Stage 0 complete-checkpoint JANG_6S baseline and provenance exist; see Plan002 and the canonical foundation measurement.
 - [ ] Stages 1–7 have explicit dispositions; selected tracks have evidence, optional/dependent `not_selected` tracks have reasons, and no required selected track is blocked.
 - [ ] Every selected exact optimization passes byte/state/routing parity and memory gates.
 - [ ] Any selected new kernel or approximation passes its separate quality gates, with real held-out sample counts.
-- [ ] M5 usage is proven for the stated build/path, or remains labeled unverified/already-used without a new acceleration claim.
-- [ ] Optional ANE result distinguishes requested compute units from observed execution.
+- [x] M5 dispatch is observed for the instrumented diagnostic build; production utilization remains explicitly unverified, with no new acceleration claim.
+- [x] Optional ANE has an explicit not-selected disposition after its neuron prerequisite failed; no execution or utilization claim is made.
 - [ ] End-to-end paired performance supports every claimed gain; no paper speedup is inherited.
-- [ ] Original default quant, router, MTP/vision boundaries and numerical fallback remain intact.
+- [x] Original default quant, router, MTP/vision boundaries and numerical fallback remain intact; new controls remain explicit and rejected modes inactive.
 - [ ] Strict stage gates verify fresh binary identity, required check names/counts, zero required skips, and complete run-set evidence; unavailable full-model gates are recorded as unavailable.
-- [ ] Canonical evidence, generated docs, and `plans/README.md` agree about implemented, rejected and unqualified work; all new defaults remain off and activation is documented.
+- [x] Canonical evidence, generated docs and the plan index describe implemented, rejected and unqualified work; scalar/default behavior and explicit widening activation are documented. Final qualification itself remains unchecked above.
 
 Completion of the research plan may yield no accepted sparse or ANE path. That is a completed investigation, not fulfillment of a promised performance gain. State the distinction explicitly.
 

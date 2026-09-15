@@ -112,3 +112,9 @@ Remove credentials and private conversation or file contents.
 Developers: see the [API reference](API.md) for supported fields and request
 examples, and [integration tests](TESTING.md#openai-agent-integration) for
 protocol and real-client checks.
+
+
+The examples on this page use the default checkpoint. For a local experimental
+JANG server, select the actual loaded model returned by discovery and follow
+[JANG's serving limits](JANG.md). The explicit widening development benchmark
+was a CLI experiment and is not an enabled serving-default speed claim.

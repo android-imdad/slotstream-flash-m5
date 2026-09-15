@@ -144,3 +144,13 @@ to their authors.
 
 The full [engineering notes](ENGINEERING.md#speed) explain prompt-processing
 time, memory use, and the methods behind the performance claims.
+
+
+## Experimental JANG results
+
+The tables above retain their original default-checkpoint evidence. Local
+JANG_6S widening results come from a separate checkpoint and explicit settings;
+they do not update the default planner's throughput curve or qualify other Macs.
+See [JANG Flash findings](JANG-FINDINGS.md) for the measured device, budget and
+scope. Existing GPU dispatch observation is separate from Neural Engine
+execution, which was not added. JANG_4M full-model qualification remains pending.

@@ -1,5 +1,11 @@
 # Plan011: Accelerate exact4-to6-bit expert expansion
 
+## Current disposition — September 15, 2026
+
+**IN PROGRESS — formal qualification remains.** Exact opt-in widening is implemented and its matched 24 GB development benchmark completed. The original ten-pair qualification and broader parent run-set are still pending.
+
+[Evidence/current findings](009-oracle-execution.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
+
 ## Status and purpose
 
 September 15 measurement update: the user requested a performance checkpoint after the neuron-oracle investigation. A separate cooled 24 GB benchmark completed three paired rounds per saved workload, with exact output/work equality. Current packed widening achieved 6.983 / 7.409 / 7.266 tok/s versus scalar 3.199 / 3.331 / 3.272, with all arms timing-eligible and under 24 GB. See `plans/009-oracle-execution.md` and `.build/flash/runs/engine-benchmark-24gb-cooled-20260915`. This is not the predeclared ten-pair 14 GB qualification below and does not enable defaults or serving activation.
