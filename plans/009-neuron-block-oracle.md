@@ -2,7 +2,9 @@
 
 ## Status
 
-P1; effort L; risk HIGH. TODO; depends on reviewed Plan008 and its frozen development corpus/metric implementation. Planned against core source `0b032fa` and plan commit `f61730d`; reconcile the final008/010 commits and corpus hashes before dispatch. Same isolated execution checkout/branch; reviewer owns plans, source commits after review, no merge/push. This is a dense-load teacher-forced diagnostic: it does not skip SSD reads or establish a performance gain. Free-generation validation is deliberately a separate conditional stage after a teacher-forced winner; this plan cannot authorize predictor advancement by itself.
+**September 15 operator revision:** The user stopped tests below six blocks after the complete eight- and six-block cohorts failed fidelity thresholds. The adapter/evaluator and the revised investigation scope are complete: dense-ten passed all 896 positions exactly; eight and six failed; four stopped after 512 validated positions and has no complete verdict; two was not run. The original five-cohort protocol below remains preserved as history and is not claimed complete. No partial mask, sparse reader or predictor was admitted. Benchmarking the usable exact engine follows before new optimization work.
+
+P1; effort L; risk HIGH. COMPLETE at the user-revised investigation scope. The original column-norm export, host scoring, charged versioned adapter and evaluator were implemented and validated. Dense-ten passed the complete 896-position reference; eight/six failed fidelity; lower counts were stopped as documented above. The requested separate 24 GB exact-engine benchmark also completed before any new optimization. See [the foundation checkpoint](009-foundation-review.md) and [the final execution record](009-oracle-execution.md). Same isolated checkout/branch; local uncommitted changes, no merge/push. The dense-load oracle does not skip SSD reads or establish a performance gain, and no predictor advancement is admitted.
 
 ## Reconciled code facts
 

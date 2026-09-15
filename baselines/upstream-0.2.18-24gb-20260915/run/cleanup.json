@@ -1,0 +1,10 @@
+{
+  "server_pid": 26306,
+  "server_returncode": -15,
+  "final_vm": {
+    "raw": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                  1207070.\nPages active:                                 702134.\nPages inactive:                               699195.\nPages speculative:                              3571.\nPages throttled:                                   0.\nPages wired down:                             226827.\nPages purgeable:                                5967.\n\"Translation faults\":                      103729518.\nPages copy-on-write:                         4942351.\nPages zero filled:                         219859622.\nPages reactivated:                           2247883.\nPages purged:                                 773805.\nFile-backed pages:                            745916.\nAnonymous pages:                              658984.\nPages stored in compressor:                   543333.\nPages occupied by compressor:                 241752.\nDecompressions:                              1391880.\nCompressions:                                2454872.\nPageins:                                    24505228.\nPageouts:                                      18605.\nSwapins:                                           0.\nSwapouts:                                          0.\nPages tagged:                                 102130.\nPages tagged resident:                         88570.\nPages tagged compressed:                       13560.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 4273.\nPages tag-storage free:                         3190.\nPages tag-storage non-tag pageable:            90833.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    1905792.\nTagged compressions:                           32456.\nTagged decompressions:                         17502.\n",
+    "reclaimable_gb": 32.095485952,
+    "swapins": 0,
+    "swapouts": 0
+  }
+}

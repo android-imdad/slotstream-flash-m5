@@ -2,6 +2,8 @@
 
 ## Status and purpose
 
+September 15 measurement update: the user requested a performance checkpoint after the neuron-oracle investigation. A separate cooled 24 GB benchmark completed three paired rounds per saved workload, with exact output/work equality. Current packed widening achieved 6.983 / 7.409 / 7.266 tok/s versus scalar 3.199 / 3.331 / 3.272, with all arms timing-eligible and under 24 GB. See `plans/009-oracle-execution.md` and `.build/flash/runs/engine-benchmark-24gb-cooled-20260915`. This is not the predeclared ten-pair 14 GB qualification below and does not enable defaults or serving activation.
+
 P1; effort M; risk MED. IN PROGRESS against `bc185dfe4d5ab8c04f107bef90be47d7952ffc69`; reviewed010 is complete and has released main.swift ownership. This exact-loading experiment takes priority over the conditional neuron oracle. Source/API recon and the010 commit were checked before dispatch. Work in the existing isolated checkout/branch, reviewer owns plans, source commits after review, no merge/push. All new runtime behavior is explicit opt-in; scalar expansion remains the default.
 
 The source opportunity is confirmed. `AffineCodes.widen` in `Sources/Slotstream/AffineRow.swift` clears the destination then visits every code, even for the frequent fixed4→6 conversion. `ExpertStore.readRows` calls it for original4-bit projections entering the6-bit JANG_6S pool. Gate widens in47 layers, up in40, down in0;40 layers need two conversions per missed expert, seven need one, layer22 needs none. Each conversion visits1638400 codes.

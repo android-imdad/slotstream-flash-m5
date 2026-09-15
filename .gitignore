@@ -40,3 +40,7 @@ db/.dbmd/
 
 # Local Cloudflare CLI account and runtime cache.
 .wrangler/
+
+# Frozen local benchmark executables are preserved on disk and hash-inventoried.
+# Commit their reports and manifests, not the large executable/Metal payloads.
+/baselines/*/bin/

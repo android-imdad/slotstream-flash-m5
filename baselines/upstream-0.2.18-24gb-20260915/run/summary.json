@@ -1,0 +1,54 @@
+{
+  "complete": true,
+  "requests": 9,
+  "groups": {
+    "explanation": {
+      "eligible": 3,
+      "decode_tps": [
+        13.77566701205776,
+        14.342101207415718,
+        14.00315364410581
+      ],
+      "median_decode_tps": 14.00315364410581,
+      "median_first_visible_token_seconds": 2.1825158329999965,
+      "output_tokens": [
+        128,
+        128,
+        128
+      ],
+      "same_output_ids": true
+    },
+    "coding": {
+      "eligible": 3,
+      "decode_tps": [
+        15.878556829711977,
+        16.02899887935158,
+        15.900784323267667
+      ],
+      "median_decode_tps": 15.900784323267667,
+      "median_first_visible_token_seconds": 1.9926126250000067,
+      "output_tokens": [
+        128,
+        128,
+        128
+      ],
+      "same_output_ids": true
+    },
+    "reasoning": {
+      "eligible": 3,
+      "decode_tps": [
+        15.668258412791346,
+        15.7903074312718,
+        15.683579534599842
+      ],
+      "median_decode_tps": 15.683579534599842,
+      "median_first_visible_token_seconds": 2.572606166,
+      "output_tokens": [
+        128,
+        128,
+        128
+      ],
+      "same_output_ids": true
+    }
+  }
+}

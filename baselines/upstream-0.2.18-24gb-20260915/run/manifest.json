@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/Users/imdad/Documents/ChatGPT/slotstream/upstream/.build/release/slotstream",
+    "serve",
+    "--model",
+    "/Users/imdad/Documents/ChatGPT/slotstream/models/qwen38-flash-next-mlx-4bit",
+    "--memory-gb",
+    "24",
+    "--max-context",
+    "32768",
+    "--port",
+    "18086",
+    "--no-prefix-cache"
+  ],
+  "instrumentation": {
+    "SLOTSTREAM_BENCH_DETAILS": "1"
+  },
+  "commit": "ad89ecc17bcbdd6a1ca8b80fbd09d903b6c65fd0",
+  "binary_sha256": "6f37103baddb8ed8fa55552190d9ddf96c7c40e20eccbd734df53a8db8b551b7",
+  "initial_vm": {
+    "raw": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    10435.\nPages active:                                1020401.\nPages inactive:                              1621831.\nPages speculative:                              3194.\nPages throttled:                                   0.\nPages wired down:                             217380.\nPages purgeable:                                8134.\n\"Translation faults\":                      102135171.\nPages copy-on-write:                         4924343.\nPages zero filled:                         218054520.\nPages reactivated:                           2174683.\nPages purged:                                 746358.\nFile-backed pages:                           1741183.\nAnonymous pages:                              904243.\nPages stored in compressor:                   453703.\nPages occupied by compressor:                 209846.\nDecompressions:                              1076588.\nCompressions:                                2018690.\nPageins:                                    24294936.\nPageouts:                                      18347.\nSwapins:                                           0.\nSwapouts:                                          0.\nPages tagged:                                 104537.\nPages tagged resident:                         91539.\nPages tagged compressed:                       12998.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 4454.\nPages tag-storage free:                          505.\nPages tag-storage non-tag pageable:            93337.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    1870656.\nTagged compressions:                           31145.\nTagged decompressions:                         16835.\n",
+    "reclaimable_gb": 28.831776768,
+    "swapins": 0,
+    "swapouts": 0
+  },
+  "hardware": "Apple M5 Max",
+  "model": "qwen3.8-flash-next:4bit",
+  "memory_target_decimal_gb": 24,
+  "rounds": 3,
+  "max_output_tokens": 128,
+  "method": "One fresh server, distinct warmup, three prompts in three rotated rounds. No forced disk cache purge. Physical-footprint sampling enabled. Conversation prefix cache disabled so each prompt is fully processed; other upstream optimizations retain defaults."
+}

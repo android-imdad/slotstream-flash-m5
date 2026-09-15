@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "baseline_id": "upstream-0.2.18-24gb-20260915",
+  "objective": "Beat this upstream baseline with Qwen3.8-Flash-Next JANG_6S while preserving the JANG checkpoint quality.",
+  "baseline_commit": "ad89ecc17bcbdd6a1ca8b80fbd09d903b6c65fd0",
+  "baseline_binary_sha256": "6f37103baddb8ed8fa55552190d9ddf96c7c40e20eccbd734df53a8db8b551b7",
+  "baseline_model": "qwen3.8-flash-next:4bit",
+  "candidate_model": "qwen3.8-flash-next:jang-6s",
+  "original_run_directory": "/Users/imdad/Documents/ChatGPT/slotstream/results/benchmark-20260915-132246",
+  "memory_target_decimal_gb": 24,
+  "max_context_tokens": 32768,
+  "max_output_tokens": 128,
+  "rounds_per_workload": 3,
+  "overall_baseline_median_decode_tokens_per_second": 15.683579534599842,
+  "baseline_peak_physical_memory_decimal_gb": 19.521632272,
+  "baseline_mtp": true,
+  "baseline_expert_lookahead": true,
+  "prefix_cache_enabled": false,
+  "requests": {
+    "explanation": {
+      "model": "qwen3.8-flash-next:4bit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explain how a database index speeds up queries. Include a concrete example, the difference between a table scan and an index lookup, and the costs of maintaining indexes. Write about 400 words."
+        }
+      ],
+      "think": false,
+      "stream": true,
+      "options": {
+        "temperature": 0,
+        "seed": 42,
+        "num_predict": 128
+      }
+    },
+    "coding": {
+      "model": "qwen3.8-flash-next:4bit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Write a Python function that merges two sorted lists of integers into one sorted list without using sort or sorted. Include type hints, a docstring, examples with duplicates and empty lists, and an explanation of time and space complexity."
+        }
+      ],
+      "think": false,
+      "stream": true,
+      "options": {
+        "temperature": 0,
+        "seed": 42,
+        "num_predict": 128
+      }
+    },
+    "reasoning": {
+      "model": "qwen3.8-flash-next:4bit",
+      "messages": [
+        {
+          "role": "user",
+          "content": "A warehouse has 120 boxes. On Monday it ships one quarter of them and receives 18 new boxes. On Tuesday it ships one third of the boxes then present and receives 12 new boxes. Explain each calculation, find the final number of boxes, and check the answer by accounting for all arrivals and departures."
+        }
+      ],
+      "think": false,
+      "stream": true,
+      "options": {
+        "temperature": 0,
+        "seed": 42,
+        "num_predict": 128
+      }
+    }
+  },
+  "targets": {
+    "explanation": {
+      "median_decode_tokens_per_second": 14.00315364410581,
+      "median_first_visible_text_seconds": 2.1825158329999965,
+      "observed_decode_tokens_per_second": [
+        13.77566701205776,
+        14.342101207415718,
+        14.00315364410581
+      ]
+    },
+    "coding": {
+      "median_decode_tokens_per_second": 15.900784323267667,
+      "median_first_visible_text_seconds": 1.9926126250000067,
+      "observed_decode_tokens_per_second": [
+        15.878556829711977,
+        16.02899887935158,
+        15.900784323267667
+      ]
+    },
+    "reasoning": {
+      "median_decode_tokens_per_second": 15.683579534599842,
+      "median_first_visible_text_seconds": 2.572606166,
+      "observed_decode_tokens_per_second": [
+        15.668258412791346,
+        15.7903074312718,
+        15.683579534599842
+      ]
+    }
+  },
+  "comparison_rules": [
+    "Use the exact frozen prompts, greedy decoding, seed 42, 128 output tokens, context 32768, and a 24 GB total process target on this Mac.",
+    "Use a separate warmup and three rotated rounds. Record effective candidate settings; an existing 20 GB scalar JANG result is not this comparison.",
+    "Primary target: exceed every workload median decode rate. Record first-visible-text latency and total request time alongside throughput; do not conceal regressions.",
+    "No swap activity or thermal throttling in counted intervals. Keep one model process active, pause competing heavy I/O, and record physical footprint within 24 GB.",
+    "Keep original JANG_6S checkpoint bytes, native routing and precision. Validate optimization correctness against the unchanged JANG reference, not against a different upstream quantization. Cross-quantization output IDs may differ.",
+    "A three-round win is exploratory. Confirm a claimed optimization gain in a larger interleaved comparison with the frozen upstream binary, including timing spread and repeatability."
+  ]
+}

@@ -1,0 +1,19 @@
+slotstream memory plan (--memory-gb)
+  device: 52 GB RAM (28.9 GB reclaimable now), 40.2 GB Metal working set
+  target: 24.0 GB total for this process
+  cache:  ~98 of 512 experts per layer  (4718 global slots = 13.0 GB pool)
+  expect: ~23.0 GB peak, ~10 tok/s warm decode (est. from M5 Pro anchors)
+  disk:   that estimate assumes an SSD like the one it was measured on (17.3 GB/s). A base-storage Mac mini M2 reads 1.5 GB/s and decoded at 1.41 tok/s against a ~4 estimate, so on base storage expect well under the number above — see docs/HARDWARE.md
+  prefill: 2048 tokens per pass (~205 tok/s here; costs ~2.7 GB of the target)
+  mtp:    draft head on — speculative decode (1.6 GB resident, charged above)
+  vision: images accepted — first image reserves +0.9 GB inside the target; refused if it cannot fit
+  context: up to 32768 tokens per request (prompt + reply); a full-length prompt takes ~3.1 min before its first token here, follow-up turns read only what is new
+  lookahead: on, expert prefetch with the draft head, router cache and a GPU barrier every 4 layers (373 MiB, charged above)
+  note:   prefill and prefix retention reservations match the explicit runtime controls
+engine ready in 1.7s: expert cache ~98/512 per layer (4718 global slots = 13.0 GB), mtp draft head on, eos [248044, 248046]
+prefix cache: off — every request re-prefills its whole prompt
+elastic: off — an explicit size is pinned; omit the size flag for elastic auto
+slotstream listening on http://127.0.0.1:18086
+try it:
+  curl localhost:18086/api/chat -d '{"model": "qwen3.8-flash-next:4bit", "messages": [{"role": "user", "content": "hello"}]}'
+or point any Ollama or OpenAI client at http://localhost:18086
