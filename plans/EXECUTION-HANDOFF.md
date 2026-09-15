@@ -1,3 +1,25 @@
+# Completed checkpoint — whole-expert layout screen
+
+The user requested `commit and proceed`. Completed work through Plan 013 is now
+committed locally as `65d7e82` (implementation) and `ba18325` (reports/baseline),
+with no push or default activation. Large baseline executable/Metal payloads stay
+in the local ignored archive; committed manifests retain their original hashes.
+
+Plan 014 completed and was rejected (8.48% longer paired total reader time).
+All native equality and host evidence checks passed; no model process remains.
+Evidence is `.build/flash/runs/whole-expert-20260915`. The next bounded experiment
+will test original source-native records with no expanded-byte disk overhead.
+
+Plan 014 scope: compare the existing expanded whole-expert
+layout with original JANG reads using exact packed4-to6 widening, on at most
+256 MiB of original regions/derived payload. It remains diagnostic-only pending
+the predeclared screen. Read `plans/014-whole-expert-layout.md` for controls and
+admission criteria. Do not change completed Plan 013's rejected disposition.
+
+Historical statements below about uncommitted work reflect their earlier dates.
+
+---
+
 # Latest checkpoint — exact read-scheduling experiment
 
 September 15 continuation is complete at Plan 013's bounded scope. The user asked

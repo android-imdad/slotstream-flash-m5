@@ -20,6 +20,7 @@ A second fresh-context review checked executor readiness against the source. The
 | [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — opt-in path benchmarked at 24 GB (three pairs/workload); original ten-pair qualification remains pending |
 | [012](012-archived-evidence-validation.md) | Verify archived harness bytes and immutable receipt joins | P1 | S | 008 uncommitted host implementation | DONE — reviewed in `aa9b771`; archive mutations rejected |
 | [013](013-balanced-read-scheduling.md) | Balance exact expert read jobs | P1 | M | 011 packed reader | COMPLETE — component rejected; default-depth reader calls about 40% longer, no generation activation |
+| [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
 
 Execution checkout: `../slotstream-flash-m5`, branch `advisor/001-flash-m5`, starting at `93fb512`. The executor owns implementation there; the reviewer maintains this index and reviews each bounded stage. The original checkout holds the completed, verified download. Model weights are reused read-only; mutable build artifacts are separate. No merge, push, default activation or completed qualification is implied.
 

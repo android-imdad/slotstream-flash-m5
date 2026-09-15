@@ -479,6 +479,48 @@ public final class ExpertStore {
         if let profile { profile.stagingEvalSeconds += RuntimeClock.seconds(since: evalStart) }
         return out
     }
+
+    /// Diagnostic subset of the existing v1 expanded layout. Its identity binds
+    /// the original IDs as well as the checkpoint, so it cannot masquerade as
+    /// a complete model layout. No generation reader installs this artifact.
+    package func buildPackedSample(at directory: URL, layers: [Int], experts: [Int]) throws -> PackedExpertLayout {
+        try ModelProcessGuard.acquire()
+        guard !layers.isEmpty, !experts.isEmpty, layers.count <= 3, experts.count <= 10,
+              Set(layers).count == layers.count, Set(experts).count == experts.count,
+              layers.allSatisfy({ (0 ..< cfg.numLayers).contains($0) }),
+              experts.allSatisfy({ (0 ..< cfg.numExperts).contains($0) }),
+              layers.count * experts.count * recordBytes <= 256 << 20 else {
+            throw ModelError("packed sample geometry exceeds its diagnostic bound")
+        }
+        let original = try packedModelIdentity()
+        struct SampleIdentity: Encodable {
+            let source: String
+            let layers: [Int]
+            let experts: [Int]
+        }
+        let encoder = JSONEncoder(); encoder.outputFormatting = [.sortedKeys]
+        let identity = PackedExpertLayout.hex(try encoder.encode(SampleIdentity(source: original, layers: layers, experts: experts)))
+        _ = try PackedExpertLayout.build(directory: directory, identity: identity, layers: layers.count,
+            experts: experts.count, pieces: pieceRowBytes, sourceUnchanged: {
+                guard try self.packedModelIdentity() == original else { throw ModelError("sample source changed") }
+            }, reader: { layer, expert, piece, output in
+                try self.readRows(into: output, layer: layers[layer], piece: piece, first: experts[expert], count: 1)
+            })
+        return try PackedExpertLayout(directory: directory, identity: identity, layers: layers.count,
+            experts: experts.count, pieces: pieceRowBytes)
+    }
+
+    package func readPackedSample(_ sample: PackedExpertLayout, localKeys: [ExpertKey], queueDepth: Int) throws -> [MLXArray] {
+        guard sample.manifest.pieces == pieceRowBytes, !localKeys.isEmpty, localKeys.count <= 10 else {
+            throw ModelError("packed sample output geometry mismatch")
+        }
+        let buffers = try allocateStaging(rows: localKeys.count)
+        var transferred = false
+        defer { if !transferred { buffers.forEach { free($0) } } }
+        try sample.readBatch(localKeys, buffers: buffers, queueDepth: queueDepth)
+        transferred = true
+        return stagingArrays(buffers, rows: localKeys.count)
+    }
 }
 
 // MARK: - Slot pool
