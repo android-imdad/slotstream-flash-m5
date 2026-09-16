@@ -1,0 +1,120 @@
+{
+  "aggregate" : {
+    "document_count" : 4,
+    "prompt_artifact_bytes" : 35931,
+    "prompt_token_count" : 3538
+  },
+  "artifacts" : {
+    "prompts\/prompt-0000.json" : {
+      "bytes" : 965,
+      "sha256" : "a41bb0da849b03bbab825887b54fd49a960f2161c6c4d80a4545faa4b1fd91b1"
+    },
+    "prompts\/prompt-0001.json" : {
+      "bytes" : 20118,
+      "sha256" : "73c4445de1b34df019d7ea8fefb3151e368d7973a83012e414bc68d3c7ed006b"
+    },
+    "prompts\/prompt-0002.json" : {
+      "bytes" : 13615,
+      "sha256" : "b848abe6d4a22acf190cc61c6f41085e1bd82ac33743c0ee2fa22a7357e56f03"
+    },
+    "prompts\/prompt-0003.json" : {
+      "bytes" : 1233,
+      "sha256" : "b87260f0ae37b9343cf2ad83d0f1019b0fb932dc4bd263765020a635c48ec71e"
+    }
+  },
+  "canonical_test_vector" : {
+    "canonical_json" : "{\"Mixed_key\":{\"a_value\":7,\"zValue\":true},\"camelKey\":\"slash\/a newline\\n quote\\\" backslash\\\\\",\"snake_key\":\"é and é\"}",
+    "sha256" : "bee604a6fb30e796eab0bfbc19edd8e29dd5216e5c89179bf8d915531d8c732a",
+    "value" : {
+      "camelKey" : "slash\/a newline\n quote\" backslash\\",
+      "Mixed_key" : {
+        "a_value" : 7,
+        "zValue" : true
+      },
+      "snake_key" : "é and é"
+    }
+  },
+  "context" : {
+    "artifact_limit_is_inference_permission" : false,
+    "artifact_token_limit" : 8192,
+    "inference_context_limit" : 2048
+  },
+  "documents" : [
+    {
+      "artifact_bytes" : 965,
+      "artifact_sha256" : "a41bb0da849b03bbab825887b54fd49a960f2161c6c4d80a4545faa4b1fd91b1",
+      "id" : "short-json",
+      "path" : "prompts\/prompt-0000.json",
+      "prompt_count" : 41,
+      "prompt_ids_sha256" : "35e6e89ae0d05ec5735f93f5b8d805f6225c4e093ffdeaa1197e3283ce09f4e6",
+      "source_hash" : "9d79c42345179b33f9bcb255eadb70438a6cb178d813b5e3b78223eb09ee5ce9"
+    },
+    {
+      "artifact_bytes" : 20118,
+      "artifact_sha256" : "73c4445de1b34df019d7ea8fefb3151e368d7973a83012e414bc68d3c7ed006b",
+      "id" : "grounded-document",
+      "path" : "prompts\/prompt-0001.json",
+      "prompt_count" : 2040,
+      "prompt_ids_sha256" : "1aba1ee54553b50b9f88bc860268a1c875f487dbe4c5c25120314e0b5c19cfb6",
+      "source_hash" : "299829c32815fa4675194067ec6ea511147cc75a1962be9a11e522ee62df296d"
+    },
+    {
+      "artifact_bytes" : 13615,
+      "artifact_sha256" : "b848abe6d4a22acf190cc61c6f41085e1bd82ac33743c0ee2fa22a7357e56f03",
+      "id" : "reader-offsets",
+      "path" : "prompts\/prompt-0002.json",
+      "prompt_count" : 1389,
+      "prompt_ids_sha256" : "5c7c6f894b1288187ae1b3c547fc973a6cb422206a200190bb5ae632cd9deec8",
+      "source_hash" : "9458c6280e949e9bc0ac1aaac4e305e9374d037fd40f43a6bc807a15892511d3"
+    },
+    {
+      "artifact_bytes" : 1233,
+      "artifact_sha256" : "b87260f0ae37b9343cf2ad83d0f1019b0fb932dc4bd263765020a635c48ec71e",
+      "id" : "long-csv",
+      "path" : "prompts\/prompt-0003.json",
+      "prompt_count" : 68,
+      "prompt_ids_sha256" : "cafac76a5e4a806970eaf7121038cba6d5b04df0e3cbd75f0aff15e6ceb414b3",
+      "source_hash" : "a230150c112bade705522f09482963eb1f0d521bfc0a8f2a9e79ccaf4a26df8c"
+    }
+  ],
+  "executable_identity" : {
+    "binary_sha256" : "0124a9e69e0ba2a7583eba6b73b6288eda68ce33ce58f5fd44762b4bdf3050b8",
+    "build_identity_sha256" : "5d23a7aa935ed3b590ce2a6b8e26bb26c24e5a0b75efd8ae626018c1331672ed",
+    "historical" : false,
+    "metallib_sha256" : "198488eb61359e953580a9c4530400feee1a06dd2f28a930a6ffa58aec66a597",
+    "path" : "\/Users\/imdad\/Documents\/projects\/slotstream-flash-m5\/.build\/release\/slotstream",
+    "source_archive_sha256" : "5993a10ac5ca768e0b98ab636838b89f4ba4d0ad42e0871595e6cea72d95ae4a"
+  },
+  "format" : "slotstream-prompt-corpus-v1",
+  "model_loaded" : false,
+  "qualification" : false,
+  "schema_version" : 1,
+  "source_manifest_path" : "\/Users\/imdad\/Documents\/projects\/slotstream-flash-m5\/.build\/flash\/prefill-qualification-20260916\/task-source.json",
+  "source_manifest_sha256" : "2c1549a61b54c67a188e4637a04d780b5b5d04771cdf9d58039e7d754daa4ad9",
+  "source_provenance_scope" : "caller metadata preserved; external provenance not verified by tokenizer bridge",
+  "tokenizer_identity" : {
+    "embedded_chat_template_sha256" : "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+    "files" : [
+      {
+        "bytes" : 12809320,
+        "path" : "tokenizer.json",
+        "sha256" : "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
+      },
+      {
+        "bytes" : 17928,
+        "path" : "tokenizer_config.json",
+        "sha256" : "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+      },
+      {
+        "bytes" : 113950,
+        "path" : "config.json",
+        "sha256" : "06d4ba9c9604e901ed5d8a7c2e8d236d32adbbedd1c3b5d1a621a525bffc594a"
+      }
+    ],
+    "model_revision" : "3781190c6bbdf0a7637beda49ba179822612058a",
+    "swift_transformers_revision" : "2fa33e1f5e7131a7fc64c28e6d161dcec0d24820",
+    "text_add_special_tokens" : false,
+    "thinking" : false
+  },
+  "tokenizer_only" : true
+}

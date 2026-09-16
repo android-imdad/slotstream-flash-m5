@@ -91,6 +91,24 @@ For an API server:
 Clients must request the loaded JANG name reported by the API. A request for
 the original PipeNetwork quant is rejected when JANG is loaded.
 
+## Numerical diagnostics
+
+The source build also includes a matched numerical capture diagnostic. Its
+serializer and control checks run with:
+
+```sh
+.build/release/slotstream prefill-capture --self-check
+```
+
+Full `prefill-capture` runs load the model and export logits, retained state and
+common-continuation evidence through the actual Engine path. Use the fixed
+budgets, monitored launcher and frozen protocol in
+[the qualification record](../db/records/measurements/jang-prefill-qualification-2026-09-16.md).
+That investigation did not admit the larger prefill candidate; existing defaults
+remain. The [independent fallback investigation](../db/records/measurements/jang-prefill-512-qualification-2026-09-16.md)
+also failed its state and routing gates. The diagnostic's presence does not
+establish broader model qualification.
+
 ## Explicit exact widening
 
 Scalar expansion remains the default. The local `run` command accepts

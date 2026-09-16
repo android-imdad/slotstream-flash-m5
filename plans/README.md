@@ -2,8 +2,9 @@
 
 **Public WIP research repository:** [android-imdad/slotstream-flash-m5](https://github.com/android-imdad/slotstream-flash-m5), branch `main`. The local working branch remains `advisor/001-flash-m5`; the original `origin` remote remains upstream. Publication here does not mean an upstream merge, release or default activation.
 
-Updated September 16, 2026 after the NEON full-model benchmark and the
-metadata/scratch implementation experiments. The original plans were authored on September 12;
+Updated September 16, 2026 after the NEON full-model benchmark,
+metadata/scratch experiments, bounded prefill-chunk screen and matched numerical
+qualification of both larger-chunk candidates. The original plans were authored on September 12;
 their dated briefs/reviews are retained as history, not new pending tasks.
 Execution remains on `advisor/001-flash-m5` in this repository. Source and
 measurement commits do not imply merge, push, upstream release or default rollout.
@@ -27,6 +28,9 @@ measurement commits do not imply merge, push, upstream release or default rollou
 | [015](015-source-native-layout.md) | Measure original-byte whole-expert records | P1 | M | 014 reported | COMPLETE — rejected; paired total reader time essentially tied, below the improvement gate |
 | [016](016-prefetch-cost-screen.md) | Price causal SSD-prefetch timing and overlap | P1 | M | Existing trace replay and packed widening | COMPLETE — both forecasts rejected by matched 14 GB timing/cost screen; no native worker |
 | [017](017-jang-reader-conversion.md) | Optimize metadata conversion and lane-local scratch | P1 | M | NEON benchmark complete | COMPLETE — metadata already vectorizes; scratch lacked reader benefit; original runtime retained |
+| [018](018-prefill-chunk-screen.md) | Screen JANG prefill chunks at a fixed memory target | P1 | S | Current NEON binary and frozen prompts | COMPLETE — timing-only screen; subsequent 019/020 numerical gates do not admit either candidate |
+| [019](019-prefill-qualification.md) | Qualify the larger prefill candidate on deployed controls | P1 | M | 018 | COMPLETE — 1024 fails the retained-state band; defaults unchanged; task/latency follow-up skipped by gate |
+| [020](020-prefill-512-qualification.md) | Independently qualify the 512 fallback | P1 | M | 019 instrument | COMPLETE — fresh 256/384/512 study rejects candidate on state and prefill routing; defaults unchanged |
 
 ## Outcome
 
@@ -47,6 +51,12 @@ ANE execution was added.
 The [metadata and scratch follow-up](../db/records/measurements/jang-reader-followup-2026-09-16.md) is complete: both runtime candidates were rejected and the original implementation retained. Do not repeat these exact approaches without new evidence. Bounded contiguous prefill reads and native-bit cache storage remain separate unexecuted candidates.
 
 ## Pending, ranked
+
+The larger-prefill investigations are closed without default admission. Further
+chunk work needs a separate investigation of the measured numerical divergence;
+the midpoint control is not an automatically selected next candidate. Existing
+decode gains with the retained prefill default remain valid in their measured
+scope. Prepared task fixtures are not completed quality or latency evidence.
 
 1. **Plan011 implementation follow-up:** the new NEON backend has a bounded CPU
    conversion result and a [short 14 GB full-model comparison](../db/records/measurements/jang-neon-full-model-2026-09-16.md).

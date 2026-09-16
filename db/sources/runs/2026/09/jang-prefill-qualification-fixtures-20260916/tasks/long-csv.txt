@@ -1,0 +1,1 @@
+Return CSV only, with no Markdown fences or commentary. The header must be n,square,cube. Then produce every integer n from 1 through 32 in increasing order, one row per number, with its square and cube. Include all 32 data rows.

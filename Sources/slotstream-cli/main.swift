@@ -13,7 +13,7 @@ struct Slotstream: ParsableCommand {
         version: SlotstreamBuild.version,
         subcommands: [
             Run.self, Serve.self, Pull.self, Doctor.self, Parity.self, ElasticCheck.self, JANGCheck.self, M5Check.self,
-            WideningCheck.self,
+            WideningCheck.self, PrefillCapture.self,
             ReadSchedulingCheck.self,
             WholeExpertCheck.self,
             SourceNativeCheck.self,

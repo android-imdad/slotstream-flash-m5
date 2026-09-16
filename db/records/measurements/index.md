@@ -2,11 +2,14 @@
 type: index
 scope: type-folder
 folder: records/measurements
-updated: 2026-09-16T04:50:49.766126Z
+updated: 2026-09-16T06:33:00.753520Z
 ---
 
 # records/measurements
 
+- [[records/measurements/jang-prefill-512-qualification-2026-09-16]] — Independent JANG 512 prefill qualification
+- [[records/measurements/jang-prefill-qualification-2026-09-16]] — JANG larger-prefill numerical qualification
+- [[records/measurements/jang-prefill-chunks-2026-09-16]] — JANG prefill chunk screen at a fixed memory budget
 - [[records/measurements/jang-reader-followup-2026-09-16]] — JANG metadata and scratch follow-up: both runtime candidates rejected
 - [[records/measurements/jang-neon-full-model-2026-09-16]] — JANG NEON full-model development comparison
 - [[records/measurements/jang-simd-widening-2026-09-15]] — NEON CPU widening is implemented; standalone conversion improves while full-model TPS remains unmeasured

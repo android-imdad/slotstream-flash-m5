@@ -1,0 +1,95 @@
+{
+  "format": "slotstream-prefill-chunk-manual-review-v1",
+  "raw_sha256": "5d963b3c62820ea0c7851a0fefc1f5a1ae950ff4e444150da3b933ea5ea1b615",
+  "review_scope": "All six distinct outputs across all eighteen completed arms; correctness, completeness, usefulness and at most 75 whitespace-separated words. This is not numerical qualification.",
+  "overall_quality_pass": false,
+  "numerical_quality": "not measured on the matched deployment configuration",
+  "entries": [
+    {
+      "workload": "prose",
+      "chunk": 256,
+      "rounds": 3,
+      "text_sha256": "8e3d2cbd2245555e8c08a2a134c96245a0557f9c734aa487c654705d8c75cad4",
+      "word_count": 75,
+      "within_word_limit": true,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": true,
+      "finding": "Accurate complete summary of supplied material.",
+      "clear_new_substantive_regression_vs_256": false
+    },
+    {
+      "workload": "prose",
+      "chunk": 512,
+      "rounds": 3,
+      "text_sha256": "b17ee8131c13f87fee06269707ba2af2d626ac4f5d9bae25a8101955d09fe8f8",
+      "word_count": 76,
+      "within_word_limit": false,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": true,
+      "finding": "Accurate complete summary of supplied material.",
+      "clear_new_substantive_regression_vs_256": false
+    },
+    {
+      "workload": "prose",
+      "chunk": 1024,
+      "rounds": 3,
+      "text_sha256": "cfde685e7427dfc6232c9c72ad4d773e272c642d62dae7139f5bd0cdbc4232ff",
+      "word_count": 75,
+      "within_word_limit": true,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": true,
+      "finding": "Accurate complete summary of supplied material.",
+      "clear_new_substantive_regression_vs_256": false
+    },
+    {
+      "workload": "code",
+      "chunk": 256,
+      "rounds": 3,
+      "text_sha256": "ca8786941be967625c93e28d13d532edc8d69551b4df135fef8403677764408d",
+      "word_count": 55,
+      "within_word_limit": true,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": false,
+      "finding": "Incorrect central explanation: widening does not intrinsically break contiguous source offsets. The implementation issues per-row reads because it uses a single-row source scratch buffer and conversion loop. Concurrent scratch ownership is relevant, but explicit scratch bounds and failure draining are omitted. Baseline shares the central error; its target-float-layout wording also conflates weight codes with metadata.",
+      "clear_new_substantive_regression_vs_256": false
+    },
+    {
+      "workload": "code",
+      "chunk": 512,
+      "rounds": 3,
+      "text_sha256": "3e9c7037642cfb89eb6cd552d293635c3b0bc42e80a52002b7870a986e206c7b",
+      "word_count": 59,
+      "within_word_limit": true,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": false,
+      "finding": "Incorrect central explanation: widening does not intrinsically break contiguous source offsets. The implementation issues per-row reads because it uses a single-row source scratch buffer and conversion loop. Concurrent scratch ownership is relevant, but explicit scratch bounds and failure draining are omitted. Baseline shares the central error; its target-float-layout wording also conflates weight codes with metadata.",
+      "clear_new_substantive_regression_vs_256": false
+    },
+    {
+      "workload": "code",
+      "chunk": 1024,
+      "rounds": 3,
+      "text_sha256": "1cef03e9f037cecfca98884b1be91eaaa258144b89f9a8dc7afd81490af9f510",
+      "word_count": 60,
+      "within_word_limit": true,
+      "all_finish_reason_stop": true,
+      "factual_task_pass": false,
+      "finding": "Incorrect central explanation: widening does not intrinsically break contiguous source offsets. The implementation issues per-row reads because it uses a single-row source scratch buffer and conversion loop. Concurrent scratch ownership is relevant, but explicit scratch bounds and failure draining are omitted. Baseline shares the central error; its target-float-layout wording also conflates weight codes with metadata.",
+      "clear_new_substantive_regression_vs_256": false
+    }
+  ],
+  "limitations": "The code question presupposes that individual reads are required and may reinforce the shared misconception. Its latency remains a valid observation, but this is not a clean task-quality gate. The 512 prose response introduces a one-word limit violation; 1024 shows no clear new manual-quality regression in this tiny sample.",
+  "independent_integrity_review": {
+    "passed": true,
+    "checks": [
+      "eighteen-arm balanced schedule",
+      "frozen driver and harness snapshots",
+      "raw artifacts against archived native stats and receipts",
+      "terminal lifetime sampling and timing eligibility",
+      "frozen expected prompt IDs",
+      "independently recomputed paired medians",
+      "same-setting output repeatability and differing cross-setting work"
+    ],
+    "limitation": "Timing shortlist only; 1024 prose decode regression barely passes and shared code-answer error prevents clean task-quality acceptance."
+  }
+}

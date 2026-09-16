@@ -1,0 +1,138 @@
+Read this project documentation as reference material. At the end, answer the question using only the supplied material.
+
+# Slotstream Flash M5 — WIP
+
+**Work in progress.** This is an experimental research fork of
+[Slotstream](https://github.com/carloslfu/slotstream), maintained by
+[android-imdad](https://github.com/android-imdad). It explores SSD-streamed
+JANG inference and exact loading improvements on Apple Silicon. The current
+results are development measurements; final qualification and serving/default
+rollout are unfinished.
+
+**Model used:** [JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S on Hugging Face](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S)
+([pinned revision used for these experiments](https://huggingface.co/JANGQ-AI/Qwen3.8-Flash-Next-JANG_6S/tree/3781190c6bbdf0a7637beda49ba179822612058a)). The original weights
+are preserved; this fork streams experts as well as n-gram data from SSD.
+
+## M5 Max benchmarks — measured development results
+
+A local JANG_6S benchmark at a 24 GB target measured 6.98–7.41 tok/s with explicit packed widening, about 2.2× scalar throughput.
+
+Protocol: three paired rounds per workload on the local M5 Max with 48 GB unified memory; a 24 GB process target; 32,768 configured context tokens; greedy seed 42; up to 128 output tokens; fresh CLI processes; prefix cache, MTP and vision off.
+
+| Workload | Scalar tok/s | Packed tok/s | First text seconds, scalar → packed |
+|---|---:|---:|---:|
+| Coding | 3.331 | 7.409 | 5.311 → 2.584 |
+| Explanation | 3.199 | 6.983 | 5.870 → 2.930 |
+| Reasoning | 3.272 | 7.266 | 6.623 → 3.235 |
+
+All paired outputs and completed work matched exactly. The maximum observed
+packed-process footprint was 20.69 GB. First-text measurements exclude loading
+and cooldown. The configured context window is not a long-prompt quality test.
+
+The latest packed-widening implementation adds an ARM NEON CPU backend.
+Its conversion component and a short full-model comparison are now measured.
+The table above records the preceding implementation at a different memory
+budget; the new comparison does not replace it.
+[Latest benchmark evidence](db/records/measurements/jang-neon-full-model-2026-09-16.md).
+
+Subsequent [metadata and scratch experiments](db/records/measurements/jang-reader-followup-2026-09-16.md)
+did not justify additional runtime changes.
+
+These measurements come from the implemented exact widening path. No new Neural
+Engine execution or native expert-prefetch worker was added. Neuron masks,
+reader scheduling and storage-layout experiments did not meet their admission
+gates. [Full findings and evidence](docs/JANG-FINDINGS.md) distinguish measured
+results, model estimates, rejections and [remaining work](plans/README.md).
+
+## Build this WIP fork
+
+```sh
+git clone https://github.com/android-imdad/slotstream-flash-m5.git
+cd slotstream-flash-m5
+make build SLOTSTREAM_BUILD_JOBS=2
+
+```
+
+Then follow [the JANG guide](docs/JANG.md) to verify the selected checkpoint,
+preview memory and run with explicit widening. Scalar remains the default;
+CLI serving has no widening activation flag. The upstream installation/release
+links below install upstream Slotstream, not this fork's experiments.
+
+## Upstream Slotstream overview
+
+The following overview, release results and history describe the upstream
+default checkpoint. The JANG experiments above have their own text-only scope.
+The original MIT license and author attribution are retained.
+
+[![Latest release](https://img.shields.io/github/v/release/carloslfu/slotstream?label=upstream%20release)](https://github.com/carloslfu/slotstream/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/carloslfu/slotstream?style=flat&logo=github&label=upstream%20stars)](#star-history)
+
+**Run a 105 GB AI model on a 48 GB Mac.**
+
+Slotstream runs Qwen3.8-Flash-Next on your Mac by keeping most of the model
+on SSD and loading the parts it needs into memory. After a one-time download,
+the model works offline. No Python or cloud API account is required.
+
+Use it to chat, ask about pictures, or work with files through an agent such
+as Hermes. Developers can connect their own apps through its APIs or Swift library.
+
+[Get started](#install) · [Performance](#speed) · [Guides](#guides) · [Get help](#support)
+
+> **Upstream author Carlos Galarza is building Sevra on Slotstream: private, personal AI optimized for your computer.**
+> Sevra will choose a tested model for your hardware and keep that choice current
+> as models improve, with inference, memory and tools tuned together. You'll
+> control what it remembers and can access. The app is in development, starting
+> with Mac.
+> [See Sevra and join the waitlist](https://www.sevrahq.com/).
+> Slotstream's command-line tool, APIs, and Swift library remain independently usable.
+
+## Will it run on my Mac?
+
+You need an **Apple Silicon Mac, macOS 14 or later, and about 110 GB of free
+SSD space**. Choose Apple menu → About This Mac to check your chip and memory.
+
+Smaller Macs can run the model too, but speed depends on the chip, SSD, and
+available memory. An 8 GB Mac needs swap and can slow down the whole computer.
+The installer has been tested on macOS 14 and 15; model runs have been tested
+on macOS 26. Windows, Linux, and Intel Macs are not currently supported.
+
+## Speed
+
+These reply speeds were measured on real Macs after the model warmed up.
+`tok/s` means tokens per second; a token is a small piece of text, often
+part of a word.
+
+| Mac | Memory | Reply speed |
+|---|---|---|
+| MacBook Pro, M5 Pro | 48 GB | ~12 tok/s |
+| Mac mini, M2 (base storage) | 16 GB | 1.41 tok/s |
+| MacBook Air, M5 | 32 GB | 6.22 tok/s |
+| MacBook Pro, M5 Max | 128 GB | ~21–22 tok/s |
+
+The M5 Pro is the development Mac; the other rows are community reports.
+They use different releases and settings, including speculative decoding on
+the M5 Max. See [hardware results and test conditions](docs/HARDWARE.md) for
+credits, methods, and separate estimates for other Macs.
+
+**Starting a reply takes additional time.** Slotstream must first process
+your question and conversation history. Long prompts can take minutes;
+follow-up turns can reuse unchanged history. Terminal shows progress while
+you wait.
+
+The latest optimization work improves prompt reuse and reduces runtime memory.
+The [integrated measurements](MEASUREMENTS.md#final-integrated-optimization-results)
+separate time to the first token, sustained generation, and process memory.
+The benefit depends on your workload; sustained generation did not improve
+across every tested configuration.
+
+## Install
+
+Open Terminal and paste this command:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/carloslfu/slotstream/main/install.sh | sh
+```
+
+Run the same command to upda
+
+Question: In at most 75 words, explain how this engine runs a model larger than RAM, why long prompts can be slow, and which JANG capabilities remain unqualified. Do not include benchmark numbers.

@@ -1,0 +1,105 @@
+# 019 — Matched JANG prefill qualification
+
+Status: IN PROGRESS. September 16, 2026; runtime source baseline `8f79284`.
+Depends on the completed Plan018 timing screen. Its raw evidence is immutable.
+
+## Authorized scope
+
+Qualify the 1024-token prefill candidate against 256, using 512 as the numerical
+rechunk control and lower-tradeoff alternative. Preserve production defaults.
+Use the pinned JANG_6S checkpoint, NEON packed4-to6, 14 GB target, 4096 context,
+deployed optimization controls, MTP/vision/prefix off. One model process at a
+time, target-plus-3 GB real reclaimable preflight, monitored physical footprint
+and terminal peak. No server rollout, weight changes, release or push.
+
+## Numerical instrument
+
+The existing prefill-family check hardcodes reference controls and fixed slots.
+Add a diagnostic-only command that uses the actual Engine and Generator prefill
+path and records the effective plan, optimization/numerical controls and IDs.
+It must use each chunk's actual memory plan, including the smaller expert pool.
+
+Use a nil-by-default package-only Generator observer at the successful complete
+prefill boundary to obtain raw full-vocabulary logits and state. No public API,
+environment or wire setting may install it. It must not introduce computations
+or change tensors when nil; errors from diagnostics must fail the command.
+The command requests one ordinary greedy output token and asserts that the
+retained state still represents exactly the input prompt after the unused final
+forward is skipped. Never enable prefix caching to extract state.
+
+Export the prefill logits and active diagnostic state tensors, then perform
+eight teacher-forced continuation steps through the ordinary single-token model
+forward. Baseline chooses the common continuation IDs; the other arms use those
+exact IDs. Export logits/state at steps 1 and 8, plus ordered routes. This is
+numerical evidence, not a speed benchmark. Capture one engine per process.
+
+Serialize one bounded tensor at a time to fresh files, preserving shapes/dtypes,
+finite-value checks and hashes. Integer state must compare exactly. Enforce a
+32 MiB live CPU tensor-copy cap and 1 GiB artifact quota per arm, with partial
+failure evidence and no completion marker on error. This scratch allowance is
+diagnostic, observed inside the same externally enforced 14 GB ceiling; do not
+credit it as extra model memory or silently shrink/raise the selected plan.
+Refuse unsupported checkpoint/mode/control combinations before loading.
+
+Compare full logits relative to reference spread, numeric state relative to
+reference max magnitude, and routed-expert keep-set differences using the
+existing predeclared band `candidate <= max(3 * control, 0.01)`. Require finite
+values, identical integer state/consumed IDs, matching field shapes, and the
+existing greedy-token agreement check. Preserve individual failing fields;
+never relax thresholds after seeing the result. Report 512's role as the band
+control rather than independent full qualification.
+
+Use both frozen natural Plan018 prompts, identical IDs and deployed settings.
+Any instrumentation build must preserve normal `run` output/runtime controls
+against its archived predecessor on a bounded smoke before numerical capture.
+
+## Representative task and latency follow-up
+
+Freeze corrected, non-leading tasks and objective expected answers before
+inference. Cover a short exact-answer request, grounded long-document retrieval,
+code reasoning with an executable/reference answer, and a longer response with
+checkable content. Inspect complete useful replies, truncation and instruction
+following. Use the current instrumented build with observers disabled for every
+timed run. Repeat paired/rotated controls, report differing output work, preserve
+thermal/paging exclusions and never pool this cohort with Plan018.
+
+Prefer a bounded first pass to reject an unsafe/incorrect candidate early;
+additional repeated timing is justified only if numerical and task checks pass.
+The short-prompt and long-completion comparison must examine decode cost, not
+only first-token latency. Results qualify only the actual tested scope, not the
+whole model, arbitrary context or every hardware profile.
+
+The frozen task suite is `short-json` (41 prompt tokens, 64 output cap),
+`grounded-document` (2040, 96), `reader-offsets` (1389, 160), and `long-csv`
+(68, 512). Expected JSON values and every CSV row are authored before inference.
+All must finish with stop and match the parsed expected values/types exactly;
+surrounding whitespace is allowed, fences/commentary/duplicate keys are not.
+Run one balanced round of all four tasks at all three chunks. If numerical or
+task acceptance fails, do not run a longer timing campaign just to obtain a
+speed claim. Preserve the candidate's failure and the baseline's outcome.
+
+If both numerical and task gates pass, add two rotated rounds for short-json
+and long-csv, giving three paired observations for each of those tradeoffs.
+Require no more than 5% median paired total-request regression on either and
+no more than 5% median paired decode-rate regression on long-csv. A marginal
+pass is reported as marginal; these development results cannot establish a
+universal default from this small suite. No threshold is relaxed after results.
+
+## Ownership, gates and closure
+
+Implementation occurs in a separate worktree. Source scope: a new diagnostic
+module and CLI command, minimal command registration and nil observer hook,
+focused serializer/observer checks and host report validation. No optimization
+default, planner policy or inference algorithm changes.
+
+Review the entire diff before adopting it in the research checkout. Builds are
+serial and limited to two jobs: `make build SLOTSTREAM_BUILD_JOBS=2`; check fresh
+reclaimable memory first. Run meaningful focused checks and the existing T0/T1
+catalogue; record failures rather than treating a skipped gate as passing.
+Parent owns all model launches and db curation. Independent review covers
+artifact integrity, matched controls and numerical/quality conclusions.
+
+Capture raw results under db/sources/runs before writing the measurement, update
+the canonical status and this plan, regenerate projections, run brain/claims
+and diff checks, and confirm no owned process remains. A failed candidate is a
+valid completed investigation; a missing experiment is not a passing gate.

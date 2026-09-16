@@ -1,0 +1,21 @@
+--- a/Sources/SlotstreamDiagnostics/Diagnostics+PrefillCapture.swift
++++ b/Sources/SlotstreamDiagnostics/Diagnostics+PrefillCapture.swift
+@@ -59,7 +59,7 @@
+ extension Diagnostics {
+     /// Refuse experimental environment controls before any model allocation.
+     public static func validatePrefillCaptureEnvironment(chunk: Int, environment: [String: String] = ProcessInfo.processInfo.environment) throws {
+-        guard [256, 512, 1024].contains(chunk) else { throw ModelError("capture chunk must be 256, 512 or 1024") }
++        guard [256, 384, 512, 1024].contains(chunk) else { throw ModelError("capture chunk must be 256, 384, 512 or 1024") }
+         for (key, value) in environment where key.hasPrefix("SLOTSTREAM_") {
+             switch key {
+             case "SLOTSTREAM_PREFIX_CACHE" where value == "0": break
+@@ -244,6 +244,9 @@
+         c.expect("experimental controls refused", rejected { try validatePrefillCaptureEnvironment(chunk: 256, environment: ["SLOTSTREAM_OPT_FINAL_FORWARD": "0"]) })
+         c.expect("unknown MLX controls refused", rejected { try validatePrefillCaptureEnvironment(chunk: 256, environment: ["MLX_UNKNOWN": "1"]) })
+         c.expect("mismatched chunk refused", rejected { try validatePrefillCaptureEnvironment(chunk: 512, environment: ["SLOTSTREAM_PREFILL_CHUNK": "256"]) })
++        c.expect("384 control mismatched override refused", rejected { try validatePrefillCaptureEnvironment(chunk: 384, environment: ["SLOTSTREAM_PREFILL_CHUNK": "512"]) })
++        try validatePrefillCaptureEnvironment(chunk: 384, environment: ["SLOTSTREAM_PREFIX_CACHE": "0", "SLOTSTREAM_PREFILL_CHUNK": "384"])
++        c.expect("384 empirical control accepted", true)
+         try validatePrefillCaptureEnvironment(chunk: 1024, environment: ["SLOTSTREAM_PREFIX_CACHE": "0", "SLOTSTREAM_PREFILL_CHUNK": "1024"])
+         c.expect("supported controls accepted", true)
+         return c.report()

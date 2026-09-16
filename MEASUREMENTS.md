@@ -4444,6 +4444,53 @@ Next candidates are separate: bounded contiguous source reads for converted pref
 
 Evidence: [[sources/runs/2026/09/jang-reader-followup-20260916]]. Decision: [[records/decisions/jang-reader-followup-rejected-2026-09-16]].
 
+## JANG prefill chunk screen at a fixed memory budget
+A complete bounded screen compares the existing JANG_6S prefill controls without modifying runtime source or defaults. Both larger chunks pass the predeclared timing shortlist; this does not admit either as a new default. The 1024-token arm has the largest observed request-latency benefit, while its prose decode regression is marginal against the screening limit. Manual task review is not a clean quality pass, and matched numerical qualification remains pending.
+
+### Protocol
+
+Local M5 Max with 48 GB unified memory; pinned JANG_6S; the validated current NEON binary; explicit packed4-to6; fixed 14 GB process target; 4096 configured context; greedy seed 42; at most 128 output tokens; MTP, vision and prefix reuse disabled. Two frozen natural repository excerpts ask for documentation summarization and code review: 1843 and 1342 chat tokens. Each workload has three rounds of 256/512/1024 chunks, rotating order so every chunk occupies each position once. All eighteen arms run serially in fresh processes, without cache purges. The planner charges the chunk before allocating the cache: 885, 808 and 653 expert slots respectively.
+
+Each arm requires thirty seconds of nominal thermal observations and target-plus-3 GB reclaimable preflight, then records launcher and generator operating conditions, sampled physical memory and terminal lifetime footprint. No arm was replaced or excluded. All eighteen passed functional completion, effective-control/prompt-ID checks, terminal sampling and timing eligibility. Thermal endpoints were nominal, low-power mode was off, and recorded swap counters did not change. These observations do not establish continuous idle hardware or continuous nominal temperature. Global paging remains a functional diagnostic outside this timing protocol.
+
+### Results
+
+Times below are medians of three runs per cell, in seconds. Memory is the maximum observed physical footprint across that cell, including terminal lifetime evidence. Load/cooldown are excluded from request time and retained separately in raw evidence.
+
+| Workload | Chunk | Prefill seconds | Request seconds | Decode tok/s | Output tokens | Maximum footprint GB |
+|---|---:|---:|---:|---:|---:|---:|
+| prose | 256 | 38.553 | 55.424 | 5.469 | 92 | 13.034 |
+| prose | 512 | 25.246 | 42.388 | 5.319 | 91 | 12.300 |
+| prose | 1024 | 17.268 | 34.923 | 5.162 | 91 | 11.776 |
+| code | 256 | 25.206 | 39.469 | 5.419 | 77 | 13.228 |
+| code | 512 | 17.603 | 32.931 | 5.556 | 85 | 12.232 |
+| code | 1024 | 14.110 | 30.598 | 5.223 | 86 | 11.655 |
+
+The following percentages are medians of within-round comparisons with 256; they are not ratios of the preceding table's medians. A positive decode regression means slower decoding; negative means faster.
+
+| Workload | Chunk | Prefill-time reduction | Request-time reduction | Decode-rate regression |
+|---|---:|---:|---:|---:|
+| prose | 512 | 34.52% | 23.52% | 2.7417% |
+| prose | 1024 | 55.66% | 37.52% | 4.9967% |
+| code | 512 | 31.77% | 17.74% | -2.9553% |
+| code | 1024 | 44.32% | 22.88% | 3.1281% |
+
+The predeclared shortlist requires at least 10% median paired request-time reduction in each workload, no more than 5% median paired decode-rate regression in either, and all timing/memory checks. Both candidates pass that timing-only rule. The 1024 prose median is 4.9966566% decode regression, barely below the limit; one individual round regresses 7.97%. This is not evidence of a robust margin or a statistically established universal improvement. The baseline itself becomes faster over rounds, which is why all paired observations are retained.
+
+Maximum footprint across all arms was 13.228349440 GB, under the fixed target. The lower observed peaks with larger chunks occur with smaller planned expert caches; this is not an increase in the available RAM budget.
+
+### Output and qualification limits
+
+Within each workload/chunk, all three rounds reproduce identical output IDs and text and end with `stop`. Across chunks, wording and output counts differ. Request latency therefore compares observed completed requests, not byte-identical or equal-decode-work executions. Prefill processes the same exact prompt IDs in every arm.
+
+Manual review covers all six distinct outputs. Prose answers cover the requested facts; 256 and 1024 meet the 75-word limit, whereas 512 has 76 words. All code answers wrongly imply that widening itself destroys source contiguity. The baseline shares this error and additionally conflates packed weights with metadata. The code prompt's premise may encourage that misconception. No clear new substantive manual-quality regression was found at 1024, but none of this constitutes a clean task-quality or numerical-equivalence pass.
+
+No matched full-vocabulary/logit/state rechunk-band test was run. The existing prefill-family diagnostic uses scalar widening, fixed slots and reference optimization controls, so its result would not qualify this deployed NEON configuration. Short prompts, long completions, other memory budgets, larger contexts and other checkpoints remain outside this screen.
+
+The next useful step is a matched numerical and representative-task check of the 1024 candidate, retaining 512 as the lower-tradeoff alternative. Keep the default at 256 until broader acceptance supports changing it. Neither a generic default change nor server activation follows from this study.
+
+Evidence: [[sources/runs/2026/09/jang-prefill-chunks-20260916]]. See Plan018 for the frozen protocol. The raw comparison and separate manual-review artifact preserve the distinction between timing success and incomplete quality qualification.
+
 ## JANG neuron-block oracle: fidelity rejection and operator stop
 The diagnostic oracle masks blocks of intermediate neurons inside each routed expert, while retaining full dense loading and down-projection computation. It does not implement sparse SSD reads. Original hidden values are scored against verified original column norms, and every selected mask is independently recomputed by the host. The extra diagnostic memory is charged before pool sizing.
 
@@ -4491,3 +4538,87 @@ The model charges staging against the cache, grants free predictions/insertion, 
 Both missed the predeclared ten-percent gate in every tested workload even under the optimistic sensitivity. These are empirical estimates, not measured native prefetch speedups. No worker or serving activation was implemented. The result is scoped to these forecasts and this budget; it does not establish a universal rejection at 24 GB or for learned predictors.
 
 Evidence: [[sources/runs/2026/09/jang-flash-findings-20260915]]. Original report SHA-256 `49cb662be69ad0fa866ff9c3078b7ef9aca33d332afa12ac95570b684cfb8519`; independent verification binds all control, calibration, readiness and settling artifacts. Plan016 retains the complete equations, per-workload table and limitations.
+
+## JANG larger-prefill numerical qualification
+**Disposition: the 1024-token candidate is not admitted.** Three retained-state fields in the prose case exceed the existing rechunking band. The code case passes the canonical numerical checks. No prefill, widening or serving default changed. These small discrepancies do not by themselves prove a bad answer; they fail the acceptance rule required before adopting the faster configuration.
+
+### Matched instrument and scope
+
+The new `prefill-capture` diagnostic constructs the actual Engine with the pinned JANG_6S checkpoint, explicit NEON packed4-to6, a 14 GB process target, 4096 configured context and deployed optimization controls. Prefix caching, MTP and vision stay off. The only capture hook is package-only and nil in ordinary inference; it retains the completed prefill logits and state without replaying or modifying the prefill. Ordinary one-token generation must leave exactly the prompt consumed and match the captured raw greedy choice.
+
+Each chunk uses its actual fixed-budget planner result: 885, 808 and 653 slots at 256, 512 and 1024. Two frozen natural Plan018 prompts have 1843 and 1342 chat tokens. Each is captured at all three chunks in a separate serial process. The reference supplies eight common raw-argmax continuation IDs; the other arms teacher-force that exact list through ordinary checked single-token forwards. Full-vocabulary logits and active state are exported after prefill, one continuation token and eight continuation tokens. All logical routing observations and finite values, field/catalogue shape, integer state, hashes, controls and continuation identities are checked.
+
+Exports limit each CPU tensor copy to 32 MiB and each arm's artifacts to 1 GiB. These are diagnostic ceilings, not extra model memory. Target-plus-3 GB reclaimable preflights, the monitored launcher, terminal lifetime sampling and per-command footprint checks remain active. All six capture processes completed inside the target; the maximum observed capture footprint was 13.466360288 GB. Numerical capture timings are deliberately ineligible for speed claims, and global paging is diagnostic for this functional work.
+
+Before capture, two normal 1024-chunk CLI runs with the observer disabled matched the immutable Plan018 prompt/output IDs, text, completed work and effective controls exactly. These are functional predecessor checks, not new timing pairs. The original Plan018 raw evidence remains unchanged.
+
+### Numerical outcome
+
+The 512 arm supplies the empirical rechunk control; it is not independently qualified. The candidate must satisfy `candidate <= max(3 * control, 0.01)` for each floating state field. Relative state error is maximum absolute difference divided by reference maximum magnitude, with the existing denominator floor. Full-vocabulary logits use reference spread. Integer state is exact, and candidate greedy tokens must match the reference at the captured checkpoints.
+
+| Prose field | Control relative error | Candidate relative error | Allowed |
+|---|---:|---:|---:|
+| prefill/ssm.4 | 0.334984% | 1.009814% | 1.004953% |
+| step1/conv.13 | 0.558659% | 1.955307% | 1.675978% |
+| step1/ssm.4 | 0.337132% | 1.025249% | 1.011396% |
+
+All six full-vocabulary logit comparisons and their candidate/reference greedy-token checks pass. Code state comparisons pass. Canonical routing disagreement aggregates expert keep-set replacements across every layer within the phase; both prompt cases and both phases pass this aggregate criterion. Individual layer differences remain visible in the raw reports and must not be misrepresented as failures of the established aggregate gate.
+
+The three state failures alone reject overall admission. Thresholds were not relaxed, captures were not replaced, and no new control was selected after seeing the outcome. Independent reductions over hash-verified raw tensors reproduce each discrepancy.
+
+### Evaluation corrections and provenance
+
+The first host evaluator incorrectly required fused RoPE, which the deployment selector does not enable on this machine. Actual capture controls exactly match the Plan018 deployment vector. V2 fixes that metadata assumption but applies a stricter per-layer routing criterion than the established aggregate rule. V3 restores the canonical aggregation while retaining every per-layer observation as a nongating diagnostic. All existing individual measurement values remain identical; only metadata validation and route classification change. Original evaluators and failed reports are preserved alongside V3. No additional model run was needed for either correction.
+
+V3 retains 432 individual measurements per prompt and records aggregate routing separately. The source build and all 55 native T0/T1 groups pass, with zero failures or skips. The final comparator's 26 synthetic corruption/boundary tests pass; objective task-scoring tests were also verified without inference. Serializer checks cover exact integer storage, finite values, copy/quota bounds, unsafe paths, overwrite refusal and unsupported controls.
+
+### Follow-up disposition
+
+The corrected task suite and short-prompt/long-completion timing driver were frozen before inference. Their model runs and conditional extended timing campaign were **not run after numerical rejection**, following Plan019's stop rule. Prepared fixtures are not quality or latency evidence.
+
+Keep the ordinary prefill default at 256. Retain the earlier larger-chunk timing results within their exact scope, but do not treat their faster replies as numerical qualification. The 512 fallback needs a separately specified independent numerical check and task/latency acceptance; its role as the control here does not admit it. Parent001 and Plan011 qualification remain separate and incomplete.
+
+Evidence: [[sources/runs/2026/09/jang-prefill-numerics-20260916]]. Decision: [[records/decisions/jang-prefill-1024-not-admitted-2026-09-16]].
+
+## Independent JANG 512 prefill qualification
+**Disposition: the 512-token fallback is not admitted.** Both fresh prompts fail retained-state and aggregate-prefill-routing gates. Full-vocabulary logit, candidate/reference greedy-token and integer-state checks pass. Keep the ordinary 256-token prefill default; its earlier explicit packed-widening and NEON decode measurements remain unchanged.
+
+### Prospectively frozen independent method
+
+Plan020 selects 256 as reference, 384 as empirical rechunk control and 512 as candidate. The control is the arithmetic midpoint, selected before observing its results; it is not independently qualified or admitted as an alternative default. These are fresh captures of two previously frozen but unrun Plan019 tasks, `grounded-document` and `reader-offsets`, with 2040 and 1389 chat tokens. No old numerical/timing rows are pooled, no old candidate error extrema set the threshold, and neither prompt nor control is replaced after results.
+
+The only source change from the Plan019 instrument adds 384 to its diagnostic allowlist and focused validation checks. Production inference, planner policy, weights and defaults are unchanged. A fresh two-job source build, the native capture self-check, all 55 T0/T1 groups and all 40 host comparator/task-driver tests pass. The actual planner/recorder confirms 885, 846 and 808 cache slots for 256, 384 and 512 at the same total target. The evaluator verifies charged workspace and pool bytes, observed pass schedules, actual chunk execution and chronological route coverage.
+
+All arms use the actual Engine/Generator, pinned JANG_6S, explicit NEON packed4-to6, a 14 GB process target, 4096 configured context and the same deployed M5 Max controls, with prefix caching, MTP and vision off. The reference supplies eight common raw-argmax continuation IDs. All other arms teacher-force that exact list. Full logits and active state are captured after prefill, one continuation token and eight continuation tokens; routing covers every logical position and layer. The existing tensor-copy and artifact caps, real target-plus-3 GB preflight, one-model-at-a-time rule and terminal physical-footprint sampler remain in force.
+
+All six processes complete with valid memory/terminal evidence. Maximum captured physical footprint is 13.910055560 GB, below the fixed target. These numerical runs are not speed benchmarks; global paging is a functional diagnostic and no clean-timing claim is made.
+
+### Numerical results
+
+The unchanged per-field gate is `candidate <= max(3 * control, 0.01)`, using reference maximum magnitude for state and reference spread for logits, with the established denominator floor. Integer state is exact; candidate/reference greedy tokens must agree. Routing uses keep-set replacements aggregated across every layer within each phase; per-layer observations are nongating diagnostics.
+
+| Prompt | Failed state comparisons across checkpoints | Unique state fields | Additional failed gate |
+|---|---:|---:|---|
+| grounded-document | 36 | 12 | Aggregate prefill routing |
+| reader-offsets | 26 | 10 | Aggregate prefill routing |
+
+Counts include retained history observed again at later checkpoints. They are not counts of independent bugs or wrong answers. The complete reports retain every one of the 432 individual measurements per prompt and both aggregate routing results.
+
+| Aggregate prefill routing | Control disagreement | Candidate disagreement | Allowed |
+|---|---:|---:|---:|
+| grounded-document | 0.253574% | 2.921058% | 1.000000% |
+| reader-offsets | 0.409617% | 2.854272% | 1.228852% |
+
+All six full-vocabulary logit and candidate/reference greedy-token checks pass. Integer state and both continuation-routing aggregates pass. Control deviations and control greedy choices remain visible; this relative-drift method is not an absolute model-quality oracle.
+
+An independently checked reader example is `prefill/value.35`, shape `[1, 2, 1389, 256]`, at head 1, logical prompt row 522, component 69. Every arm identifies that row as prompt token 585. Reference and control hold `-0.287109375`; the candidate holds `36.5`. Maximum absolute delta divided by reference maximum magnitude is `0.987573406`, exceeding the bound `0.138108221`. The cache implementation appends chronological rows, growth preserves their positions, and the export excludes unused capacity. MLX's copied data is contiguous. Each arm retains the same prompt values at subsequent checkpoints, so the repeated failures do not establish continued growth in the discrepancy. The underlying computational cause remains undiagnosed; no kernel or algorithm explanation is claimed.
+
+Independent review verifies all 2634 native artifact hashes, prompt/continuation identities, finite arrays, shapes, deployed options, binary/source/model metadata, pass schedules and pool pricing, and independently reproduces every recorded metric. No metadata, routing-alignment or cached-row-base mismatch explains these failures. Thresholds and data remain unchanged.
+
+### Conditional work and next scope
+
+The eight-arm objective task screen and conditional eight-arm short-request/long-completion extension were prepared and tested without model inference, then **not run after the numerical rejection**, as Plan020 prescribed. Prepared task fixtures are not task-quality or latency evidence.
+
+Neither 512 nor 1024 is admitted by these investigations. Do not try the 384 control as a new default simply because it served as a comparator. Any further chunk-size work requires a separately declared investigation of the observed divergence. Existing Plan011 packed-widening qualification and serving/default integration remain separate pending work; the prior decode improvements measured with 256-token prefill are preserved.
+
+Evidence: [[sources/runs/2026/09/jang-prefill-512-numerics-20260916]]. Decision: [[records/decisions/jang-prefill-512-not-admitted-2026-09-16]].

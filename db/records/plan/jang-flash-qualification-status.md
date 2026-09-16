@@ -2,7 +2,7 @@
 type: plan
 id: 01m2jn131bsa68nkjdtjs8bfc0
 created: 2026-09-15T13:45:14.539263+00:00
-updated: 2026-09-16T04:51:59.930862+00:00
+updated: 2026-09-16T06:34:21.166866+00:00
 summary: JANG Flash experiment status and remaining qualification
 date: 2026-09-16
 doc: plan
@@ -42,3 +42,8 @@ Latest implementation-first follow-up: [[records/measurements/jang-simd-widening
 Latest bounded benchmark: [[records/measurements/jang-neon-full-model-2026-09-16]] records two alternating pairs for each short workload, exact output/work equality and monitored memory/thermal/paging conditions. It is exploratory development evidence, not formal qualification or default activation.
 
 Metadata/scratch follow-up completed: [[records/measurements/jang-reader-followup-2026-09-16]] records two rejected runtime candidates. The production metadata loop already vectorizes; lane-local CPU scratch passed exact/fault checks but lacked reader benefit. The original runtime is retained and no follow-up full-model cohort was run. [[records/decisions/jang-reader-followup-rejected-2026-09-16]] closes these implementations. Plan017 is complete; bounded multi-row source reads and native-bit caches remain separate unexecuted ideas.
+
+Plan018 completed the fixed-budget prefill screen: [[records/measurements/jang-prefill-chunks-2026-09-16]] records the complete paired timing results and manual-quality limitations. Larger chunks pass the timing-only shortlist, but no runtime default changed. The selected candidate was subsequently evaluated in Plan019; its disposition is recorded below. This screen does not close Plan011 or parent001 qualification.
+Plan019 completed the matched numerical investigation: [[records/measurements/jang-prefill-qualification-2026-09-16]]. Three retained-state comparisons reject the 1024 candidate. Code and canonical aggregate routing pass; the evaluator corrections and all original evidence are retained. No default changed. Prepared task/latency runs were skipped after this numerical gate failure, not passed. That independent fallback investigation was subsequently completed in Plan020, recorded below. [[records/decisions/jang-prefill-1024-not-admitted-2026-09-16]] records the admission decision.
+
+Plan020 independently evaluates the 512 fallback against reference 256 and prospectively selected midpoint control 384: [[records/measurements/jang-prefill-512-qualification-2026-09-16]]. Both fresh prompts fail state and aggregate-prefill-routing gates, independently verified from raw data. Logit/greedy/integer-state checks pass. The task/timing campaign was not run after numerical rejection. The ordinary default stays 256; neither larger candidate nor the midpoint control is admitted. Existing scoped packed-widening/NEON decode results remain intact. Further chunk work requires a separate investigation of the observed divergence. [[records/decisions/jang-prefill-512-not-admitted-2026-09-16]] records the decision.

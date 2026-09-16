@@ -1,0 +1,96 @@
+# 020 — Independent bounded qualification of the 512-token fallback
+
+Status: COMPLETE — candidate not admitted. September 16, 2026. Runtime source baseline is the
+uncommitted Plan019 diagnostic on `8f79284`; preserve all earlier dirty work.
+
+All six fresh captures completed within the process target. Both prompts fail
+retained-state and aggregate-prefill-routing gates; logit, greedy-token and
+integer-state checks pass. Independent raw-artifact review confirms the result.
+The conditional task/timing campaign was not run after this numerical rejection.
+The default remains 256, and 384 remains an unqualified control. See the
+[canonical result and scope](../db/records/measurements/jang-prefill-512-qualification-2026-09-16.md).
+
+## Prospective method
+
+The user authorized independent qualification of the 512 fallback. It cannot
+grade itself using its old role as the Plan019 empirical control. Use fresh
+captures: 256 reference, **384 empirical rechunk control**, 512 candidate.
+384 is the arithmetic midpoint between reference and candidate, selected before
+observing its data. It is not an independently qualified configuration. This
+relative-drift method does not prove absolute correctness; objective task and
+latency/memory acceptance remain separate required gates.
+
+Use two frozen but previously unrun Plan019 tasks: `grounded-document` (2040
+chat tokens) and `reader-offsets` (1389). Do not use the earlier candidate's
+observed errors to choose thresholds, substitute prompts/control after results,
+or pool older model runs into this cohort. Freeze prompt/fixture hashes and
+evaluation source before inference. Independent pre-run method review accepted
+this bounded design with the limitations above.
+
+## Fixed configuration and numerical gates
+
+Pinned JANG_6S, actual Engine/Generator, deployed M5 Max controls, explicit NEON
+packed4-to6, 14 GB process target, 4096 configured context, prefix/MTP/vision off.
+Each arm uses its own correctly charged chunk/pool plan. Extend only the
+diagnostic allowlist and focused checks to admit 384; no planner, math, default
+or public serving changes. Confirm effective chunk, scheduled pass accounting,
+workspace reservation and pool sizes in the reports.
+
+Capture each arm in a separate process, with target-plus-3 GB reclaimable
+preflight, one model at a time, monitored physical footprint and terminal peak.
+Retain the existing 32 MiB CPU-copy and 1 GiB per-arm artifact caps. Numerical
+timings are not speed evidence; global paging remains a functional diagnostic.
+
+Keep Plan019's complete numerical method: baseline chooses eight common
+raw-argmax continuation IDs; control/candidate teacher-force those exact IDs.
+Export full logits and active state at prefill, step 1 and step 8. Require
+matching finite tensors, hashes, logical positions, state catalogue/shapes,
+exact integer state, and candidate/reference greedy choices at each checkpoint.
+For each floating state/logit metric, require
+`candidate <= max(3 * control, 0.01)`, with the same denominator definitions and
+floor. Aggregate routing across all layers **per phase**, using the same band;
+retain per-layer observations as nongating diagnostics. Report control absolute
+deviations and greedy differences; a large control can make this band permissive.
+Both prompts must pass every gate. A failed or incomplete arm stops advancement.
+
+## Conditional objective task and latency gates
+
+Reuse the prospectively frozen, unrun Plan019 task definitions and exact expected
+answers; run fresh model arms at 256 and 512 only. The four tasks are short JSON
+arithmetic, grounded document extraction, source/destination offset reasoning,
+and a complete 32-row CSV answer. Require stop completion and exact parsed
+values/types. Whitespace is allowed; fences, extra prose, duplicates and
+truncation fail. The scoring implementation already has negative checks; adapt
+only the selected chunks/cohort paths and test their schedules.
+
+First run one balanced pair per task (eight arms). If numerical or task gates
+fail, do not launch extended timing to obtain a speed claim. If they pass, run
+two additional reversed/rotated paired rounds of `short-json` and `long-csv`,
+giving three pairs per tradeoff and sixteen task arms overall. Require no more
+than 5% median paired request-time regression on either short-json or long-csv,
+and no more than 5% median paired decode-rate regression on long-csv. Report
+output-work differences and margins; three pairs do not prove universal benefit.
+Timed arms require the existing thirty-second nominal readiness observations,
+no low-power mode, clean timing intervals and explicit sampled memory checks.
+Preserve excluded/incomplete cohorts; never replace pairs or mix run sets.
+
+## Verification and disposition
+
+Worktree executor owns the diagnostic-only allowlist/check change. Parent
+reviews before importing into the research checkout; preserve all prior source
+and artifacts. Use a serial two-job build after a fresh memory check, the native
+serializer check and applicable existing catalogue, plus meaningful corruption
+tests for the adapted comparator and task driver. No model may overlap a build.
+Parent owns model launches. Independent review verifies identities, arithmetic,
+failure handling and the final interpretation.
+
+This is qualification only for the tested local configuration. Do not promote
+384 because it is a control, reopen the rejected 1024 case, or silently change
+the ordinary 256 default. If all gates pass, record the supported explicit 512
+profile and its limitations; a broad default/serving rollout remains separate.
+If a gate fails, record the rejection and skip dependent work honestly.
+
+Save raw output first under db/sources/runs, preserve frozen drivers/fixtures,
+write canonical measurement/decision/status records, regenerate projections,
+run relevant documentation/evidence gates and confirm no owned process remains.
+No commit, push or release is implied.

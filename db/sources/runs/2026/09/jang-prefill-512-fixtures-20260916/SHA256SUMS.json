@@ -1,0 +1,30 @@
+{
+  "capture_run.py": {
+    "bytes": 10633,
+    "sha256": "dcc2bfa2a07bfcb8c2eadfbad68168bc71ccde822178193d98c0f6b1ee6d29cc"
+  },
+  "compare.py": {
+    "bytes": 32476,
+    "sha256": "21d47197cd98580f9b23d4dcf20bcea91395f591f321f24661d84b52888e7e9b"
+  },
+  "implementation.patch": {
+    "bytes": 1919,
+    "sha256": "2e3e4a7e75481e5f53e8787357ddf30f1977b1802075a205ebedc179eb5bd899"
+  },
+  "plan020-protocol.txt": {
+    "bytes": 5427,
+    "sha256": "0553ad4097068a4b55ada2f41e81aa7a5d1d50e5b97807b6c584d3c7f4c64b02"
+  },
+  "tasks_run.py": {
+    "bytes": 24373,
+    "sha256": "78998a66c0b1ea6bdd43d7ead9247598a20e139f346d947f8c6a41d0f35048ec"
+  },
+  "test_compare.py": {
+    "bytes": 17017,
+    "sha256": "7d155310052fac9c48d521105d9ccd896b08140ae44167c254cb6a851a70237f"
+  },
+  "test_tasks_run.py": {
+    "bytes": 5051,
+    "sha256": "9301c5b256de46912025372220264db42f66ab785cacace16e6c70f2d89995a3"
+  }
+}

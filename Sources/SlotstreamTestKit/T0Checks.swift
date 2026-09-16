@@ -39,6 +39,7 @@ extension Catalogue {
             Check("bounded-output", tier: .t0) { try Diagnostics.optimizationOutput() },
             Check("vision-check", tier: .t0) { Diagnostics.vision() },
             // T1: touches MLX, so it needs the Metal library beside the runner.
+            Check("prefill-capture-serializer", tier: .t1) { try Diagnostics.prefillCaptureSelfCheck() },
             Check("sampler-behaviour", tier: .t1) { try Diagnostics.samplerBehaviour() },
             Check("compact-indexer", tier: .t1) { Diagnostics.optimizationCompactIndexer() },
             Check("slot-slices", tier: .t1) { Diagnostics.optimizationSlotSlices() },

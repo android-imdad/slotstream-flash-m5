@@ -1,0 +1,94 @@
+{
+  "aggregate" : {
+    "document_count" : 2,
+    "prompt_artifact_bytes" : 31106,
+    "prompt_token_count" : 3185
+  },
+  "artifacts" : {
+    "prompts\/prompt-0000.json" : {
+      "bytes" : 17969,
+      "sha256" : "92f868b0cd205b9d0a44013785ba2f8c27e279df6ae3733b745a1565c0926569"
+    },
+    "prompts\/prompt-0001.json" : {
+      "bytes" : 13137,
+      "sha256" : "43b0fe9890dceffb71803db34037360226debb3eb5375c5adbd4a51cbe70f026"
+    }
+  },
+  "canonical_test_vector" : {
+    "canonical_json" : "{\"Mixed_key\":{\"a_value\":7,\"zValue\":true},\"camelKey\":\"slash\/a newline\\n quote\\\" backslash\\\\\",\"snake_key\":\"é and é\"}",
+    "sha256" : "bee604a6fb30e796eab0bfbc19edd8e29dd5216e5c89179bf8d915531d8c732a",
+    "value" : {
+      "camelKey" : "slash\/a newline\n quote\" backslash\\",
+      "Mixed_key" : {
+        "a_value" : 7,
+        "zValue" : true
+      },
+      "snake_key" : "é and é"
+    }
+  },
+  "context" : {
+    "artifact_limit_is_inference_permission" : false,
+    "artifact_token_limit" : 8192,
+    "inference_context_limit" : 2048
+  },
+  "documents" : [
+    {
+      "artifact_bytes" : 17969,
+      "artifact_sha256" : "92f868b0cd205b9d0a44013785ba2f8c27e279df6ae3733b745a1565c0926569",
+      "id" : "prose",
+      "path" : "prompts\/prompt-0000.json",
+      "prompt_count" : 1843,
+      "prompt_ids_sha256" : "fcc1eaa402c4eeb6a90312b9d588ad68919623fb8df2c829fbafa17b91cfd415",
+      "source_hash" : "2e7c64cedb1464af388e87e37d1df5ac218c6b06f5b31f51bd68a148cf4c48b5"
+    },
+    {
+      "artifact_bytes" : 13137,
+      "artifact_sha256" : "43b0fe9890dceffb71803db34037360226debb3eb5375c5adbd4a51cbe70f026",
+      "id" : "code",
+      "path" : "prompts\/prompt-0001.json",
+      "prompt_count" : 1342,
+      "prompt_ids_sha256" : "904a6c383bcc377cb68d2a99b55453255905ebd6da5dd8a9047eb0de7c494064",
+      "source_hash" : "a2c0c7447e972e1ad3f4c6915976474cfaf80b87d5ef258bad8977883187891f"
+    }
+  ],
+  "executable_identity" : {
+    "binary_sha256" : "0124a9e69e0ba2a7583eba6b73b6288eda68ce33ce58f5fd44762b4bdf3050b8",
+    "build_identity_sha256" : "5d23a7aa935ed3b590ce2a6b8e26bb26c24e5a0b75efd8ae626018c1331672ed",
+    "historical" : false,
+    "metallib_sha256" : "198488eb61359e953580a9c4530400feee1a06dd2f28a930a6ffa58aec66a597",
+    "path" : "\/Users\/imdad\/Documents\/projects\/slotstream-flash-m5\/.build\/release\/slotstream",
+    "source_archive_sha256" : "5993a10ac5ca768e0b98ab636838b89f4ba4d0ad42e0871595e6cea72d95ae4a"
+  },
+  "format" : "slotstream-prompt-corpus-v1",
+  "model_loaded" : false,
+  "qualification" : false,
+  "schema_version" : 1,
+  "source_manifest_path" : "\/Users\/imdad\/Documents\/projects\/slotstream-flash-m5\/.build\/flash\/prefill-chunks-20260916\/prompt-source.json",
+  "source_manifest_sha256" : "e8863e6ba6f26df1043f27d0ec99d8f6eb05b64667a0ce07fec403884f9e86cc",
+  "source_provenance_scope" : "caller metadata preserved; external provenance not verified by tokenizer bridge",
+  "tokenizer_identity" : {
+    "embedded_chat_template_sha256" : "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+    "files" : [
+      {
+        "bytes" : 12809320,
+        "path" : "tokenizer.json",
+        "sha256" : "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3"
+      },
+      {
+        "bytes" : 17928,
+        "path" : "tokenizer_config.json",
+        "sha256" : "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+      },
+      {
+        "bytes" : 113950,
+        "path" : "config.json",
+        "sha256" : "06d4ba9c9604e901ed5d8a7c2e8d236d32adbbedd1c3b5d1a621a525bffc594a"
+      }
+    ],
+    "model_revision" : "3781190c6bbdf0a7637beda49ba179822612058a",
+    "swift_transformers_revision" : "2fa33e1f5e7131a7fc64c28e6d161dcec0d24820",
+    "text_add_special_tokens" : false,
+    "thinking" : false
+  },
+  "tokenizer_only" : true
+}

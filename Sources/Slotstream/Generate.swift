@@ -349,6 +349,9 @@ public struct Sampler {
 }
 
 public final class Generator {
+    /// Diagnostic-only complete-prefill boundary. Nil adds no tensor work.
+    /// Never installed by a product API, environment setting, or server request.
+    package var completePrefillObserver: ((MLXArray, Qwen4ExpModel.State) throws -> Void)?
     public let model: Qwen4ExpModel
     /// Tokens per prefill pass. Bigger is faster on long prompts: a chunk
     /// activates nearly every expert of every layer, so the expert stream is
@@ -1009,6 +1012,16 @@ public final class Generator {
         }
         model.pool.resetStats()
         model.ngram.resetStats()
+
+        if let observe = completePrefillObserver {
+            do { try observe(logits, state) }
+            catch {
+                discardFailedState(error)
+                stats.requestSeconds = RuntimeClock.seconds(since: requestStart)
+                stats.sampledFootprint = footprint?.finish()
+                return finish([])
+            }
+        }
 
         // ---- decode
         var out: [Int] = []

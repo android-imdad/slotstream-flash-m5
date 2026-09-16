@@ -1,0 +1,34 @@
+{
+  "run.py": {
+    "bytes": 18347,
+    "sha256": "6a1f594d70b7c8b75fe748343f9b9639fdc310a49c738d3ae60295846b9a1fbd"
+  },
+  "prompt-source.json": {
+    "bytes": 13325,
+    "sha256": "e8863e6ba6f26df1043f27d0ec99d8f6eb05b64667a0ce07fec403884f9e86cc"
+  },
+  "prompts/prose.txt": {
+    "bytes": 6942,
+    "sha256": "749513b941a7a132abf36a0b30faa32af634c1e3d8009f1ca3bc8b29028d1e54"
+  },
+  "prompts/code.txt": {
+    "bytes": 5162,
+    "sha256": "b3282b5ef91042468dd5c48c4623fb745a4b851b9b042443d964b7f66f94e492"
+  },
+  "tokenized/prompts.json": {
+    "bytes": 3833,
+    "sha256": "63e73661cff4c05e5f5312de35e7c7a5e7d05a0faaa6df2b07889934f429218d"
+  },
+  "tokenized/completion.json": {
+    "bytes": 173,
+    "sha256": "8cd62ed62ea17e542d887637b4a2ff4fe68bbe6fa3b08f5ebbaf1a3eaf159c1d"
+  },
+  "tokenized/prompts/prompt-0000.json": {
+    "bytes": 17969,
+    "sha256": "92f868b0cd205b9d0a44013785ba2f8c27e279df6ae3733b745a1565c0926569"
+  },
+  "tokenized/prompts/prompt-0001.json": {
+    "bytes": 13137,
+    "sha256": "43b0fe9890dceffb71803db34037360226debb3eb5375c5adbd4a51cbe70f026"
+  }
+}

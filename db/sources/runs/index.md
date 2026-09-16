@@ -2,11 +2,14 @@
 type: index
 scope: type-folder
 folder: sources/runs
-updated: 2026-09-16T04:54:17.430044Z
+updated: 2026-09-16T06:33:00.691344Z
 ---
 
 # sources/runs
 
+- [[sources/runs/2026/09/jang-prefill-512-numerics-20260916]] — Independent JANG 512 prefill qualification capture
+- [[sources/runs/2026/09/jang-prefill-numerics-20260916]] — Matched JANG prefill numerical qualification capture
+- [[sources/runs/2026/09/jang-prefill-chunks-20260916]] — JANG fixed-budget prefill chunk comparison
 - [[sources/runs/2026/09/jang-reader-followup-20260916]] — JANG metadata and scratch optimization experiments
 - [[sources/runs/2026/09/jang-neon-full-model-20260916]] — JANG NEON versus previous packed full-model benchmark
 - [[sources/runs/2026/09/jang-simd-widening-20260915]] — NEON widening implementation, bounded exactness checks and standalone component comparison
@@ -504,11 +507,8 @@ updated: 2026-09-16T04:54:17.430044Z
 - [[sources/runs/2026/09/2026-09-05-optimization-vision-identity-and-router-weights]] — Vision identity and router promotion with an open memory failure
 - [[sources/runs/2026/09/2026-09-05-optimization-vision-padding-probe]] — Bounded vision attention padding numerical and component probe
 - [[sources/runs/2026/09/2026-09-05-optimization-mtp-selector-and-image-reuse]] — Cached MTP selector and request-local image feature reuse
-- [[sources/runs/2026/09/2026-09-05-optimization-smaller-routed-tile]] — Smaller routed tile resource pass and failed paired qualification
-- [[sources/runs/2026/09/2026-09-05-optimization-denormals-and-workspace-peak]] — Subnormal selection contract corrected; compact-frontier and piecewise-write resource probes fail; phase trace identifies routed compute peak
-- [[sources/runs/2026/09/2026-09-05-optimization-exact-256-compute-scopes]] — Larger read scopes preserve 256-token arithmetic but code-review pilot exceeds its memory target and lacks enough clean pairs
 
 ## More
 
-This folder has 537 files. The 500 most recent are listed above.
+This folder has 540 files. The 500 most recent are listed above.
 Use `dbmd query --type run --in sources` for the complete catalog.

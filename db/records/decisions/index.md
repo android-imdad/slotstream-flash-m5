@@ -2,11 +2,13 @@
 type: index
 scope: type-folder
 folder: records/decisions
-updated: 2026-09-16T04:50:49.784250Z
+updated: 2026-09-16T06:33:00.771701Z
 ---
 
 # records/decisions
 
+- [[records/decisions/jang-prefill-512-not-admitted-2026-09-16]] — Do not adopt the 512 prefill fallback
+- [[records/decisions/jang-prefill-1024-not-admitted-2026-09-16]] — Do not adopt the larger prefill candidate from timing alone
 - [[records/decisions/jang-reader-followup-rejected-2026-09-16]] — Reject redundant metadata SIMD and unhelpful lane scratch
 - [[records/decisions/jang-flash-public-wip-repository]] — Publish the JANG Flash research source as a public WIP fork
 - [[records/decisions/jang-flash-admission-2026-09-15]] — JANG Flash experiments remain opt-in and rejected tracks do not advance

@@ -1,0 +1,104 @@
+Analyze this Swift implementation.
+
+```swift
+        else { try index.preadChecked(into: dst, refs[layer][piece], offset: offset, count: count) }
+    }
+    public private(set) var pieceRowBytes: [Int] = []  // bytes per expert per piece
+    package func sourceRecordBytes(layer: Int) -> Int { refs[layer].reduce(0) { $0 + $1.rowBytes } }
+    package func wideningProjectionCount(layer: Int) -> Int {
+        [0, 3, 6].reduce(0) { count, piece in
+            count + (refs[layer][piece].rowBytes == pieceRowBytes[piece] ? 0 : 1)
+        }
+    }
+    private var pieceShapes: [[Int]] = []
+    private var scaleDType: DType { cfg.format.isJANG ? .float32 : .bfloat16 }
+
+    /// Read original packed bytes; widen only integer codes when a six-bit
+    /// shared pool receives a four-bit projection. At most one source record
+    /// per worker is scratch, including during contiguous prefill reads.
+    private func readRows(into dst: UnsafeMutableRawPointer, layer: Int, piece: Int, first: Int, count: Int) throws {
+        let sourceBytes = refs[layer][piece].rowBytes
+        let targetBytes = pieceRowBytes[piece]
+        if sourceBytes == targetBytes {
+            try read(into: dst, layer: layer, piece: piece, offset: first * sourceBytes, count: count * sourceBytes)
+            return
+        }
+        if piece % 3 != 0 {
+            guard cfg.format.isJANG, targetBytes == 2 * sourceBytes else { throw ModelError("unsupported expert scale layout") }
+            var raw = Data(count: sourceBytes)
+            for row in 0 ..< count {
+                try raw.withUnsafeMutableBytes { bytes in
+                    try read(into: bytes.baseAddress!, layer: layer, piece: piece,
+                             offset: (first + row) * sourceBytes, count: sourceBytes)
+                    let output = (dst + row * targetBytes).assumingMemoryBound(to: Float.self)
+                    for i in 0 ..< sourceBytes / 2 {
+                        let bits = UInt16(bytes[2 * i]) | UInt16(bytes[2 * i + 1]) << 8
+                        output[i] = Float(Float16(bitPattern: bits))
+                    }
+                }
+            }
+            return
+        }
+        let base = "model.layers.\(layer).mlp.switch_mlp." + Self.pieces[piece].replacingOccurrences(of: ".weight", with: "")
+        let bits = cfg.quantization(for: base).bits
+        var raw = Data(count: sourceBytes)
+        for row in 0 ..< count {
+            try raw.withUnsafeMutableBytes { bytes in
+                try read(into: bytes.baseAddress!, layer: layer, piece: piece,
+                         offset: (first + row) * sourceBytes, count: sourceBytes)
+                try AffineCodes.widen(UnsafeRawBufferPointer(bytes),
+                    to: UnsafeMutableRawBufferPointer(start: dst + row * targetBytes, count: targetBytes),
+                    count: cfg.hiddenSize * cfg.moeIntermediate, from: bits, to: cfg.expertBits,
+                    policy: effectiveWideningPolicy)
+            }
+        }
+    }
+    public func readRunsChecked(
+        layer: Int, experts: [Int], queueDepth: Int = ExpertStore.defaultQueueDepth
+    ) throws -> [MLXArray] {
+        let n = experts.count
+        guard n > 0, layer >= 0, layer < cfg.numLayers,
+            experts.allSatisfy({ $0 >= 0 && $0 < cfg.numExperts })
+        else { throw CheckpointReadError.invalidRange }
+        let buffers = try allocateStaging(rows: n)
+        var transferred = false
+        defer { if !transferred { buffers.forEach { free($0) } } }
+        let failure = JoinedReadFailure()
+        var runs: [(row: Int, len: Int)] = []
+        var j = 0
+        while j < n {
+            var k = j + 1
+            while k < n, experts[k] == experts[k - 1] + 1 { k += 1 }
+            runs.append((j, k - j))
+            j = k
+        }
+        // One job per (run, piece), largest first so the lanes finish together.
+        var jobs: [(piece: Int, row: Int, len: Int)] = []
+        jobs.reserveCapacity(runs.count * 9)
+        for r in runs { for p in 0 ..< 9 { jobs.append((p, r.row, r.len)) } }
+        jobs.sort { $0.len * pieceRowBytes[$0.piece] > $1.len * pieceRowBytes[$1.piece] }
+        let lanes = min(max(queueDepth, 1), jobs.count)
+        let lock = NSLock()
+        var next = 0
+        DispatchQueue.concurrentPerform(iterations: lanes) { _ in
+            while true {
+                lock.lock()
+                let j = next
+                next += 1
+                lock.unlock()
+                if j >= jobs.count { return }
+                let (p, row, len) = jobs[j]
+                let pb = pieceRowBytes[p]
+                do {
+                    try readRows(into: buffers[p] + row * pb, layer: layer, piece: p,
+                        first: experts[row], count: len)
+                } catch { failure.record(error) }
+            }
+        }
+        try failure.finish()
+        transferred = true
+        return stagingArrays(buffers, rows: n)
+    }
+```
+
+Consider only the integer-code conversion branch of readRows, with first=5, count=3, sourceBytes=8 and targetBytes=12. These are arithmetic example sizes, not valid model tensor dimensions. Return only JSON with "read_calls", "source_offsets", "destination_offsets", and "source_span_bytes" (the total length of the adjacent source rows). Calculate the values from the loop. Do not discuss whether conversion requires separate reads.
