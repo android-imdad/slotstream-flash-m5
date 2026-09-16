@@ -20,7 +20,7 @@ measurement commits do not imply merge, push, upstream release or default rollou
 | [008](008-corpus-quality-metrics.md) | Freeze corpus and validate full-vocabulary quality metrics | P1 | L | 007,010,012 | DONE — reviewed `aa9b771`;896-position real cohort/metrics |
 | [009](009-neuron-block-oracle.md) | Measure neuron-block oracle quality and possible byte savings | P1 | L | 008 corpus and metrics | COMPLETE at user-revised scope — dense-ten exact; eight/six fail fidelity; lower counts stopped by user; no sparse runtime admission |
 | [010](010-prompt-tokenizer.md) | Freeze complete task prompts without inference | P1 | M | 007 tokenizer facade | DONE — reviewed `bc185df`, exact tokenizer overlap |
-| [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — NEON backend implemented; focused exact/source checks and component comparison pass; new-backend full-model TPS remains unmeasured |
+| [011](011-exact-widening.md) | Accelerate exact4-to6-bit expert expansion | P1 | M | 007,010; measured CPU recon | IN PROGRESS — NEON backend implemented; focused exact/source checks and component comparison pass; short full-model comparison completed; formal qualification remains pending |
 | [012](012-archived-evidence-validation.md) | Verify archived harness bytes and immutable receipt joins | P1 | S | 008 uncommitted host implementation | DONE — reviewed in `aa9b771`; archive mutations rejected |
 | [013](013-balanced-read-scheduling.md) | Balance exact expert read jobs | P1 | M | 011 packed reader | COMPLETE — component rejected; default-depth reader calls about 40% longer, no generation activation |
 | [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
@@ -46,8 +46,8 @@ ANE execution was added.
 ## Pending, ranked
 
 1. **Plan011 implementation follow-up:** the new NEON backend has a bounded CPU
-   conversion result. A short matched comparison against the previous packed
-   backend at the saved 24 GB configuration can establish any additional TPS gain.
+   conversion result and a [short 14 GB full-model comparison](../db/records/measurements/jang-neon-full-model-2026-09-16.md).
+   The saved 24 GB configuration has not been remeasured with NEON.
    The preceding backend's formal studies remain thermally inconclusive; no pair
    replacement, pooling, or transfer of those results to the new backend is allowed.
 2. **Parent001 final tooling and qualification:** aggregate run-set creation,

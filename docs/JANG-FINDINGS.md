@@ -14,8 +14,10 @@ This [public WIP research fork](https://github.com/android-imdad/slotstream-flas
 
 The latest implementation adds an ARM NEON CPU backend to the existing
 `packed4-to6` option. Focused exact-byte and checkpoint-source checks passed.
-Its component comparison is recorded separately; full-model TPS for the NEON
-backend has not been measured. The development figures below belong to the
+Its [short full-model comparison](../db/records/measurements/jang-neon-full-model-2026-09-16.md)
+now records exploratory gains against the preceding packed backend, with matching
+outputs. It uses a smaller memory budget and does not replace the development
+figures below or complete formal qualification. The figures below belong to the
 preceding Swift packed implementation. [SIMD implementation and component
 evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md).
 

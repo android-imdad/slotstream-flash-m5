@@ -1,8 +1,8 @@
 # Plan011: Accelerate exact4-to6-bit expert expansion
 
-## Current disposition — September 15, 2026
+## Current disposition — September 16, 2026
 
-**IN PROGRESS — NEON optimization implemented; new-backend TPS unmeasured.** The existing `packed4-to6` policy now uses a CPU NEON bulk path with exact tails. The release build, focused vector/byte checks and bounded checkpoint-source comparisons pass. A short component comparison measured the conversion improvement; no long qualification campaign was repeated. [SIMD evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md). The earlier packed backend's qualification attempts remain [thermally inconclusive](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md); no overall qualification or default activation is claimed.
+**IN PROGRESS — NEON optimization implemented; short full-model comparison completed.** A [14 GB paired benchmark](../db/records/measurements/jang-neon-full-model-2026-09-16.md) now records exploratory throughput results against the previous packed backend. This does not qualify the full suite or update the earlier 24 GB measurements. The existing `packed4-to6` policy now uses a CPU NEON bulk path with exact tails. The release build, focused vector/byte checks and bounded checkpoint-source comparisons pass. A short component comparison measured the conversion improvement; no long qualification campaign was repeated. [SIMD evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md). The earlier packed backend's qualification attempts remain [thermally inconclusive](../db/records/measurements/jang-widening-qualification-attempts-2026-09-15.md); no overall qualification or default activation is claimed.
 
 [Evidence/current findings](009-oracle-execution.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md). The original execution brief and dated review notes below are retained as history; current work is governed by [the plan index](README.md). Do not restart completed or unselected steps from a historical instruction.
 

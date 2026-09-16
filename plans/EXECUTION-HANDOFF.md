@@ -14,7 +14,7 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
 - Latest optimization: the explicit packed-widening path now uses an internal
   CAffine NEON backend. Release build, focused exhaustive/vector-tail checks and
   bounded original-source comparisons pass. A standalone conversion comparison
-  is recorded; full-model TPS for this backend is unmeasured. See
+  is recorded; a [short 14 GB full-model comparison](../db/records/measurements/jang-neon-full-model-2026-09-16.md) is now complete. Formal qualification remains pending. See
   [SIMD evidence](../db/records/measurements/jang-simd-widening-2026-09-15.md).
 - Plans002–008,010,012: verified JANG_6S baseline; existing M5 diagnostic dispatch;
   tokenization, bounded capture, corpus/quality metrics and terminal sampling.
@@ -41,8 +41,8 @@ Original checkpoint bytes and immutable local evidence remain unchanged.
 
 ## Remaining work
 
-1. Measure the new NEON backend against the preceding packed baseline using a
-   short matched 24 GB development comparison when resources permit.
+1. The short 14 GB NEON versus previous-packed comparison is complete.
+   A matched comparison at the saved 24 GB configuration remains a separate scope.
    Plan011's predeclared ten-pair qualification remains pending after two thermal
    stops. The cooled sky-blue/Python subsets are complete; arithmetic is not.
    Do not replace failed pairs or combine attempts. The separate 24 GB checkpoint

@@ -2,9 +2,9 @@
 type: plan
 id: 01m2jn131bsa68nkjdtjs8bfc0
 created: 2026-09-15T13:45:14.539263+00:00
-updated: 2026-09-15T17:55:52.277696+00:00
+updated: 2026-09-16T04:10:47.224673+00:00
 summary: JANG Flash experiment status and remaining qualification
-date: 2026-09-15
+date: 2026-09-16
 doc: plan
 kind: milestone
 level: '2'
@@ -13,14 +13,14 @@ title: JANG Flash experiment status and remaining qualification
 ---
 Public WIP repository: [https://github.com/android-imdad/slotstream-flash-m5](https://github.com/android-imdad/slotstream-flash-m5). Its `main` branch publishes the research source; this is separate from upstream integration or release. The original upstream remote and MIT attribution are retained.
 
-Current local source state after the September 15 investigation. This is not an upstream release or default activation.
+Current local source and benchmark state after the September 16 comparison. This is not an upstream release or default activation.
 
 | Track | State | Evidence and limits |
 |---|---|---|
 | Full JANG_6S checkpoint and baseline | Complete | Pinned download verified; real generation and physical-memory evidence exist |
 | Tokenization, capture, metrics and terminal sampling | Complete at bounded scope | Immutable reference/corpus and versioned report validation |
 | Existing M5 GPU dispatch | Observed in instrumented diagnostic build | Production utilization unverified; no new ANE acceleration |
-| Exact packed widening | NEON CPU backend implemented under the existing explicit policy | Focused byte/source checks and standalone component comparison pass; new-backend full-model TPS remains unmeasured |
+| Exact packed widening | NEON CPU backend implemented under the existing explicit policy | Focused byte/source checks and standalone component comparison pass; short full-model comparison completed; formal qualification remains pending |
 | Neuron-block oracle | Closed at user-revised scope | Eight/six failed fidelity; four stopped incomplete; two not run |
 | Dependent predictor/sparse runtime/ANE | Not selected for that approach | No quality-passing neuron policy to advance |
 | Cache windows and loading layouts | Tested and rejected | No new policy or full-model artifact admitted |
@@ -37,4 +37,6 @@ Evidence: [[records/measurements/jang-flash-foundation-2026-09-15]], [[records/m
 
 Current-source follow-up: [[records/measurements/jang-widening-qualification-attempts-2026-09-15]] records passing prerequisites, both thermal stops and the separate bounded CPU sample. The CPU sample preserves exact output/work under recorded fair conditions but establishes no eligible speed or GPU-duration claim. Clean longer-prompt timing profiles never launched; owned prelaunch waiters were stopped, and no custom M5 kernel is admitted.
 
-Latest implementation-first follow-up: [[records/measurements/jang-simd-widening-2026-09-15]] records the new CAffine NEON backend, its exact tails and portable fallback, the release build, focused checks and the short conversion comparison. Earlier full-model timings and thermal exclusions belong to the preceding packed implementation. The next development performance comparison should match the saved 24 GB setup against that preceding packed baseline; component acceleration is not a new TPS claim. No scalar/serving default changed and no long model qualification was repeated.
+Latest implementation-first follow-up: [[records/measurements/jang-simd-widening-2026-09-15]] records the new CAffine NEON backend, its exact tails and portable fallback, the release build, focused checks and the short conversion comparison. Earlier full-model timings and thermal exclusions belong to the preceding packed implementation. The September 16 follow-up measured the two packed backends at a 14 GB target; the saved 24 GB setup remains a separate unmeasured NEON scope. No scalar/serving default changed and no long model qualification was repeated.
+
+Latest bounded benchmark: [[records/measurements/jang-neon-full-model-2026-09-16]] records two alternating pairs for each short workload, exact output/work equality and monitored memory/thermal/paging conditions. It is exploratory development evidence, not formal qualification or default activation.

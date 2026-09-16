@@ -1021,3 +1021,6 @@ Verified every frozen cooled-cohort harness file against commit 0509f71; linked 
 ## [2026-09-15 18:01] update | records/plan/jang-flash-qualification-status.md
 Implemented the CAffine NEON backend for explicit packed widening. Standalone conversion comparison and focused native/source-byte checks pass; release build passes. Preserved scalar defaults and prior measurements; no full-model TPS result or long qualification campaign claimed.
 
+## [2026-09-16 04:10] update | records/measurements/jang-neon-full-model-2026-09-16.md
+Completed the short NEON versus previous packed full-model benchmark: two interleaved pairs per workload with exact output and work equality, nominal endpoints, unchanged swap counters and bounded process footprint. Saved raw evidence and updated current status; formal qualification and default activation remain pending.
+

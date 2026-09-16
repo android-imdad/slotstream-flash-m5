@@ -36,9 +36,10 @@ packed-process footprint was 20.69 GB. First-text measurements exclude loading
 and cooldown. The configured context window is not a long-prompt quality test.
 
 The latest packed-widening implementation adds an ARM NEON CPU backend.
-Its conversion component is faster in a bounded comparison; full-model TPS
-for that backend has not yet been measured. The table above records the
-preceding implementation. [Latest implementation evidence](docs/JANG-FINDINGS.md).
+Its conversion component and a short full-model comparison are now measured.
+The table above records the preceding implementation at a different memory
+budget; the new comparison does not replace it.
+[Latest benchmark evidence](db/records/measurements/jang-neon-full-model-2026-09-16.md).
 
 These measurements come from the implemented exact widening path. No new Neural
 Engine execution or native expert-prefetch worker was added. Neuron masks,
