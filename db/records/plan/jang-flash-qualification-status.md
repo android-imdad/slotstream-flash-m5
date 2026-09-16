@@ -2,7 +2,7 @@
 type: plan
 id: 01m2jn131bsa68nkjdtjs8bfc0
 created: 2026-09-15T13:45:14.539263+00:00
-updated: 2026-09-16T04:10:47.224673+00:00
+updated: 2026-09-16T04:51:59.930862+00:00
 summary: JANG Flash experiment status and remaining qualification
 date: 2026-09-16
 doc: plan
@@ -40,3 +40,5 @@ Current-source follow-up: [[records/measurements/jang-widening-qualification-att
 Latest implementation-first follow-up: [[records/measurements/jang-simd-widening-2026-09-15]] records the new CAffine NEON backend, its exact tails and portable fallback, the release build, focused checks and the short conversion comparison. Earlier full-model timings and thermal exclusions belong to the preceding packed implementation. The September 16 follow-up measured the two packed backends at a 14 GB target; the saved 24 GB setup remains a separate unmeasured NEON scope. No scalar/serving default changed and no long model qualification was repeated.
 
 Latest bounded benchmark: [[records/measurements/jang-neon-full-model-2026-09-16]] records two alternating pairs for each short workload, exact output/work equality and monitored memory/thermal/paging conditions. It is exploratory development evidence, not formal qualification or default activation.
+
+Metadata/scratch follow-up completed: [[records/measurements/jang-reader-followup-2026-09-16]] records two rejected runtime candidates. The production metadata loop already vectorizes; lane-local CPU scratch passed exact/fault checks but lacked reader benefit. The original runtime is retained and no follow-up full-model cohort was run. [[records/decisions/jang-reader-followup-rejected-2026-09-16]] closes these implementations. Plan017 is complete; bounded multi-row source reads and native-bit caches remain separate unexecuted ideas.

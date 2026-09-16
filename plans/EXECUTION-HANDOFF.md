@@ -92,3 +92,7 @@ time, keep explicit memory targets and preflight headroom, and separate clean
 benchmark timing eligibility from functional/global-paging diagnostics.
 
 [Plan index](README.md) · [Canonical status](../db/records/plan/jang-flash-qualification-status.md) · [Public findings](../docs/JANG-FINDINGS.md)
+
+## September 16 reader follow-up
+
+Plan017 completed both recommended experiments. The release metadata loop already vectorizes; a separate explicit SIMD runtime path was not added. Lane-local CPU scratch passed its exact/fault checks but did not demonstrate reader benefit, so it was restored out of production. Benchmark tools, raw samples and the candidate patch are retained in [the canonical result](../db/records/measurements/jang-reader-followup-2026-09-16.md). No new full-model throughput claim or default activation follows.

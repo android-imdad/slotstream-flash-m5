@@ -137,6 +137,8 @@ Latest implementation-first follow-up: [[records/measurements/jang-simd-widening
 
 Latest bounded benchmark: [[records/measurements/jang-neon-full-model-2026-09-16]] records two alternating pairs for each short workload, exact output/work equality and monitored memory/thermal/paging conditions. It is exploratory development evidence, not formal qualification or default activation.
 
+Metadata/scratch follow-up completed: [[records/measurements/jang-reader-followup-2026-09-16]] records two rejected runtime candidates. The production metadata loop already vectorizes; lane-local CPU scratch passed exact/fault checks but lacked reader benefit. The original runtime is retained and no follow-up full-model cohort was run. [[records/decisions/jang-reader-followup-rejected-2026-09-16]] closes these implementations. Plan017 is complete; bounded multi-row source reads and native-bit caches remain separate unexecuted ideas.
+
 ## 0. Status tracker (living)
 Measured data lives in **[MEASUREMENTS.md](MEASUREMENTS.md)**; this file keeps the
 design and the estimates it replaces.

@@ -1,0 +1,54 @@
+{
+  "admitted": false,
+  "reason": "Five of six reader medians regressed; no demonstrated broad component benefit. Preserve existing production reader.",
+  "cases": [
+    {
+      "api": "readBatchChecked",
+      "layer": 0,
+      "scratch_off_ms": 2.8234584999999996,
+      "scratch_on_ms": 2.8385,
+      "speedup_percent": -0.5299101638189252,
+      "exact": true
+    },
+    {
+      "api": "readBatchChecked",
+      "layer": 5,
+      "scratch_off_ms": 2.9589795000000003,
+      "scratch_on_ms": 2.97,
+      "speedup_percent": -0.37106060606060254,
+      "exact": true
+    },
+    {
+      "api": "readBatchChecked",
+      "layer": 22,
+      "scratch_off_ms": 3.1548955000000003,
+      "scratch_on_ms": 3.201396,
+      "speedup_percent": -1.4525069688348435,
+      "exact": true
+    },
+    {
+      "api": "readRunsChecked",
+      "layer": 0,
+      "scratch_off_ms": 3.504521,
+      "scratch_on_ms": 3.6461875,
+      "speedup_percent": -3.8853322820068925,
+      "exact": true
+    },
+    {
+      "api": "readRunsChecked",
+      "layer": 5,
+      "scratch_off_ms": 3.353937,
+      "scratch_on_ms": 3.204521,
+      "speedup_percent": 4.662662532091377,
+      "exact": true
+    },
+    {
+      "api": "readRunsChecked",
+      "layer": 22,
+      "scratch_off_ms": 1.7611459999999999,
+      "scratch_on_ms": 1.802708,
+      "speedup_percent": -2.305531456009524,
+      "exact": true
+    }
+  ]
+}

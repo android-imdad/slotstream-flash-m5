@@ -1,0 +1,59 @@
+{
+  "artifacts": {
+    "jang-reader-executor-report-20260916.json": "ec802c3a3576b7cd2f062acdd77a34e7dccb43bb30f4c8da18919c1558dfd73a",
+    "jang-reader-metadata-20260916.json": "9cb4079b3531a4187c3bc316e8091b93af35988aab34ac28266d9de76f6e1d1a",
+    "jang-reader-metadata-production-assembly-20260916.txt": "3bf970b61c5026e85aba63a338de270727a7f0a3f388f35635fb5b23c49e366c",
+    "jang-reader-metadata-receipt-20260916.json": "eb5626f8a03c536ac17b4effee10a315bbdeb7c57b94d6d6e6ac8130257961ae",
+    "jang-reader-metadata-repeat-20260916.json": "d1f0703792f706a8171d54cd1b0155fa5a0a8173510e046f7c92bdf9a5deb385",
+    "jang-reader-restored-baseline-checks-20260916.txt": "d3e963251df3e33ca509a0444adb6a007141741eb3d3f95b768464465a994233",
+    "jang-reader-scratch-archive-20260916.json": "90156f18f8113a46ffe509d66d9ea925c982e56d8c6453f8a02c96f1a17e3569",
+    "jang-reader-scratch-candidate-20260916.patch.gz": "0ce3e909bcd9f263764a05b35f0bdac16172652afb89da1548e4bb61bb872bab",
+    "jang-reader-scratch-completion-20260916.json": "22ad0dae3d58f724c5513bb85cbd779a193e8096185b162ab6344cd5462b6b5d",
+    "jang-reader-scratch-component-20260916.json": "19e1ca93511da374442563db95591358e172b353192791e10d6b4357d1048a27",
+    "jang-reader-scratch-decision-20260916.json": "d92bf6281259a9e1a71053ecbdecdb58236bdc96c06479229322170a19bb3f12",
+    "jang-reader-scratch-exact-20260916.txt": "277686d0890eb229e65b839f14cc480df6240898388e8808804efbe38a34a3f8",
+    "jang-reader-scratch-preflight-20260916.txt.gz": "2b148dca7024d9cb2e702cacda9147c024fb20502c426b86c09a0b64b240fdb9"
+  },
+  "baseline_binary_sha256": "0124a9e69e0ba2a7583eba6b73b6288eda68ce33ce58f5fd44762b4bdf3050b8",
+  "build_logs": {
+    "build-final.log": "7add2a58283e796757d883c2fd23e3537a5ced8f8199ffb8e0f71d95b76adf23",
+    "build-retry.log": "a4fd156285c1b5919c1027f9a6b48d5d2f50e37949de77b4a51dc1ccd2dccce5",
+    "build.log": "7bfe98fa54f309f662abb6c43d7216adb6a8f9287dd28996efe701d20c70a6f4",
+    "checks-build.log": "48db04fa6dd7596307089890f0a61dcbe9e04b845feccbdb4f3f59b1559d9729"
+  },
+  "compressed_raw_artifacts": {
+    "jang-reader-scratch-candidate-20260916.patch": {
+      "file": "jang-reader-scratch-candidate-20260916.patch.gz",
+      "uncompressed_sha256": "33e82a9ccc45dc4d3101cc7e3a44fae27ff8e09d66531c91ffc0051d47d0fc01"
+    },
+    "jang-reader-scratch-preflight-20260916.txt": {
+      "file": "jang-reader-scratch-preflight-20260916.txt.gz",
+      "uncompressed_sha256": "3e66adbcdde9093be72ae88d388acb454ecbc8a3f4ee7a6fa79014b8993bf685"
+    }
+  },
+  "format": "slotstream-reader-followup-evidence-v1",
+  "full_model_followup_launched": false,
+  "limitations": [
+    "Standalone metadata timings have no per-interval thermal/paging observations and are diagnostic only.",
+    "Scratch reader screen is a bounded component comparison, not a full-model result or formal performance qualification.",
+    "Scratch footprint is sampled at 20ms, not a terminal lifetime peak.",
+    "Small timing differences do not prove a general slowdown."
+  ],
+  "local_archives": {
+    "restored_baseline": "/Users/imdad/Documents/projects/slotstream-reader-conversion/.build/flash/reader-conversion/restored-baseline-archive",
+    "scratch": "/Users/imdad/Documents/projects/slotstream-reader-conversion/.build/flash/reader-conversion/scratch-archive"
+  },
+  "metadata_tools_commit": "324b26e",
+  "runtime_candidates_admitted": false,
+  "scratch_binary_sha256": "a4e385f3401bda9a70bfce7e580316e46e61e005fc3383f13b197e6cfb99cc5f",
+  "scratch_command": "SLOTSTREAM_READER_SCRATCH_COMPONENT=1 <candidate>/slotstream widening-check --model <pinned JANG_6S directory> --output <fresh output>",
+  "scratch_source_archive_sha256": "9349688a617188e932e55dc5864ccae80469c31d2be129702d9839f5dd3dc943",
+  "verification": {
+    "candidate_exact_widening_assertions": 36,
+    "component_assertions": 26,
+    "restored_baseline_groups_failed": 0,
+    "restored_baseline_groups_passed": 54,
+    "restored_baseline_groups_skipped": 0,
+    "reviewer_exact_widening_assertions": 36
+  }
+}

@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: sources/runs
-updated: 2026-09-16T04:10:35.466937Z
+updated: 2026-09-16T04:54:17.430044Z
 ---
 
 # sources/runs
 
+- [[sources/runs/2026/09/jang-reader-followup-20260916]] — JANG metadata and scratch optimization experiments
 - [[sources/runs/2026/09/jang-neon-full-model-20260916]] — JANG NEON versus previous packed full-model benchmark
 - [[sources/runs/2026/09/jang-simd-widening-20260915]] — NEON widening implementation, bounded exactness checks and standalone component comparison
 - [[sources/runs/2026/09/jang-widening-qualification-20260915]] — Current-source widening evidence, two thermal exclusions and a separate non-timing CPU sample
@@ -506,9 +507,8 @@ updated: 2026-09-16T04:10:35.466937Z
 - [[sources/runs/2026/09/2026-09-05-optimization-smaller-routed-tile]] — Smaller routed tile resource pass and failed paired qualification
 - [[sources/runs/2026/09/2026-09-05-optimization-denormals-and-workspace-peak]] — Subnormal selection contract corrected; compact-frontier and piecewise-write resource probes fail; phase trace identifies routed compute peak
 - [[sources/runs/2026/09/2026-09-05-optimization-exact-256-compute-scopes]] — Larger read scopes preserve 256-token arithmetic but code-review pilot exceeds its memory target and lacks enough clean pairs
-- [[sources/runs/2026/09/2026-09-05-chronological-prefill-numerical-counterexample]] — Larger chronological pass fails full-state and greedy continuation gates despite fewer expert reads
 
 ## More
 
-This folder has 536 files. The 500 most recent are listed above.
+This folder has 537 files. The 500 most recent are listed above.
 Use `dbmd query --type run --in sources` for the complete catalog.

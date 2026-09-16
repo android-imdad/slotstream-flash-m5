@@ -1,0 +1,11 @@
+{
+  "source_worktree": "/Users/imdad/Documents/projects/slotstream-reader-conversion",
+  "files": {
+    "slotstream": "a4e385f3401bda9a70bfce7e580316e46e61e005fc3383f13b197e6cfb99cc5f",
+    "build-identity.json": "98da57b5e73f5e3a9099e11634d476fe3564c28e0ee93b4182feefab326a6daf",
+    "slotstream-checks": "b4b8e2fd9235b3c495ef3312edd9c063a7e4fe316e0fb74cd23fc50cf5980067",
+    "mlx.metallib": "198488eb61359e953580a9c4530400feee1a06dd2f28a930a6ffa58aec66a597",
+    "build-source.tar.gz": "9349688a617188e932e55dc5864ccae80469c31d2be129702d9839f5dd3dc943",
+    "build-source-before.json": "a4121b8fd9afd652758afcd06d3f8eb2038c7535268815802043a292c8181d26"
+  }
+}

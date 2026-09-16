@@ -33,6 +33,9 @@ The table above records the preceding implementation at a different memory
 budget; the new comparison does not replace it.
 [Latest benchmark evidence](db/records/measurements/jang-neon-full-model-2026-09-16.md).
 
+Subsequent [metadata and scratch experiments](db/records/measurements/jang-reader-followup-2026-09-16.md)
+did not justify additional runtime changes.
+
 These measurements come from the implemented exact widening path. No new Neural
 Engine execution or native expert-prefetch worker was added. Neuron masks,
 reader scheduling and storage-layout experiments did not meet their admission

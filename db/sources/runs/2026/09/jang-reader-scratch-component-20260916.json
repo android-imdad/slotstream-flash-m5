@@ -1,0 +1,574 @@
+{
+  "format" : "slotstream-widening-command-v1",
+  "mode" : "bounded-model-reader",
+  "model" : {
+    "cases" : [
+      {
+        "api" : "readBatchChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 2,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 0,
+        "observedWideningProjections" : 2,
+        "outputSHA256" : "151e95d0378bfb330042ae3ffbe280635b674256f2502a26827c92d6ced3d166",
+        "packedMedianSeconds" : 0.0028385,
+        "packedSeconds" : [
+          0.002837833,
+          0.002839167,
+          0.002832416,
+          0.00289575
+        ],
+        "pairOrders" : [
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ]
+        ],
+        "queueDepth" : 32,
+        "scalarMedianSeconds" : 0.0028234584999999998,
+        "scalarSeconds" : [
+          0.003461875,
+          0.002790792,
+          0.002833542,
+          0.002813375
+        ]
+      },
+      {
+        "api" : "readBatchChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 1,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 5,
+        "observedWideningProjections" : 1,
+        "outputSHA256" : "131f0d8f08ed8097bf1a040edace92c2fe26097ef6e4292f3b769930c9f335a1",
+        "packedMedianSeconds" : 0.00297,
+        "packedSeconds" : [
+          0.003260083,
+          0.00288,
+          0.003029792,
+          0.002910208
+        ],
+        "pairOrders" : [
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ]
+        ],
+        "queueDepth" : 32,
+        "scalarMedianSeconds" : 0.0029589795,
+        "scalarSeconds" : [
+          0.002923833,
+          0.002978375,
+          0.002939584,
+          0.003028708
+        ]
+      },
+      {
+        "api" : "readBatchChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 0,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 22,
+        "observedWideningProjections" : 0,
+        "outputSHA256" : "d662ad0e1a803ff47e6eaffbe01833bc96b065127fe292b624f8e1046b39d25e",
+        "packedMedianSeconds" : 0.003201396,
+        "packedSeconds" : [
+          0.003223709,
+          0.003179083,
+          0.003076833,
+          0.003292875
+        ],
+        "pairOrders" : [
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ]
+        ],
+        "queueDepth" : 32,
+        "scalarMedianSeconds" : 0.0031548955,
+        "scalarSeconds" : [
+          0.00376625,
+          0.003080167,
+          0.003218833,
+          0.003090958
+        ]
+      },
+      {
+        "api" : "readRunsChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 2,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 0,
+        "observedWideningProjections" : 2,
+        "outputSHA256" : "151e95d0378bfb330042ae3ffbe280635b674256f2502a26827c92d6ced3d166",
+        "packedMedianSeconds" : 0.0036461875,
+        "packedSeconds" : [
+          0.004055042,
+          0.003292666,
+          0.003827125,
+          0.00346525
+        ],
+        "pairOrders" : [
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ]
+        ],
+        "queueDepth" : 12,
+        "scalarMedianSeconds" : 0.003504521,
+        "scalarSeconds" : [
+          0.003459208,
+          0.003858333,
+          0.003198959,
+          0.003549834
+        ]
+      },
+      {
+        "api" : "readRunsChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 1,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 5,
+        "observedWideningProjections" : 1,
+        "outputSHA256" : "131f0d8f08ed8097bf1a040edace92c2fe26097ef6e4292f3b769930c9f335a1",
+        "packedMedianSeconds" : 0.003204521,
+        "packedSeconds" : [
+          0.003143292,
+          0.003095125,
+          0.00326575,
+          0.003509958
+        ],
+        "pairOrders" : [
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ]
+        ],
+        "queueDepth" : 12,
+        "scalarMedianSeconds" : 0.003353937,
+        "scalarSeconds" : [
+          0.004456417,
+          0.003172584,
+          0.003413333,
+          0.003294541
+        ]
+      },
+      {
+        "api" : "readRunsChecked",
+        "comparedBytes" : 43008000,
+        "exactBytes" : true,
+        "expectedWideningProjections" : 0,
+        "experts" : [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "layer" : 22,
+        "observedWideningProjections" : 0,
+        "outputSHA256" : "d662ad0e1a803ff47e6eaffbe01833bc96b065127fe292b624f8e1046b39d25e",
+        "packedMedianSeconds" : 0.001802708,
+        "packedSeconds" : [
+          0.003743333,
+          0.001748375,
+          0.00184175,
+          0.001763666
+        ],
+        "pairOrders" : [
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ],
+          [
+            "packed4-to6",
+            "scalar"
+          ],
+          [
+            "scalar",
+            "packed4-to6"
+          ]
+        ],
+        "queueDepth" : 12,
+        "scalarMedianSeconds" : 0.001761146,
+        "scalarSeconds" : [
+          0.001702334,
+          0.001916333,
+          0.001669292,
+          0.001819958
+        ]
+      }
+    ],
+    "check" : {
+      "items" : [
+        {
+          "name" : "packed widening rejects a bypassing packed expert layout",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 0 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 0 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 5 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 5 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 22 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readBatchChecked layer 22 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 0 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 0 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 5 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 5 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 22 exact full tensor bytes",
+          "passed" : true
+        },
+        {
+          "name" : "readRunsChecked layer 22 widening class",
+          "passed" : true
+        },
+        {
+          "name" : "scratch mixed layers exact with 1 lanes",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readBatchChecked 1 lanes drains and rejects failed batch",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readBatchChecked 1 lanes recovers exact bytes",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readRunsChecked 1 lanes drains and rejects failed batch",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readRunsChecked 1 lanes recovers exact bytes",
+          "passed" : true
+        },
+        {
+          "name" : "scratch mixed layers exact with 3 lanes",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readBatchChecked 3 lanes drains and rejects failed batch",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readBatchChecked 3 lanes recovers exact bytes",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readRunsChecked 3 lanes drains and rejects failed batch",
+          "passed" : true
+        },
+        {
+          "name" : "scratch readRunsChecked 3 lanes recovers exact bytes",
+          "passed" : true
+        },
+        {
+          "name" : "checkpoint identity is unchanged",
+          "passed" : true
+        },
+        {
+          "name" : "component physical footprint stays within 512 MiB",
+          "passed" : true
+        },
+        {
+          "name" : "all descriptor controls are observed successful",
+          "passed" : true
+        }
+      ],
+      "measurements" : {
+        "logical_source_bytes_read" : 1720320000,
+        "sampled_physical_footprint_peak_bytes" : 197411632,
+        "unique_original_region_bytes" : 107520000
+      },
+      "name" : "widening-model-component",
+      "passed" : true
+    },
+    "checkpointFormat" : "jang6S",
+    "comparison" : "Both arms use packed4-to6: legacy scalar columns mean per-piece Data (scratch off); packed columns mean lane scratch on. Timed calls include allocation, original reads, conversion and MLX wrapping. Additional untimed mixed-layer and fault-recovery calls are excluded from logicalSourceBytesRead.",
+    "diskBytesReadAfter" : 1312571392,
+    "diskBytesReadBefore" : 36864,
+    "diskObservationScope" : "proc_pid_rusage RUSAGE_INFO_V4 process disk bytes; may cover only part of logical reads and does not establish a cold-SSD run",
+    "footprint" : {
+      "intervalMilliseconds" : 20,
+      "peakBytes" : 197411632,
+      "samples" : 47
+    },
+    "format" : "slotstream-reader-scratch-component-v1",
+    "logicalSourceBytesRead" : 1720320000,
+    "modelPath" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s",
+    "physicalFootprintLimitBytes" : 512000000,
+    "policies" : [
+      "packed4-to6",
+      "packed4-to6"
+    ],
+    "readControls" : [
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00001-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00010-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00014-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00019-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00022-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00023-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00007-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00008-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00009-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00011-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00012-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00013-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00015-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00016-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00017-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00018-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00020-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      },
+      {
+        "noCacheReturnCode" : 0,
+        "path" : "\/Users\/imdad\/Documents\/Codex\/2026-09-12\/wha\/outputs\/slotstream\/models\/jang-6s\/model-00021-of-00026.safetensors",
+        "readAheadReturnCode" : 0
+      }
+    ],
+    "schemaVersion" : 1,
+    "sourceIdentityAfter" : "fb8652ae29be70ff7afae09bc978e73b19526dd78ea5c78b449df082b0a22cc4",
+    "sourceIdentityBefore" : "fb8652ae29be70ff7afae09bc978e73b19526dd78ea5c78b449df082b0a22cc4",
+    "timingScope" : "whole ExpertStore checked reader call: staging allocation, original pread, exact code widening and metadata conversion, MLX wrapping\/evaluation; full-byte verification excluded",
+    "uniqueOriginalRegionBytes" : 107520000,
+    "uniqueOriginalRegionLimitBytes" : 268435456,
+    "verificationScope" : "all nine returned tensors for experts 0...9 at layers 0, 5 and 22; both checked batch and contiguous-runs APIs"
+  },
+  "processID" : 81436,
+  "provenance" : {
+    "buildIdentitySHA256" : "98da57b5e73f5e3a9099e11634d476fe3564c28e0ee93b4182feefab326a6daf",
+    "compilerVersion" : "swift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+    "executablePath" : "\/Users\/imdad\/Documents\/projects\/slotstream-reader-conversion\/.build\/flash\/reader-conversion\/scratch-archive\/slotstream",
+    "executableSHA256" : "a4e385f3401bda9a70bfce7e580316e46e61e005fc3383f13b197e6cfb99cc5f",
+    "metallibSHA256" : "198488eb61359e953580a9c4530400feee1a06dd2f28a930a6ffa58aec66a597",
+    "sourceArchiveSHA256" : "9349688a617188e932e55dc5864ccae80469c31d2be129702d9839f5dd3dc943"
+  },
+  "schemaVersion" : 1
+}

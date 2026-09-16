@@ -1,0 +1,56 @@
+{
+  "status": "complete",
+  "commits": [
+    "a4c4d250bbdb3cfdad61611bc9c0ffc0da822d35"
+  ],
+  "production_changes_retained": false,
+  "metadata_candidate_admitted": false,
+  "scratch_candidate_admitted": false,
+  "metadata_results": {
+    "metadata.json": {
+      "previous": 1.6144687499999999e-06,
+      "native": 1.334979e-06
+    },
+    "metadata-repeat.json": {
+      "previous": 1.5205e-06,
+      "native": 1.033302e-06
+    }
+  },
+  "scratch_component": "scratch-component/report.json",
+  "scratch_candidate_patch": "scratch-candidate.patch",
+  "scratch_build_identity": "scratch-archive/build-identity.json",
+  "checks": {
+    "scratch_focused": {
+      "passed_groups": 1,
+      "assertions": 36,
+      "failed": 0,
+      "skipped": 0,
+      "log": "exact-widening.log"
+    },
+    "scratch_original_reader": {
+      "passed_assertions": 26,
+      "failed": 0,
+      "report": "scratch-component/report.json"
+    },
+    "final_restored_baseline": {
+      "passed_groups": 54,
+      "assertions": 27629,
+      "failed": 0,
+      "skipped": 0,
+      "log": "restored-baseline-t0-t1.log",
+      "binary": "restored-baseline-archive/slotstream-checks",
+      "sha256": "a622245ee185fb3d6af0f98d1f185ad84447202d80a7e7e88749ca1c2f3eef91"
+    }
+  },
+  "builds": {
+    "initial": "Failed due cloned absolute ModuleCache paths; deleted only cloned cache and retried.",
+    "retry": "make build exit0,248.53 seconds",
+    "final_candidate": "make build exit0,63.39 seconds",
+    "restored_baseline": "Used unchanged pre-change release archive verified to match restored source; no redundant compile."
+  },
+  "not_run": [
+    "No full-model process or TPS benchmark (both candidates rejected by component admission).",
+    "No new Python driver, so py_compile is not applicable.",
+    "No full verify.sh or long qualification."
+  ]
+}

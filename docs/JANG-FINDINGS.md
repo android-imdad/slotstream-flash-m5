@@ -10,6 +10,10 @@ This [public WIP research fork](https://github.com/android-imdad/slotstream-flas
 - Frozen tokenization, bounded activation/logit/state capture, terminal memory sampling and full-vocabulary quality metrics support reproducible comparisons.
 - M5 GPU dispatch was observed in an instrumented MLX build. Production utilization remains unverified. No new Apple Neural Engine execution was implemented.
 
+The subsequent [metadata and scratch experiments](../db/records/measurements/jang-reader-followup-2026-09-16.md)
+completed without runtime changes: the metadata loop already vectorizes, and
+lane-local CPU scratch did not demonstrate reader benefit.
+
 ## Measured widening result
 
 The latest implementation adds an ARM NEON CPU backend to the existing

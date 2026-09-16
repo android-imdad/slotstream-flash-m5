@@ -2,11 +2,12 @@
 type: index
 scope: type-folder
 folder: records/decisions
-updated: 2026-09-15T14:23:40.867759Z
+updated: 2026-09-16T04:50:49.784250Z
 ---
 
 # records/decisions
 
+- [[records/decisions/jang-reader-followup-rejected-2026-09-16]] — Reject redundant metadata SIMD and unhelpful lane scratch
 - [[records/decisions/jang-flash-public-wip-repository]] — Publish the JANG Flash research source as a public WIP fork
 - [[records/decisions/jang-flash-admission-2026-09-15]] — JANG Flash experiments remain opt-in and rejected tracks do not advance
 - [[records/decisions/global-paging-is-diagnostic]] — Treat host-wide paging as diagnostics, separate from functional and process-memory acceptance; preserve actual headroom, pressure and budget safeguards.

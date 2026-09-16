@@ -1,0 +1,128 @@
+{
+  "checksum" : 41112698880000,
+  "count" : 25600,
+  "exhaustive_fp16_bits_exact" : true,
+  "repetitions" : 2000,
+  "samples" : [
+    {
+      "mode" : "previous",
+      "pair" : 0,
+      "seconds_per_piece" : 1.5601455e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 0,
+      "seconds_per_piece" : 8.0200000000000001e-07
+    },
+    {
+      "mode" : "native",
+      "pair" : 1,
+      "seconds_per_piece" : 1.3019585e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 1,
+      "seconds_per_piece" : 1.8768750000000001e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 2,
+      "seconds_per_piece" : 2.070083e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 2,
+      "seconds_per_piece" : 1.5304374999999999e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 3,
+      "seconds_per_piece" : 1.5105835000000001e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 3,
+      "seconds_per_piece" : 1.825854e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 4,
+      "seconds_per_piece" : 1.7575204999999999e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 4,
+      "seconds_per_piece" : 1.3863749999999999e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 5,
+      "seconds_per_piece" : 1.3015414999999999e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 5,
+      "seconds_per_piece" : 1.6084375e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 6,
+      "seconds_per_piece" : 1.6205e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 6,
+      "seconds_per_piece" : 1.3294375e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 7,
+      "seconds_per_piece" : 1.3405204999999999e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 7,
+      "seconds_per_piece" : 1.6318335e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 8,
+      "seconds_per_piece" : 1.5724165000000001e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 8,
+      "seconds_per_piece" : 1.3550210000000001e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 9,
+      "seconds_per_piece" : 1.369333e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 9,
+      "seconds_per_piece" : 1.4964374999999998e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 10,
+      "seconds_per_piece" : 1.471292e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 10,
+      "seconds_per_piece" : 1.3164374999999999e-06
+    },
+    {
+      "mode" : "native",
+      "pair" : 11,
+      "seconds_per_piece" : 1.2568955e-06
+    },
+    {
+      "mode" : "previous",
+      "pair" : 11,
+      "seconds_per_piece" : 1.4138750000000001e-06
+    }
+  ]
+}

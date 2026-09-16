@@ -2,8 +2,8 @@
 
 **Public WIP research repository:** [android-imdad/slotstream-flash-m5](https://github.com/android-imdad/slotstream-flash-m5), branch `main`. The local working branch remains `advisor/001-flash-m5`; the original `origin` remote remains upstream. Publication here does not mean an upstream merge, release or default activation.
 
-Updated September 15, 2026 after the user's requested Flash/M5 experiments and
-documentation reconciliation. The original plans were authored on September 12;
+Updated September 16, 2026 after the NEON full-model benchmark and the
+metadata/scratch implementation experiments. The original plans were authored on September 12;
 their dated briefs/reviews are retained as history, not new pending tasks.
 Execution remains on `advisor/001-flash-m5` in this repository. Source and
 measurement commits do not imply merge, push, upstream release or default rollout.
@@ -26,6 +26,7 @@ measurement commits do not imply merge, push, upstream release or default rollou
 | [014](014-whole-expert-layout.md) | Measure whole-expert layout against original JANG reads | P1 | M | 011 packed widening, 013 reported | COMPLETE — expanded layout rejected; paired total reader time 8.48% longer |
 | [015](015-source-native-layout.md) | Measure original-byte whole-expert records | P1 | M | 014 reported | COMPLETE — rejected; paired total reader time essentially tied, below the improvement gate |
 | [016](016-prefetch-cost-screen.md) | Price causal SSD-prefetch timing and overlap | P1 | M | Existing trace replay and packed widening | COMPLETE — both forecasts rejected by matched 14 GB timing/cost screen; no native worker |
+| [017](017-jang-reader-conversion.md) | Optimize metadata conversion and lane-local scratch | P1 | M | NEON benchmark complete | COMPLETE — metadata already vectorizes; scratch lacked reader benefit; original runtime retained |
 
 ## Outcome
 
@@ -42,6 +43,8 @@ optional Neural Engine predictor are **not selected** for this approach. Do not
 resume the lower-count jobs automatically. Existing M5 GPU dispatch was observed
 in an instrumented build; production utilization is still unverified and no new
 ANE execution was added.
+
+The [metadata and scratch follow-up](../db/records/measurements/jang-reader-followup-2026-09-16.md) is complete: both runtime candidates were rejected and the original implementation retained. Do not repeat these exact approaches without new evidence. Bounded contiguous prefill reads and native-bit cache storage remain separate unexecuted candidates.
 
 ## Pending, ranked
 

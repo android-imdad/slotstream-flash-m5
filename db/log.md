@@ -1024,3 +1024,6 @@ Implemented the CAffine NEON backend for explicit packed widening. Standalone co
 ## [2026-09-16 04:10] update | records/measurements/jang-neon-full-model-2026-09-16.md
 Completed the short NEON versus previous packed full-model benchmark: two interleaved pairs per workload with exact output and work equality, nominal endpoints, unchanged swap counters and bounded process footprint. Saved raw evidence and updated current status; formal qualification and default activation remain pending.
 
+## [2026-09-16 04:53] update | records/measurements/jang-reader-followup-2026-09-16.md
+Completed Plan017 implementation experiments: actual release metadata conversion already vectorizes; explicit metadata SIMD was not retained. Lane-local scratch passed exact and fault-recovery checks but lacked reader benefit and was restored out of runtime source. Preserved code, source/binary archives and all samples; no full-model follow-up. Restored baseline passed all 54 bounded groups; reviewer independently validated reports and reran candidate focused checks. Brain, projection and claims gates pass.
+
